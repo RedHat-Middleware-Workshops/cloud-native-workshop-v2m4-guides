@@ -1,0 +1,12 @@
+config:
+    renderer: markdown
+
+modules:
+  getting-started-advanced-cloud-native-apps:
+    name: Getting Started with Advanced Cloud-Native App Dev
+  high-performing-cache-services:
+    name: Creating High-performing Cachable Service
+  event-driven-services:
+    name: Creating Event-Driven Service
+  evolve-serverless-services:
+    name: Evolving Serverless Service
