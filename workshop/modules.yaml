@@ -1,0 +1,25 @@
+config:
+    vars:
+    - name: OC_VERSION
+      value: undefined
+    - name: KUBECTL_VERSION
+      value: undefined
+
+modules:
+    workshop-overview:
+        name: Workshop Overview
+        exit_sign: Setup Environment
+    setup-environment:
+        name: Workshop Setup
+        exit_sign: Start Workshop
+    exercises/01-getting-started-advanced-cloud-native-apps:
+        name: Getting Started with Advanced Cloud-Native App Dev
+    exercises/02-high-performing-cache-services:
+        name: Creating High-Performing Cachable Services
+    exercises/03-event-driven-services:
+        name: Creating Event-Driven Services
+    exercises/04-evolve-serverless-services:
+        name: Evolving Serverless Service
+    workshop-summary:
+        name: Workshop Summary
+        exit_sign: Finish Workshop
