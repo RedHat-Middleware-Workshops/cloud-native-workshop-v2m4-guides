@@ -1,3 +1,3 @@
-## Lab4 - Evoling Serverless Service
+## Lab4 - Evoling Serverless Services
 
 ####1. 

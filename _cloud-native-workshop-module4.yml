@@ -1,5 +1,5 @@
 id: "cloudnative"
-name: "Cloud-Native Workshop 2019 - Module 4"
+name: "The Containers and Cloud-Native Roadshow Dev Track - Module 4"
 
 content:
   url: https://raw.githubusercontent.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-guides.git/master
@@ -29,7 +29,7 @@ vars:
   
 modules:
   activate:
-  - getting-started-advanced-cloud-native-apps
+  - cloud-native-architectures
   - high-performing-cache-services
   - event-driven-services
   - evolve-serverless-services

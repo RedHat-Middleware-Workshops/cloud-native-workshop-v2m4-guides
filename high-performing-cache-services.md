@@ -1,4 +1,4 @@
-## Lab2 - Creating High-performing Cache Service
+## Lab2 - Creating High-performing Cache Services
 
 ####1. 
 

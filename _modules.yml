@@ -2,8 +2,8 @@ config:
     renderer: markdown
 
 modules:
-  getting-started-advanced-cloud-native-apps:
-    name: Getting Started with Advanced Cloud-Native App Dev
+  cloud-native-architectures.md:
+    name: Cloud-Native Application Architectures
   high-performing-cache-services:
     name: Creating High-performing Cachable Service
   event-driven-services:

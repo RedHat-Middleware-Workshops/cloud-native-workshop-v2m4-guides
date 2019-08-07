@@ -1,4 +1,4 @@
-## Lab3 - Creating Event-Driven Service
+## Lab3 - Creating Event-Driven/Reactive Services
 
 ####1. 
 
