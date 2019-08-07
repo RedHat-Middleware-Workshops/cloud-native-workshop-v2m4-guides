@@ -2,7 +2,7 @@ config:
     renderer: markdown
 
 modules:
-  cloud-native-architectures.md:
+  cloud-native-architectures:
     name: Cloud-Native Application Architectures
   high-performing-cache-services:
     name: Creating High-performing Cachable Service

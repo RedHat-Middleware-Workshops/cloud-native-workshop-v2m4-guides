@@ -25,7 +25,7 @@ microservices as serverless workloads for business seasonality. More characteris
  * `DevOps` - Designed for continuous deployment to production in line with minimum viable product (MVP) development, automating testing, and collaborating ops teams in DevOps practices.
 
 
-#### What kinds of application environment stack will be is Istio?
+#### What application environment should be considered for the architecture?
 
 ---
 
