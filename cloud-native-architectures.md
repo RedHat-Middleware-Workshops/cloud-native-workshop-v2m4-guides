@@ -1,5 +1,11 @@
 ## Cloud-Native Application Architectures
 
+In today's digital world, enterprises need to build cloud-native applications that span many environments and disparate technologies.
+A unified cloud-native application environment is important to developers because it enables higher productivity and innovation witha full, cohesive 
+development platform that “just works”. Such an environment is equally important to operations becausethe rapid innovation from development is more reliable, 
+performant and scalable in production. And finally, incremental,fail-fast, agile development, integration and automation give business leaders undertaking 
+digital transformation whatthey need to innovate rapidly in fast-changing industries
+
 In this module, we will learn what cloud-native architecture we need to design for running containerized applications on DevOps/Cloud-Native platform in scale and speed.
 Then we will also develop cloud-natvie applications align with multiple architecture patterns such as high-performing cache, event-driven/reactive, and serverless using 
 [Red Hat Application Runtimes](https://www.redhat.com/en/technologies/cloud-computing/openshift/application-runtimes), [Red Hat CodeReady Workspaces](https://developers.redhat.com/products/codeready-workspaces/overview) and 
@@ -56,7 +62,7 @@ Red Hat Applicaton Runtime​s​ products and components included in this portf
     JBoss EAP’s architecture is lightweight, modular, and cloud ready.Based on the open source WildFly app server project, the platform offers powerful management and 
     automation for greaterdeveloper productivity.
 
- * `A set of cloud-native runtimes` are Spring Boot with Tomcat, Reactive Vert.X, Javascript Node.Js, MicroProfile Throntail.(`Quarkus is coming soon!!`) 
+ * `A set of cloud-native runtimes` are Spring Boot with Tomcat, Reactive Vert.x, Javascript Node.Js, MicroProfile Throntail.(`Quarkus is coming soon!!`) 
 
  * `Red Hat OpenJDK​`​ is an open source implementation of the Java Platform SE (Standard Edition) supported andmaintained 
     by the OpenJDK community. OpenJDK is the default Java development and runtime in Red Hat EnterpriseLinux.
@@ -96,24 +102,21 @@ HTTP microservices, reactive applications, message-driven microservices and serv
 
 * `Developer Joy` - Cohesive platform for optimized developer joy through unified configuration, Zero config with live reload in the blink of an eye,
    streamlined code for the 80% common usages with flexible for the 20%, and no hassle native executable generation.
+
 * `Unifies Imperative and Reactive` - Inject the EventBus or the Vertx context for both Reactive and imperative development in the same application.
+
 * `Functions as a Service and Serverless` - Superfast startup and low memory utilization. With Quarkus, you can embrace this new world without having 
   to change your programming language.
+
 * `Best of Breed Frameworks & Standards` - CodeReady Workspaces Vert.x, Hibernate, RESTEasy, Apache Camel, CodeReady Workspaces MicroProfile, Netty, Kubernetes, OpenShift,
   Jaeger, Prometheus, Apacke Kafka, Infinispan, and more.
 
 
-#### Your Connection is not secure?
-
----
+##### [Note] Your Connection is not secure?
 
 When you access OpenShift web console or the other route URL via `HTTPS` protocol, you will see `Your Connection is not secure` warning message.
 Because, OpenShift uses self-certification to create TLS termication route as default. For example, if you're using `Firefox`, you will see the following screen.
 
-Click on `Advanced > Add Exception...`.
+Click on `Advanced > Add Exception...` then, you can access the `HTTPS` page when you click on `Confirm Security Exception`
 
 ![warning]({% image_path browser_warning.png %})
-
-Then, you can access the `HTTPS` page when you click on `Confirm Security Exception`
-
-![warning]({% image_path browser_warning_confirmation.png %})
