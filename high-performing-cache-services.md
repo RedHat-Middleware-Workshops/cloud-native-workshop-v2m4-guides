@@ -3,7 +3,7 @@
 In this lab, we'll develop 5 microservices into the cloud-native appliation architecture. These cloud-native applications
 will be allowed to communicate with athentication by `Single Sign-On` server. To do that, we will configure how to `authenticate REST API requests` 
 across services. In the end, we will optimize `data transaction performance` of the shopping cart service thru integrating with a `Cache(Data Grid) server` 
-to increase end users'(customers) satification. And there's more fun facts how easy it is to deploy applications on OpenShift 4 via `ODO` command line tool.
+to increase end users'(customers) satification. And there's more fun facts how easy it is to deploy applications on OpenShift 4 via `oc` command line tool.
 
 #### Goals of this lab
 
@@ -78,8 +78,10 @@ we want to check its inventory status.
 
 `In Development`, we will configure to use local `in-memory H2 database` for local testing, as defined in `src/main/resources/application.properties`:
 
-`quarkus.datasource.url=jdbc:h2:file://projects/database.db`
-`quarkus.datasource.driver=org.h2.Driver`
+~~~java
+quarkus.datasource.url=jdbc:h2:file://projects/database.db
+quarkus.datasource.driver=org.h2.Driver
+~~~
 
 Let's run the inventory application locally using `maven plugin command` via CodeReady Workspaces `Terminal`:
 
@@ -108,25 +110,18 @@ We will use `Quarkus extension` to add `PostgreSQL JDBC Driver`. Go back to Code
 
 Then, modify `quarkus.datasource.url, quarkus.datasource.drive` variables in `src/main/resources/application.properties` as below:
 
-`quarkus.datasource.url=jdbc:postgresql:inventory`
-`quarkus.datasource.driver=org.postgresql.Driver`
+~~~java
+quarkus.datasource.url=jdbc:postgresql:inventory
+quarkus.datasource.driver=org.postgresql.Driver
+~~~
 
-Now we will `push and commit` all changes that we implemented applications, production configuration to the remote `Git server(Gogs)` which is 
-running on OpenShift cluster. As usual, we will use the following `git commands` in CodeReady Workspaces Terminal:
- them 
+![inventory_service]({% image_path inventory_update_properties.png %})
 
-`git add .`
+Package the applicaiton via running the following maven plugin in `Terminal`:
 
-`git commit -m 'add posgresql datasource'`
+`mvn clean package -DskipTests`
 
-`git push`
-
-You might need to input your crededntial of Gogs server duriing `git push` as below:
-
- * Username: `userXX`
- * Password: `r3dh4t1!`
-
-![inventory_service]({% image_path inventory_git_push.png %})
+> `NOTE`: You should `SKIP` the Unit test because you don't have PostgreSQL database in local environment.
 
 Let's create a cloud-native applications projects in OpenShift cluster and deploy the inventory service as a Linux container.
 To deploy applicaitons to OpenShift via `oc` tool, we need to copy login command and Login OpenShift cluster:
@@ -152,7 +147,7 @@ First, deploy a new instance of PostgreSQL by executing the following commands v
 
  * Create a new project in OpenShift Cluster. You need to replace `userXX` with your username:
 
-`oc project userXX-cloud-native-apps`
+`oc project userXX-cloudnativeapps`
 
  * Deploy PostgreSQL to the project:
 
@@ -173,34 +168,48 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 
 `rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
 
- * Start and watch the build, which will take about a minute to complete:
+ * Start and watch the build, which will take about minutes to complete:
 
 `oc start-build inventory-service --from-dir=target/binary --follow`
 
- * Deploy it as an OpenShift application after the build is done:
+![openshift_login]({% image_path inventory-build-logs.png %})
 
-`oc new-app inventory-service`
+ * Deploy it as an OpenShift application after the build is done and override the Postgres URL to specify our production Postgres credentials:
 
-# Create the route
+`oc new-app inventory-service -e QUARKUS_DATASOURCE_URL=jdbc:postgresql://inventory-database:5432/inventory`
+
+ * Create the route
 
 `oc expose svc/inventory-service`
 
-Finally, make sure it's actually done rolling out:
+ * Finally, make sure it's actually done rolling out:
 
-`oc rollout status -w dc/inventory-quarkus`
+`oc rollout status -w dc/inventory-service`
 
-Wait for that command to report replication controller "inventory-quarkus-1" successfully rolled out before continuing.
+Wait for that command to report replication controller "inventory-service-1" successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
 that is that we currently don't have any liveness check configured, but we will add that in the next steps.
 
 And now we can access using curl once again to find all inventories:
 
-# Get the route URL
+* Get the route URL
 
 `export URL="http://$(oc get route | grep inventory-service | awk '{print $2}')"`
 
-`curl $URL/services/inventory : echo`
+`curl $URL/services/inventory ; echo`
+
+You will see the following result:
+
+~~~shell
+[{"id":1,"itemId":"329299","link":"http://maps.google.com/?q=Raleigh","location":"Raleigh","quantity":736},{"id":2,"itemId":"329199","link":"http://maps.google.com/?q=Bost
+on","location":"Boston","quantity":512},{"id":3,"itemId":"165613","link":"http://maps.google.com/?q=Seoul","location":"Seoul","quantity":256},{"id":4,"itemId":"165614","li
+nk":"http://maps.google.com/?q=Singapore","location":"Singapore","quantity":54},{"id":5,"itemId":"165954","link":"http://maps.google.com/?q=London","location":"London","qu
+antity":87},{"id":6,"itemId":"444434","link":"http://maps.google.com/?q=NewYork","location":"NewYork","quantity":443},{"id":7,"itemId":"444435","link":"http://maps.google.
+com/?q=Paris","location":"Paris","quantity":600},{"id":8,"itemId":"444437","link":"http://maps.google.com/?q=Tokyo","location":"Tokyo","quantity":230}]
+~~~
+
+![openshift_login]({% image_path inventory_curl_result.png %})
 
 So now `Inventory` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console 
 with its single replica running in 1 pod, along with the Postgres database pod.
