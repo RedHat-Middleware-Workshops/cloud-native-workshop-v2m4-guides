@@ -120,3 +120,77 @@ Because, OpenShift uses self-certification to create TLS termication route as de
 Click on `Advanced > Add Exception...` then, you can access the `HTTPS` page when you click on `Confirm Security Exception`!!!
 
 ![warning]({% image_path browser_warning.png %})
+
+#### Setup CodeReady Workspaces for Lab Environment
+
+---
+
+`SKIP this setup guide if you already completed earlier in the other Modules`
+
+
+Follow these instructions to setup the development environment on CodeReady Workspaces. 
+
+You might be familiar with the Eclipse IDE which is one of the most popular IDEs for Java and other
+programming languages. [CodeReady Workspaces](https://access.redhat.com/documentation/en-us/red_hat_codeready_workspaces) is the next-generation Eclipse IDE which is web-based and gives you a full-featured IDE running in the cloud. You have an CodeReady Workspaces instance deployed on your OpenShift cluster
+which you will use during these labs.
+
+Go to the [CodeReady Workspaces URL]({{ ECLIPSE_CHE_URL }}) in order to configure your development workspace.
+
+First, you need to register as a user. Register and choose the same username and password as 
+your OpenShift credentials.
+
+![codeready-workspace-register]({% image_path codeready-workspace-register.png %})
+
+Log into CodeReady Workspaces with your user. You can now create your workspace based on a stack. A 
+stack is a template of workspace configuration. For example, it includes the programming language and tools needed
+in your workspace. Stacks make it possible to recreate identical workspaces with all the tools and needed configuration
+on-demand. 
+
+For this lab, click on the `Cloud Native Roadshow` stack and then on the `Create` button. 
+
+![codeready-workspace-create-workspace]({% image_path codeready-workspace-create-workspace.png %})
+
+Click on `Open` to open the workspace and then on the `Start` button to start the workspace for use, if it hasn't started automatically.
+
+![codeready-workspace-start-workspace]({% image_path codeready-workspace-start-workspace.png %})
+
+You can click on the left arrow icon to switch to the wide view:
+
+![codeready-workspace-wide]({% image_path codeready-workspace-wide.png %})
+
+It takes a little while for the workspace to be ready. When it's ready, you will see a fully functional 
+CodeReady Workspaces IDE running in your browser.
+
+![codeready-workspace-workspace]({% image_path codeready-workspace.png %})
+
+Now you can import the project skeletons into your workspace.
+
+In the project explorer pane, click on the `Import Projects...` and enter the following:
+
+> You can find `GIT URL` when you log in {{GIT_URL}} with your credential(i.e. user1 / r3dh4t1!).
+
+  * Version Control System: `GIT`
+  * URL: `{{GIT_URL}}/userXX/cloud-native-workshop-v2m4-labs.git`
+  * Check `Import recursively (for multi-module projects)`
+  * Name: `cloud-native-workshop-v2m4-labs`
+
+![codeready-workspace-import]({% image_path codeready-workspace-import.png %}){:width="700px"}
+
+The projects are imported now into your workspace and is visible in the project explorer.
+
+CodeReady Workspaces is a full featured IDE and provides language specific capabilities for various project types. In order to 
+enable these capabilities, let's convert the imported project skeletons to a Maven projects. In the project explorer, right-click on each project and 
+then click on `Convert to Project` continuously.
+
+![codeready-workspace-convert]({% image_path codeready-workspace-convert.png %}){:width="500px"}
+
+Choose `Maven` from the project configurations and then click on `Save`.
+
+![codeready-workspace-maven]({% image_path codeready-workspace-maven.png %}){:width="700px"}
+
+Repeat the above for inventory and catalog projects.
+
+> `NOTE`: the `Terminal` window in CodeReady Workspaces. For the rest of these labs, anytime you need to run 
+a command in a terminal, you can use the CodeReady Workspaces `Terminal` window.
+
+![codeready-workspace-terminal]({% image_path codeready-workspace-terminal.png %})
