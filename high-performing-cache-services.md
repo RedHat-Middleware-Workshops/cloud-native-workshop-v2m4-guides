@@ -117,7 +117,7 @@ quarkus.datasource.driver=org.postgresql.Driver
 
 ![inventory_service]({% image_path inventory_update_properties.png %})
 
-Package the applicaiton via running the following maven plugin in `Terminal`:
+Package the applicaiton via running the following maven plugin in CodeReady Workspaces`Terminal`:
 
 `mvn clean package -DskipTests`
 
@@ -327,11 +327,321 @@ with running 4 pods such as catalog-service, catalog-database, inventory-service
 
 ![catalog]({% image_path codeready-workspace-cart-project.png %}){:width="500px"}
 
+Let's figure out the `basic structure of Quarkus project` in terms of how `models, services, and RESTful APIs` are already implemented to serve 
+functions of the shopping cart service. 
+
+Open `CartResource.java` in `src/main/java/com/redhat/cloudnative/` to understand how this application exposes `REST` endpoints on Quarkus in simple codes.
+And you will see that `POST`, `GET` methods exist to serve the shopping cart service in terms of creating a new shopping cart, get details of a certain cart, and delete an existing cart.
+
+ * `@Path`, `@GET` and `@PathParam` are the standard `JAX-RS annotations` used to define how to access the service.
+ * `@Inject` is Standard CDI annotation to use `ShoppingCartService` for creating, updating, deleting `ShoppingCart`.
+
+![catalog]({% image_path cart-resource.png %})
+
+You can also have a look at `PromotionService`, `ShippingService` in `src/main/java/com/redhat/cloudnative/service` to understand how to 
+define `@ApplicationScoped` in each funtion service.
+
+![catalog]({% image_path cart-services-code.png %})
+
+Let's run the cart-service application locally to test if fuctions work correctly. Run this Quarkus application as 
+`Development Mode` using `quarkus-maven-plugin` or click on `Build and Run Locally` in `Commands Palette`:
+
+![codeready-workspace-maven]({% image_path quarkus-dev-run-paletter.png %})
+
+`cd /projects/cloud-native-workshop-v2m4-labs/cart-service`
+
+`mvn compile quarkus:dev`
+
+Then, access the following endpoints using `curl` and the result looks like:
+
+`curl -X POST http://localhost:8080/cart/1111/329199/50`
+
+`curl http://localhost:8080/cart/1111`
+
+~~~java
+bla bla bla
+~~~
+
+##### Developing Quarkus Infinispan Client
+
+We confirmed that the cart service serves designed CRUD funtions as we expected. Now, we will transform into `high-performing cache service` by 
+addin a `In Memory Data Grid` server that allows running in a server outside of application processes. More importantly, we will learn how 
+`Quarkus Infinispan Client` extension provides functionality to allow the client that can connect to the data grid server when running in Quarkus.
+
+Once you have the cart service built on Quarkus project configured you can add the `infinispan-client extension` to the project 
+by running the following from the command line in your project base directory via CodeReady Workspaces `Terminal`:
+
+`mvn quarkus:add-extension -Dextensions="infinispan-client"`
+
+This will add the following to your `pom.xml`.
+
+![codeready-workspace-maven]({% image_path catalog-pom-infinispan-client.png %})
+
 Now, let's create Cache Services using `cache-service` of `Red Hat JBoss Data Grid` to quickly set up clusters that give you optimal performance 
 and ease of use with minimal configuration.
 
 `Cache Service`(cache-service) provides an easy-to-use implementation of `Data Grid` for `OpenShift` that is designed to increase application 
 response time through high-performance caching. With cache-service you can create new caches only as copies of the default cache definition.
+
+The Infinispan client is configurable in the `application.properties` file that can be provided in the `src/main/resources` directory. 
+These are the properties that can be configured in this file:
+
+`quarkus.infinispan-client.server-list=cache-service:11222`
+
+It is also possible to configure a `hotrod-client.properties` as described in the Infinispan user guide. Note that the `hotrod-client.properties` values 
+overwrite any matching property from the other configuration values(eg. near cache).
+
+By default the client will support keys and values of the following types: byte[], primitive wrappers (eg. Integer, Long, Double etc.), String, Date and Instant. 
+User types require some additional steps that are detailed here. Let’s say we have the following user classes in cart service:
+
+ * `Product`
+
+ * `Promotion`
+
+ * `ShoppingCart`
+
+ * `ShoppingCartItem`
+
+The default serialization is done using a library based on `protobuf`. We need to define the proto buf schema and a marshaller for each user type(s).
+
+> `NOTE`: Annotation based proto stream marshalling is not yet supported in the Quarkus Infinispan client. This will be added soon, allowing you to only annotate your classes, skipping the following steps.
+
+We already have`cart.proto` in the `META-INF directory` of the cart project. These files will automatically be picked up at initialization time.
+
+![catalog]({% image_path catalog-cart-proto.png %})
+
+The next thing to do is to provide a `org.infinispan.protostream.MessageMarshaller` implementation for each user class defined in the proto schema. 
+This class is then provided via `@Produces` in a similar fashion to the code based proto schema definition above.
+
+Here is the Marshaller class for our `Product`, `Promotion`, `ShoppingCart`, and `ShoppingCartItem` classes.
+
+ * Create `ProductMarshaller.java` in `src/main/java/com/redhat/cloudnative/model` and copy the following codes to the Java file.
+
+~~~java
+package com.redhat.cloudnative.model;
+
+import com.redhat.cloudnative.model.Product;
+import org.infinispan.protostream.MessageMarshaller;
+
+import java.io.IOException;
+
+public class ProductMarshaller implements MessageMarshaller<Product> {
+
+    @Override
+    public Product readFrom(ProtoStreamReader reader) throws IOException {
+        String itemId = reader.readString("itemId");
+        String name = reader.readString("name");
+        String desc = reader.readString("desc");
+        double price = reader.readDouble("price");
+
+        return new Product(itemId, name, desc, price);
+    }
+
+    @Override
+    public void writeTo(ProtoStreamWriter writer, Product product) throws IOException {
+        writer.writeString("itemId", product.getItemId());
+        writer.writeString("name", product.getName());
+        writer.writeString("desc", product.getDesc());
+        writer.writeDouble("price", product.getPrice());
+    }
+
+    @Override
+    public Class<? extends Product> getJavaClass() {
+        return Product.class;
+    }
+
+    @Override
+    public String getTypeName() {
+        return "coolstore.Product";
+    }
+
+}
+~~~
+
+ * Create `PromotionMarhsaller.java` in `src/main/java/com/redhat/cloudnative/model` and copy the following codes to the Java file.
+
+~~~java
+package com.redhat.cloudnative.model;
+
+import com.redhat.cloudnative.model.Promotion;
+import org.infinispan.protostream.MessageMarshaller;
+
+import java.io.IOException;
+
+public class PromotionMarhsaller implements MessageMarshaller<Promotion> {
+
+    @Override
+    public Promotion readFrom(ProtoStreamReader reader) throws IOException {
+        String itemId = reader.readString("itemId");
+        double percentOff = reader.readDouble("percentOff");
+        return new Promotion(itemId, percentOff);
+    }
+
+    @Override
+    public void writeTo(ProtoStreamWriter writer, Promotion promotion) throws IOException {
+        writer.writeString("itemId", promotion.getItemId());
+        writer.writeDouble("percentOff", promotion.getPercentOff());
+    }
+
+    @Override
+    public Class<? extends Promotion> getJavaClass() {
+        return Promotion.class;
+    }
+
+    @Override
+    public String getTypeName() {
+        return "coolstore.Promotion";
+    }
+}
+~~~
+
+ * Create `ShoppingCartItemMarshaller.java` in `src/main/java/com/redhat/cloudnative/model` and copy the following codes to the Java file.
+
+~~~java
+package com.redhat.cloudnative.model;
+
+import com.redhat.cloudnative.model.Product;
+import com.redhat.cloudnative.model.ShoppingCartItem;
+import org.infinispan.protostream.MessageMarshaller;
+
+import java.io.IOException;
+
+public class ShoppingCartItemMarshaller implements MessageMarshaller<ShoppingCartItem> {
+
+    @Override
+    public ShoppingCartItem readFrom(ProtoStreamReader reader) throws IOException {
+        double price = reader.readDouble("price");
+        int quantity = reader.readInt("quantity");
+        double promoSavings = reader.readDouble("promoSavings");
+        Product product = reader.readObject("product", Product.class);
+
+        return new ShoppingCartItem(price, quantity, promoSavings, product);
+    }
+
+    @Override
+    public void writeTo(ProtoStreamWriter writer, ShoppingCartItem shoppingCartItem) throws IOException {
+        writer.writeDouble("price", shoppingCartItem.getPrice());
+        writer.writeInt("quantity", shoppingCartItem.getQuantity());
+        writer.writeDouble("promoSavings", shoppingCartItem.getPromoSavings());
+        writer.writeObject("product", shoppingCartItem.getProduct(), Product.class);
+    }
+
+    @Override
+    public Class<? extends ShoppingCartItem> getJavaClass() {
+        return ShoppingCartItem.class;
+    }
+
+    @Override
+    public String getTypeName() {
+        return "coolstore.ShoppingCartItem";
+    }
+}
+~~~
+
+ * Create `ShoppingCartMarshaller.java` in `src/main/java/com/redhat/cloudnative/model` and copy the following codes to the Java file.
+
+~~~java
+package com.redhat.cloudnative.model;
+
+import com.redhat.cloudnative.model.ShoppingCart;
+import com.redhat.cloudnative.model.ShoppingCartItem;
+import org.infinispan.protostream.MessageMarshaller;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ShoppingCartMarshaller implements MessageMarshaller<ShoppingCart> {
+
+    @Override
+    public ShoppingCart readFrom(ProtoStreamReader reader) throws IOException {
+        double cartItemTotal = reader.readDouble("cartItemTotal");
+        double cartItemPromoSavings = reader.readDouble("cartItemPromoSavings");
+        double shippingTotal = reader.readDouble("shippingTotal");
+        double shippingPromoSavings = reader.readDouble("shippingPromoSavings");
+        double cartTotal = reader.readDouble("cartTotal");
+        String cartId = reader.readString("cartId");
+        List<ShoppingCartItem> shoppingCartItemList = new ArrayList<>();
+        shoppingCartItemList = reader.readCollection("shoppingCartItemList", shoppingCartItemList, ShoppingCartItem.class);
+
+        return new ShoppingCart(cartItemTotal, cartItemPromoSavings, shippingTotal, shippingPromoSavings, cartTotal, cartId, shoppingCartItemList);
+    }
+
+    @Override
+    public void writeTo(ProtoStreamWriter writer, ShoppingCart shoppingCart) throws IOException {
+        writer.writeDouble("cartItemTotal", shoppingCart.getCartItemTotal());
+        writer.writeDouble("cartItemPromoSavings", shoppingCart.getCartItemPromoSavings());
+        writer.writeDouble("shippingTotal", shoppingCart.getShippingTotal());
+        writer.writeDouble("shippingPromoSavings", shoppingCart.getShippingPromoSavings());
+        writer.writeDouble("cartTotal", shoppingCart.getCartTotal());
+        writer.writeString("cartId", shoppingCart.getCartId());
+        writer.writeCollection("shoppingCartItemList", shoppingCart.getShoppingCartItemList(), ShoppingCartItem.class);
+    }
+
+    @Override
+    public Class<? extends ShoppingCart> getJavaClass() {
+        return ShoppingCart.class;
+    }
+
+    @Override
+    public String getTypeName() {
+        return "coolstore.ShoppingCart";
+    }
+
+}
+~~~
+
+ * Create `MarshallerConfig.java` in `src/main/java/com/redhat/cloudnative/model` and copy the following codes to the Java file.
+
+~~~java
+package com.redhat.cloudnative.model;
+
+import org.infinispan.protostream.MessageMarshaller;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+
+@ApplicationScoped
+public class MarshallerConfig {
+
+    @Produces
+    MessageMarshaller promotionMarshaller(){
+        return new PromotionMarhsaller();
+    }
+
+    @Produces
+    MessageMarshaller productMarshaller(){
+        return new ProductMarshaller();
+    }
+
+    @Produces
+    MessageMarshaller shoppingCartItemMarhsaller(){
+        return new ShoppingCartItemMarshaller();
+    }
+
+    @Produces
+    MessageMarshaller shoppingCartMarshaller(){
+        return new ShoppingCartMarshaller();
+    }
+
+}
+~~~
+
+Add `Dependency Injection` to `ShoppingCartServiceImpl` class as below:
+
+~~~java
+bla bla or cp pre-built codes from somewhere in the repo
+~~~
+
+Package the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
+
+![codeready-workspace-maven]({% image_path quarkus-dev-run-packageforOcp.png %})
+
+Or runthe following maven plugin in CodeReady Workspaces`Terminal`:
+
+`mvn clean package -DskipTests`
+
+##### Deploying Cart service with JBoss Data Grid to OpenShift
 
 Run the following `oc` command to create a `cache-service` in OpenShift via CodeReady Workspaces `Terminal`:
 
@@ -369,7 +679,56 @@ Once the cache-service is deployed successfully, it will be showd in `Project St
 
 ![catalog]({% image_path catalog-cache-service-status.png %})
 
+Build the image using on OpenShift:
 
+`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=cart-service -l app=cart-service`
+
+This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
+
+ * Create a temp directory to store only previously-built application with necessary lib directory:
+
+`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
+
+ * Start and watch the build, which will take about minutes to complete:
+
+`oc start-build cart-service --from-dir=target/binary --follow`
+
+![inventory]({% image_path cart-build-logs.png %})
+
+ * Deploy it as an OpenShift application after the build is done:
+
+`oc new-app cart-service`
+
+ * Create the route
+
+`oc expose svc/cart-service`
+
+ * Finally, make sure it's actually done rolling out:
+
+`oc rollout status -w dc/cart-service`
+
+Wait for that command to report replication controller "cart-service-1" successfully rolled out before continuing.
+
+>`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
+that is that we currently don't have any liveness check configured, but we will add that in the next steps.
+
+And now we can access using curl once again to find all inventories:
+
+* Get the route URL
+
+`export URL="http://$(oc get route | grep cart-service | awk '{print $2}')"`
+
+`curl -X POST $URL/cart/1111/329199/50 ; echo`
+
+`curl h$URL/cart/1111 ; echo`
+
+You will see the following result:
+
+~~~shell
+bla bla
+~~~
+
+![openshift_login]({% image_path inventory_curl_result.png %})
 
 ####4. Developing and Deploying Order Service
 
