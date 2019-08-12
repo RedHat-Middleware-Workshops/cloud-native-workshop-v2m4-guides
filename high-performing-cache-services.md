@@ -15,7 +15,7 @@ The goal is to develop advanced cloud-native applications on `Red Hat Applicatio
 
 ![goal]({% image_path module4-goal.png %})
 
-####1. Developing and Deploying Inventory Service
+####1. Deploying Inventory Service
 
 ---
 
@@ -172,7 +172,7 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 
 `oc start-build inventory-service --from-dir=target/binary --follow`
 
-![openshift_login]({% image_path inventory-build-logs.png %})
+![inventory]({% image_path inventory-build-logs.png %})
 
  * Deploy it as an OpenShift application after the build is done and override the Postgres URL to specify our production Postgres credentials:
 
@@ -213,3 +213,119 @@ com/?q=Paris","location":"Paris","quantity":600},{"id":8,"itemId":"444437","link
 
 So now `Inventory` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console 
 with its single replica running in 1 pod, along with the Postgres database pod.
+
+####2. Deploying Catalog Service
+
+---
+
+`Catalog Service` serves products and prices for retail products. Lets's go through quickly how catalog service works and built on 
+`Spring Boot` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `catalog-service` directory.
+
+![catalog]({% image_path codeready-workspace-catalog-project.png %}){:width="500px"}
+
+First of all, we won't implement the catalog application to retrieve data because of all funtions are already built when we imported this project from Git server.
+There're a few interesting things what we need to take a look at this Spring Boot application before we will deploy it to OpenShift cluster.
+
+This catalog service is not using the default BOM (Bill of material) that Spring Boot projects typically use. Instead, we are using
+a BOM provided by Red Hat as part of the [Snowdrop](http://snowdrop.me/) project.
+
+~~~xml
+<dependencyManagement>
+<dependencies>
+  <dependency>
+    <groupId>me.snowdrop</groupId>
+    <artifactId>spring-boot-bom</artifactId>
+    <version>${spring-boot.bom.version}</version>
+    <type>pom</type>
+    <scope>import</scope>
+  </dependency>
+</dependencies>
+</dependencyManagement>
+~~~
+
+![catalog]({% image_path catalog-pom.png %})
+
+Also, catalog service calls the inventory service that we deployed earlier using REST to retrieve the inventory status and include that in the response.
+Open `CatalogService.java` in `src/main/java/com/redhat/coolstore/service` directory via Project Explorer and how `read()` and `readAll()` method work:
+
+![catalog]({% image_path catalog-service-codes.png %})
+
+Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces `Terminal`:
+
+`mvn clean package spring-boot:repackage -DskipTests`
+
+The build and deploy may take a minute or two. Wait for it to complete. You should see a `BUILD SUCCESS` at the
+end of the build output.
+
+Our production catalog microservice will use an external database (PostgreSQL) to house inventory data.
+First, deploy a new instance of PostgreSQL by executing via CodeReady Workspaces `Terminal`:
+
+Make sure if the current project is `userXX-cloudnativeapps`.
+
+ * Deploy PostgreSQL to the project:
+
+~~~shell
+oc new-app -e POSTGRESQL_USER=catalog \
+             -e POSTGRESQL_PASSWORD=mysecretpassword \
+             -e POSTGRESQL_DATABASE=catalog \
+             openshift/postgresql:10 \
+             --name=catalog-database
+~~~
+
+ * Build the image using on OpenShift:
+
+`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=catalog-service -l app=catalog-service`
+
+ * Start and watch the build, which will take about minutes to complete:
+
+`oc start-build catalog-service --from-file=target/catalog-1.0.0-SNAPSHOT.jar --follow`
+
+![catalog]({% image_path catalog-build-logs.png %})
+
+ * Deploy it as an OpenShift application after the build is done and override the Postgres URL to specify our production Postgres credentials:
+
+`oc new-app catalog-service`
+
+ * Create the route
+
+`oc expose service catalog-service`
+
+ * Finally, make sure it's actually done rolling out:
+
+`oc rollout status -w dc/catalog-service`
+
+Wait for that command to report replication controller "catalog-service-1" successfully rolled out before continuing.
+
+>`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
+that is that we currently don't have any liveness check configured, but we will add that in the next steps.
+
+And now we can access using curl once again to find a certain inventory:
+
+* Get the route URL
+
+`export URL="http://$(oc get route | grep catalog-service | awk '{print $2}')"`
+
+`curl $URL/services/product/329299 ; echo`
+
+You will see the following result:
+
+`{"itemId":"329299","name":"Red Fedora","desc":"Official Red Hat Fedora","price":34.99,"quantity":736}`
+
+![openshift_login]({% image_path catalog_curl_result.png %})
+
+So now `Catalog` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console 
+with running in 1 pod, along with the Postgres database pod.
+
+![catalog]({% image_path catalog-project-status.png %})
+
+####3. Developing and Deploying Shopping Cart Service
+
+---
+
+####4. Developing and Deploying Order Service
+
+---
+
+####5. Developing and Deploying Payment Service
+
+---
