@@ -314,13 +314,62 @@ You will see the following result:
 ![openshift_login]({% image_path catalog_curl_result.png %})
 
 So now `Catalog` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console 
-with running in 1 pod, along with the Postgres database pod.
+with running 4 pods such as catalog-service, catalog-database, inventory-service, and inventory-database.
 
 ![catalog]({% image_path catalog-project-status.png %})
 
 ####3. Developing and Deploying Shopping Cart Service
 
 ---
+
+`Shopping Cart Service` manages shopping cart for each customer. Lets's go through quickly how cart service works and built on 
+`Quarkus` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `cart-service` directory.
+
+![catalog]({% image_path codeready-workspace-cart-project.png %}){:width="500px"}
+
+Now, let's create Cache Services using `cache-service` of `Red Hat JBoss Data Grid` to quickly set up clusters that give you optimal performance 
+and ease of use with minimal configuration.
+
+`Cache Service`(cache-service) provides an easy-to-use implementation of `Data Grid` for `OpenShift` that is designed to increase application 
+response time through high-performance caching. With cache-service you can create new caches only as copies of the default cache definition.
+
+Run the following `oc` command to create a `cache-service` in OpenShift via CodeReady Workspaces `Terminal`:
+
+`oc new-app cache-service -p APPLICATION_USER=developer -p APPLICATION_PASSWORD=developer -p NUMBER_OF_INSTANCES=3 -p REPLICATION_FACTOR=2`
+
+ * `NUMBER_OF_INSTANCES` sets the number of nodes in the Data Grid for OpenShift cluster. The default is 1.
+
+ * `APPLICATION_USER` creates a user to securely access the cache. There is no default value. You must always create a user.
+ 
+ * `APPLICATION_PASSWORD` specifies a password for the user. If you do not set a password, the service template randomly generates one and stores it as a secret.
+ 
+ * `REPLICATION_FACTOR` specifies the number of copies for each cache entry. The default is 1.
+
+[Red Hat® Data Grid](https://access.redhat.com/documentation/en-us/red_hat_data_grid/7.3/html-single/red_hat_data_grid_for_openshift/index) is an 
+in-memory, distributed, NoSQL datastore solution. Your applications can access, process, and analyze data at in-memory speed to deliver a superior 
+user experience with features and benefits as below:
+
+ * `Act faster` - Quickly access your data through fast, low-latency data processing using memory (RAM) and distributed parallel execution.
+
+ * `Scale quickly` - Achieve linear scalability with data partitioning and distribution across cluster nodes.
+
+ * `Always available` - Gain high availability through data replication across cluster nodes.
+
+ * `Fault tolerance` - Attain fault tolerance and recover from disaster through cross-datacenter georeplication and clustering.
+
+ * `More productivity` - Gain development flexibly and greater productivity with a highly versatile, functionally rich NoSQL data store.
+
+ * `Protect data` - Obtain comprehensive data security with encryption and role-based access.
+
+You can also create a cache service when you go to `Catalog > Developer Catalog` in OpenShift web console and select `data grid service`.
+
+![catalog]({% image_path catalog-cache-service.png %})
+
+Once the cache-service is deployed successfully, it will be showd in `Project Status`.
+
+![catalog]({% image_path catalog-cache-service-status.png %})
+
+
 
 ####4. Developing and Deploying Order Service
 
