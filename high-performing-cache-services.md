@@ -19,8 +19,8 @@ The goal is to develop advanced cloud-native applications on `Red Hat Applicatio
 
 ---
 
-`Inventory Service` serves inventory and availability data for retail products. Lets's go through quickly how inventory service works and built on 
-`Quarkus` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `inventory-service` directory.
+`Inventory Service` serves inventory and availability data for retail products. Lets's go through quickly how the inventory service works and built on 
+`Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `inventory-service` directory.
 
 ![inventory_service]({% image_path codeready-workspace-inventory-project.png %}){:width="500px"}
 
@@ -186,7 +186,7 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 
 `oc rollout status -w dc/inventory-service`
 
-Wait for that command to report replication controller "inventory-service-1" successfully rolled out before continuing.
+Wait for that command to report replication controller `inventory-service-1` successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
 that is that we currently don't have any liveness check configured, but we will add that in the next steps.
@@ -218,7 +218,7 @@ with its single replica running in 1 pod, along with the Postgres database pod.
 
 ---
 
-`Catalog Service` serves products and prices for retail products. Lets's go through quickly how catalog service works and built on 
+`Catalog Service` serves products and prices for retail products. Lets's go through quickly how the catalog service works and built on 
 `Spring Boot` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `catalog-service` directory.
 
 ![catalog]({% image_path codeready-workspace-catalog-project.png %}){:width="500px"}
@@ -294,7 +294,7 @@ oc new-app -e POSTGRESQL_USER=catalog \
 
 `oc rollout status -w dc/catalog-service`
 
-Wait for that command to report replication controller "catalog-service-1" successfully rolled out before continuing.
+Wait for that command to report replication controller `catalog-service-1` successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
 that is that we currently don't have any liveness check configured, but we will add that in the next steps.
@@ -322,7 +322,7 @@ with running 4 pods such as catalog-service, catalog-database, inventory-service
 
 ---
 
-`Shopping Cart Service` manages shopping cart for each customer. Lets's go through quickly how cart service works and built on 
+`Shopping Cart Service` manages shopping cart for each customer. Lets's go through quickly how the cart service works and built on 
 `Quarkus` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `cart-service` directory.
 
 ![catalog]({% image_path codeready-workspace-cart-project.png %}){:width="500px"}
@@ -707,7 +707,7 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 
 `oc rollout status -w dc/cart-service`
 
-Wait for that command to report replication controller "cart-service-1" successfully rolled out before continuing.
+Wait for that command to report replication controller `cart-service-1` successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
 that is that we currently don't have any liveness check configured, but we will add that in the next steps.
@@ -733,6 +733,314 @@ bla bla
 ####4. Developing and Deploying Order Service
 
 ---
+
+`Order Service` manages all orders when customers checkout items in the shopping cart. Lets's go through quickly how the order service get 
+`REST` services to use the `MongoDB` database with `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and 
+expand `order-service` directory.
+
+![catalog]({% image_path codeready-workspace-order-project.png %}){:width="500px"}
+
+The application built in `Quarkus` is quite simple: the user can add elements in a list using `RESTful APIs` and the list is updated.
+All the information between the client and the server are formatted as `JSON`. The elements are stored in `MongoDB`.
+
+##### Adding Maven Dependencies using Quarkus Extensions
+
+Execute the following command via CodeReady Workspaces `Terminal`:
+
+`mvn quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client"`
+
+This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, 
+the quarkus-mongodb-client extension has been added to your `pom.xml`.
+
+![catalog]({% image_path order-pom-dependency.png %})
+
+##### Creating Order Service using JSON REST service
+
+First, let’s have a look at the `Order` bean in `src/main/java/com/redhat/cloudnative/`as follows:
+
+![openshift_login]({% image_path order_bean.png %})
+
+Nothing fancy. One important thing to note is that having a default constructor is required by the `JSON serialization layer`.
+
+Now, open a `com.redhat.cloudnative.OrderService` that will be the business layer of our application and `store/load` the orders from the mongoDB database.
+Add the following Java codes at each market.
+
+ * `// TODO: Inject MongoClient here` marker:
+
+~~~java
+@Inject MongoClient mongoClient;
+~~~
+
+ * `// TODO: Add a while loop to make an order lists using MongoCursor here` marker in `list()` method:
+
+~~~java
+MongoCursor<Document> cursor = getCollection().find().iterator();
+
+try {
+    while (cursor.hasNext()) {
+        Document document = cursor.next();
+        Order order = new Order();
+        order.setId(document.getString("id"));
+        order.setCustomerName(document.getString("customerName"));
+        order.setCustomerEmail(document.getString("customerEmail"));
+        order.setOrderValue(document.getDouble("orderValue"));
+        order.setRetailPrice(document.getDouble("retailPrice"));
+        order.setDiscount(document.getDouble("discount"));
+        order.setShippingFee(document.getDouble("shippingFee"));
+        order.setShippingDiscount(document.getDouble("shippingDiscount"));
+        list.add(order);
+    }
+} finally {
+    cursor.close();
+}
+~~~
+
+ * `// TODO: Add to create a Document based order here` marker in `add(Order order)` method:
+
+~~~java
+Document document = new Document()
+        .append("id", order.getId())
+        .append("customerName", order.getCustomerName())
+        .append("customerEmail", order.getCustomerEmail())
+        .append("orderValue", order.getOrderValue())
+        .append("retailPrice", order.getRetailPrice())
+        .append("discount", order.getDiscount())
+        .append("shippingFee", order.getShippingFee())
+        .append("shippingDiscount", order.getShippingDiscount());
+getCollection().insertOne(document);
+~~~
+
+Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each marker:
+
+ * `// TODO: Add JAX-RS annotations here` marker:
+
+~~~java
+@Path("/orders")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+~~~
+
+ * `// TODO: Inject OrderService here` marker:
+
+~~~java
+@Inject OrderService orderService;
+~~~
+
+ * `// TODO: Add list(), add() methods here` marker:
+
+~~~java
+@GET
+public List<Order> list() {
+    return orderService.list();
+}
+
+@POST
+public List<Order> add(Order order) {
+    orderService.add(order);
+    return list();
+}
+~~~
+
+The implementation is pretty straightforward and you just need to define your endpoints using the `JAX-RS annotations` and 
+use the `OrderService` to list/add new orders.
+
+##### Configuring the MongoDB database
+
+The main property to configure is the URL to access to `MongoDB,` almost all configuration can be included in the connection URI 
+so we advise you to do so, you can find more information in the [MongoDB documentation](https://docs.mongodb.com/manual/reference/connection-string/)
+
+Open `application.properties` in `src/main/resources/` and add the following configuration:
+
+~~~java
+quarkus.mongodb.connection-string = mongodb://order-database:27017
+quarkus.mongodb.credentials.username=order
+quarkus.mongodb.credentials.password=mysecretpassword
+
+~~~
+
+![order]({% image_path order_application_properties.png %})
+
+##### Simplifying MongoDB Client usage using BSON codec
+
+By using a Bson `Codec`, the MongoDB Client will take care of the transformation of your domain object to/from a MongoDB `Document` automatically.
+
+First you need to create a Bson `Codec` that will tell Bson how to transform your entity to/from a MongoDB `Document`. 
+Here we use a `CollectibleCodec` as our object is retrievable from the database (it has a MongoDB identifier), if not we would have used a `Codec` instead. 
+More information in the [codec documentation](https://mongodb.github.io/mongo-java-driver/3.10/bson/codecs).
+
+Edit the `com.redhat.cloudnative.codec.OrderCodec` class as follows:
+
+ * `// TODO: Add Encode & Decode contexts here` marker:
+
+~~~java
+@Override
+public void encode(BsonWriter writer, Order Order, EncoderContext encoderContext) {
+    Document doc = new Document();
+    doc.put("customerName", Order.getCustomerName());
+    doc.put("customerEmail", Order.getCustomerEmail());
+    doc.put("orderValue", Order.getOrderValue());
+    doc.put("discount", Order.getDiscount());
+    doc.put("shippingFee", Order.getShippingFee());
+    doc.put("shippingDiscount", Order.getShippingDiscount());
+    documentCodec.encode(writer, doc, encoderContext);
+}
+
+@Override
+public Class<Order> getEncoderClass() {
+    return Order.class;
+}
+
+@Override
+public Order generateIdIfAbsentFromDocument(Order document) {
+    if (!documentHasId(document)) {
+        document.setId(UUID.randomUUID().toString());
+    }
+    return document;
+}
+
+@Override
+public boolean documentHasId(Order document) {
+    return document.getId() != null;
+}
+
+@Override
+public BsonValue getDocumentId(Order document) {
+    return new BsonString(document.getId());
+}
+
+@Override
+public Order decode(BsonReader reader, DecoderContext decoderContext) {
+    Document document = documentCodec.decode(reader, decoderContext);
+    Order order = new Order();
+    if (document.getString("id") != null) {
+        order.setId(document.getString("id"));
+    }
+    order.setCustomerName(document.getString("customerName"));
+    order.setCustomerEmail(document.getString("customerEmail"));
+    order.setOrderValue(document.getDouble("orderValue"));
+    order.setRetailPrice(document.getDouble("retailPrice"));
+    order.setDiscount(document.getDouble("discount"));
+    order.setShippingFee(document.getDouble("shippingFee"));
+    order.setShippingDiscount(document.getDouble("shippingDiscount"));
+    return order;
+}
+~~~
+
+Then you need to create a `CodecProvider` to link this `Codec` to the Order class.
+
+Edit the `com.redhat.cloudnative.codec.OrderCodecProvider` class as follows:
+
+ * `// TODO: Add Codec get method here` marker:
+
+~~~java
+@Override
+public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
+    if (clazz == Order.class) {
+        return (Codec<T>) new OrderCodec();
+    }
+    return null;
+}
+~~~
+
+`Quarkus` will  register the `CodecProvider` for you.
+
+Finally, when getting the `MongoCollection` from the database you can use directly the `Order` class instead of the `Document` one, 
+the codec will automatically map the `Document` to/from your `Order` class.
+
+Edit the `com.redhat.cloudnative.CodecOrderService` class as follows:
+
+ * `// TODO: Add MongoCollection method here` marker:
+
+~~~java
+private MongoCollection<Order> getCollection(){
+    return mongoClient.getDatabase("order").getCollection("order", Order.class);
+}
+~~~
+
+##### Building and Deploying Application to OpenShift
+
+ackage the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
+
+![codeready-workspace-maven]({% image_path quarkus-dev-run-packageforOcp.png %})
+
+Or runthe following maven plugin in CodeReady Workspaces`Terminal`:
+
+`mvn clean package -DskipTests`
+
+![order]({% image_path order-mvn-package.png %})
+
+##### Deploying Cart service with JBoss Data Grid to OpenShift
+
+Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady Workspaces `Terminal`:
+
+~~~shell
+oc new-app -e MONGODB_USER=order \
+    -e MONGODB_PASSWORD=mysecretpassword \
+    -e MONGODB_ADMIN_PASSWORD=adminpwd \
+    -e MONGODB_DATABASE=order-database mongodb:3.6 \
+    --name=order-database    
+~~~
+
+Once the MongoDB is deployed successfully, it will be showd in `Project Status`.
+
+![order]({% image_path order-monogo-status.png %})
+
+Build the image using on OpenShift:
+
+`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=order-service -l app=order-service`
+
+This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
+
+ * Create a temp directory to store only previously-built application with necessary lib directory:
+
+`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
+
+ * Start and watch the build, which will take about minutes to complete:
+
+`oc start-build order-service --from-dir=target/binary --follow`
+
+![order]({% image_path order-build-logs.png %})
+
+ * Deploy it as an OpenShift application after the build is done:
+
+`oc new-app order-service`
+
+ * Create the route
+
+`oc expose svc/order-service`
+
+ * Finally, make sure it's actually done rolling out:
+
+`oc rollout status -w dc/order-service`
+
+Wait for that command to report replication controller `order-service-1` successfully rolled out before continuing.
+
+>`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
+that is that we currently don't have any liveness check configured, but we will add that in the next steps.
+
+And now we can access using curl once again to find all inventories:
+
+* Get the route URL
+
+`export URL="http://$(oc get route | grep order-service | awk '{print $2}')"`
+
+~~~shell
+curl -X POST $URL/orders \
+  -H "Content-Type: application/json" \
+  -d '{"id": "1", "customerName": "Dan", "customerEmail": "dan@example.com", "orderValue": "3", "retailPrice": "100", "discount": "0.3", "shippingFee": "20", "shippingDiscount": "0.2"}' 
+~~~
+
+
+`curl $URL/orders ; echo`
+
+You will see the following result:
+
+~~~shell
+bla bla
+~~~
+
+![openshift_login]({% image_path inventory_curl_result.png %})
+
 
 ####5. Developing and Deploying Payment Service
 
