@@ -13,7 +13,7 @@ to increase end users'(customers) satification. And there's more fun facts how e
 The goal is to develop advanced cloud-native applications on `Red Hat Application Runtimes` and deploy them on `OpenShift 4` including 
 `single sign-on access management` and `distributed cache manageemnt`. After this lab, you should end up with something like:
 
-![goal]({% image_path module4-goal.png %})
+![goal]({% image_path lab1-goal.png %})
 
 ####1. Deploying Inventory Service
 
@@ -758,7 +758,7 @@ the quarkus-mongodb-client extension has been added to your `pom.xml`.
 
 First, let’s have a look at the `Order` bean in `src/main/java/com/redhat/cloudnative/`as follows:
 
-![openshift_login]({% image_path order_bean.png %})
+![openshift_login]({% image_path order_bean.png %}){:width="700px"}
 
 Nothing fancy. One important thing to note is that having a default constructor is required by the `JSON serialization layer`.
 
@@ -851,12 +851,8 @@ so we advise you to do so, you can find more information in the [MongoDB documen
 
 Open `application.properties` in `src/main/resources/` and add the following configuration:
 
-~~~java
-quarkus.mongodb.connection-string = mongodb://order-database:27017
-quarkus.mongodb.credentials.username=order
-quarkus.mongodb.credentials.password=mysecretpassword
+`quarkus.mongodb.connection-string = mongodb://order-database:27017`
 
-~~~
 
 ![order]({% image_path order_application_properties.png %})
 
@@ -973,13 +969,7 @@ Or runthe following maven plugin in CodeReady Workspaces`Terminal`:
 
 Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady Workspaces `Terminal`:
 
-~~~shell
-oc new-app -e MONGODB_USER=order \
-    -e MONGODB_PASSWORD=mysecretpassword \
-    -e MONGODB_ADMIN_PASSWORD=adminpwd \
-    -e MONGODB_DATABASE=order-database mongodb:3.6 \
-    --name=order-database    
-~~~
+`oc new-app  --docker-image mongo:4.0 --name=order-database`    
 
 Once the MongoDB is deployed successfully, it will be showd in `Project Status`.
 
@@ -1036,10 +1026,10 @@ curl -X POST $URL/orders \
 You will see the following result:
 
 ~~~shell
-bla bla
+[{"customerEmail":"dan@example.com","customerName":"Dan","discount":0.3,"id":"1","orderValue":3.0,"retailPrice":100.0,"shippingDiscount":0.2,"shippingFee":20.0}]
 ~~~
 
-![openshift_login]({% image_path inventory_curl_result.png %})
+![openshift_login]({% image_path order_curl_result.png %})
 
 
 ####5. Developing and Deploying Payment Service
