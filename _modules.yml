@@ -5,7 +5,7 @@ modules:
   cloud-native-architectures:
     name: Cloud-Native Application Architectures
   high-performing-cache-services:
-    name: Creating High-performing Cachable Service
+    name: Creating High-performing Cacheable Service
   event-driven-services:
     name: Creating Event-Driven Service
   evolve-serverless-services:

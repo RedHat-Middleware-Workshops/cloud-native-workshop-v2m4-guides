@@ -1035,3 +1035,25 @@ You will see the following result:
 ####5. Developing and Deploying Payment Service
 
 ---
+
+
+####6. Deploying WEB-UI Service
+
+---
+
+`WEB-UI Service` serves a frontend based on [AngularJS](https://angularjs.org/) and [PatternFly](http://patternfly.org/) running in a 
+[Node.js](https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i) container. 
+[Red Hat OpenShift Application Runtimes](https://developers.redhat.com/products/rhoar) includes `Node.js` support in enterprise prouction environment.
+
+Lets's go through quickly how the frontend service works and built on `Node.js` runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE 
+and expand `coolstore-ui` directory.
+
+![coolstore-ui]({% image_path codeready-workspace-coolstore-ui.png %}){:width="500px"}
+
+You will see javascripts for specific cloud-native services such as cart, catatlog, and order service as above.
+
+
+
+
+
+.
