@@ -8,7 +8,7 @@ digital transformation whatthey need to innovate rapidly in fast-changing indust
 
 In this module, we will learn what cloud-native architecture we need to design for running containerized applications on DevOps/Cloud-Native platform in scale and speed.
 Then we will also develop cloud-natvie applications align with multiple architecture patterns such as high-performing cache, event-driven/reactive, and serverless using 
-[Red Hat Application Runtimes](https://www.redhat.com/en/technologies/cloud-computing/openshift/application-runtimes), [Red Hat CodeReady Workspaces](https://developers.redhat.com/products/codeready-workspaces/overview) and 
+[Red Hat Runtimes](https://www.redhat.com/en/technologies/cloud-computing/openshift/application-runtimes), [Red Hat CodeReady Workspaces](https://developers.redhat.com/products/codeready-workspaces/overview) and 
 [Red Hat OpenShift Container Platform](https://www.redhat.com/en/technologies/cloud-computing/openshift).
 
 

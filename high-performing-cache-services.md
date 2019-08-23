@@ -9,8 +9,7 @@ to increase end users'(customers) satification. And there's more fun facts how e
 
 ---
 
-
-The goal is to develop advanced cloud-native applications on `Red Hat Application Runtimes` and deploy them on `OpenShift 4` including 
+The goal is to develop advanced cloud-native applications on `Red Hat Runtimes` and deploy them on `OpenShift 4` including 
 `single sign-on access management` and `distributed cache manageemnt`. After this lab, you should end up with something like:
 
 ![goal]({% image_path lab1-goal.png %})

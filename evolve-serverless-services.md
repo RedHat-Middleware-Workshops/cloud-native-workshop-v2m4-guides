@@ -1,4 +1,4 @@
-## Lab4 - Evoling Serverless Services
+## Lab3 - Evoling Serverless Services
 
 In this cloud-native application architecture, We now have multiple microservices to implement traditional application workloads and reactive system. 
 However, it's not necessary that whole applications/services have to run all the time(24/7) for serving funtions because a certain service can be 
@@ -28,6 +28,15 @@ The severless application enables `DevOps teams` to enjoy `benefits` as here:
 
  * Simplifying CI/CD pipeline
 
+#### Goals of this lab
+
+---
+
+The goal is to develop serverless applications on `Red Hat Runtimes` and deploy `Knative service` on `OpenShift 4` with 
+a cloud-native, continuous integration and delivery (CI/CD) Pipelines using `Tekton`. After this lab, you should end up with something like:
+
+![goal]({% image_path lab3-goal.png %})
+
 In this lab, we'll deploy the `Payment Service` as a serverless application using `Knative Serving`, `Istio`, `Tekton Pipelines` and `Quarkus native application` 
 because the payment service doesn't need to be served for the end users as the other services like the shopping cart and catalog services.
 
@@ -35,15 +44,37 @@ because the payment service doesn't need to be served for the end users as the o
 
 ![Logo]({% image_path knative-audience.png %}){:width="700px"}
 
-[Knative](https://cloud.google.com/knative/) was born for developers to create serverless experiences natively without depending on extra serverless or 
-FaaS frameworks and many custom tools. Knative has three primary components — [Build](https://github.com/knative/build), 
-[Serving](https://github.com/knative/serving), and [Eventing](https://github.com/knative/eventing) — for addressing common patterns 
-and best practices for developing serverless applications on Kubernetes platforms.
+[Knative](https://www.openshift.com/learn/topics/knative) extends [Kubernetes](https://www.redhat.com/en/topics/containers/what-is-kubernetes) 
+to provide components for building, deploying, and managing [serverless](https://developers.redhat.com/topics/serverless-architecture/) applications. 
+Build serverless applications that run wherever you need them—on-premise or on any cloud—with Knative and OpenShift.
 
-[Istio](istio.io) is an open, platform-independent service mesh designed to manage communications between microservices and
-applications in a transparent way.It provides behavioral insights and operational control over the service mesh
-as a whole. It provides a number of key capabilities uniformly across a network of services such as `Traffic Management`, `Observability`, 
-`Policy Enforcement`, and `Service Identity and Security`.
+Knative components leverage best practices from real-world Kubernetes deployments:
+
+ * [Build](https://github.com/knative/build) provides a pluggable model for building containers for serverless applications from source code.
+
+ * [Serving](https://github.com/knative/serving)uses Kubernetes and [Istio](https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh) to 
+ rapidly deploy, network, and automatically scale serverless workloads.
+ 
+ * [Eventing](https://github.com/knative/eventing) is common infrastructure for consuming and producing events to stimulate applications.
+
+[Service Mesh](https://www.openshift.com/learn/topics/service-mesh) provides `traffic monitoring`, `access control`, `discovery`, `security`, `resiliency`, 
+and other useful things to a group of services. `Istio` does all that, but it doesn't require any changes to the code of any of those services. 
+To make the magic happen, Istio deploys a `proxy (called a sidecar)` next to each service. All of the traffic meant for a service goes to the proxy, 
+which uses policies to decide how, when, or if that traffic should go on to the service. `Istio` also enables sophisticated DevOps techniques such as 
+`canary deployments`, `circuit breakers`, `fault injection`, and more. 
+
+`Istio Service Mesh` is a sidecar container implementation of the features and functions needed when creating and managing microservices. 
+Monitoring, tracing, circuit breakers, routing, load balancing, fault injection, retries, timeouts, mirroring, access control, rate limiting, and more, 
+are all a part of this. While all those features and functions are now available by using a myriad of libraries in your code, what sets Istio apart is that 
+you get these benefits with no changes to your source code.
+
+By using the `sidecar model`, Istio runs in a Linux container in your Kubernetes pods (much like a sidecar rides along side a motorcycle) and injects and 
+extracts functionality and information based on your configuration. Again (for emphasis), this is your configuration that lives outside of your code. 
+This immediately lessens code complexity and heft.
+
+It also (and this is important), moves operational aspects away from code development and into the domain of operations. Why should a developer be 
+burdened with circuit breakers and fault injections and should they respond to them? Yes, but for handling and/or creating them? Take that out of 
+your code and let your code focus on the underlying business domain. Make the code smaller and less complex.
 
 ####1. Building a Native Executable
 
@@ -139,7 +170,7 @@ You should see something like:
 
 ~~~shell
    PID   RSS COMMAND
- 16017 53816 target/people-1.0-SNAPSHOT-runner
+ 16017 53816 target/payment-1.0-SNAPSHOT-runner
 ~~~
 
 This shows that our process is taking around `50 MB` of memory ([Resident Set Size](https://en.wikipedia.org/wiki/Resident_set_size), or RSS). Pretty compact!
@@ -154,18 +185,33 @@ You should see:
 
 `hello quarkus from <your-hostname>`
 
-##### Cleanup
-
-Go to the first Terminal tab and press `CTRL+C` to stop our native app (or close the Terminal window).
-
-Congratuations! You’ve now built a Java application as an executable JAR and a Linux native binary. We’ll explore the benefits of native 
+`Congratuations!` You’ve now built a Java application as an executable JAR and a Linux native binary. We’ll explore the benefits of native 
 binaries later in when we start deploying to Kubernetes.
 
-####2. Deploying the application in Knative
+Before moving to the next step, go to the first Terminal tab and press `CTRL+C` to stop our native app (or close the Terminal window).
+
+####2. Deploying the serverless application in Knative Serving
 
 ---
 
-aa
+`Knative Serving` builds on Kubernetes and `Istio` to support deploying and serving of serverless applications and functions. `Serving` is easy to 
+get started with and scales to support advanced scenarios.
+
+The Knative Serving project provides `middleware primitives` that enable:
+
+ * Rapid deployment of serverless containers
+
+ * Automatic scaling up and down to zero
+
+ * Routing and network programming for Istio components
+
+ * Point-in-time snapshots of deployed code and configurations
+
+In the lab, `Knative Serving` is already installed on OpenShift cluster but if you want to install Knative Serving on your own OpenShift cluster, 
+you can play with [Installing the Knative Serving Operator](https://knative.dev/docs/install/knative-with-openshift/) as below:
+
+![serverless]({% image_path knative_serving_tile_highlighted.png %})
+
 
 ####3. Accessing your application
 
@@ -225,3 +271,18 @@ oc create -f https://raw.githubusercontent.com/redhat-developer-demos/pipelines-
 oc policy add-role-to-user pipeline-roles -z pipeline --role-namespace=userXX-cloudnativeapps
 ~~~
 
+##### Additional Resources:
+
+ * [Knative on OpenShift](https://www.openshift.com/learn/topics/knative)
+
+ * [Knative Install on OpenShift](https://knative.dev/docs/install/knative-with-openshift/)
+
+ * [Knative Tutorial](https://redhat-developer-demos.github.io/knative-tutorial)
+
+ * [Knative, Serverless Kubernetes Blogs](https://developers.redhat.com/topics/knative/)
+
+ * [7 open source platforms to get started with serverless computing](https://opensource.com/article/18/11/open-source-serverless-platforms)
+
+ * [How to develop functions-as-a-service with Apache OpenWhisk](https://opensource.com/article/18/11/developing-functions-service-apache-openwhisk)
+
+ * [How to enable serverless computing in Kubernetes](https://opensource.com/article/19/4/enabling-serverless-kubernetes)

@@ -1,6 +1,19 @@
-## Lab3 - Creating Event-Driven/Reactive Services
+## Lab2 - Creating Event-Driven/Reactive Services
 
-####1. 
+In this lab, we'll develop `Event-Driven/Reactive` applications into the cloud-native appliation architecture. These cloud-native applications...
+
+#### Goals of this lab
+
+---
+
+The goal is to develop advanced cloud-native applications on `Red Hat Runtimes` and deploy them on `OpenShift 4` including 
+`Kafka in Red Hat Integration` for distributed messaing capabilities. After this lab, you should end up with something like:
+
+![goal]({% image_path lab2-goal.png %})
+
+####1. Deploying Inventory Service
+
+---
 
 
 Lab 2 Reliable Async with AMQ - replace rest calls for order to inventory, shopping cart and payment service and introduce compensating transactions (Saga pattern)
