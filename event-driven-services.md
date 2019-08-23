@@ -11,7 +11,7 @@ The goal is to develop advanced cloud-native applications on `Red Hat Runtimes` 
 
 ![goal]({% image_path lab2-goal.png %})
 
-####1. Deploying Inventory Service
+####1. Creating Event-Driven/Reactive Services
 
 ---
 

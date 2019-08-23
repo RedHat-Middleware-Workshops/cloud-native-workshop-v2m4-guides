@@ -964,7 +964,7 @@ Or runthe following maven plugin in CodeReady Workspaces`Terminal`:
 
 ![order]({% image_path order-mvn-package.png %})
 
-##### Deploying Cart service with JBoss Data Grid to OpenShift
+##### Deploying Order service with MongoDB to OpenShift
 
 Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady Workspaces `Terminal`:
 
@@ -1035,6 +1035,8 @@ You will see the following result:
 
 ---
 
+To be added.......
+
 
 ####6. Deploying WEB-UI Service
 
@@ -1050,9 +1052,3 @@ and expand `coolstore-ui` directory.
 ![coolstore-ui]({% image_path codeready-workspace-coolstore-ui.png %}){:width="500px"}
 
 You will see javascripts for specific cloud-native services such as cart, catatlog, and order service as above.
-
-
-
-
-
-.
