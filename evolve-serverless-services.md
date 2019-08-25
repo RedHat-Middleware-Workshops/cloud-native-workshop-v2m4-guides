@@ -155,11 +155,13 @@ Since our environment here is Linux, you can just run it. In the CodeReady Works
 Notice the amazingly fast startup time:
 
 ~~~shell
-2019-08-22 04:04:11,817 INFO  [io.quarkus] (main) Quarkus 0.21.1 started in 0.015s. Listening on: http://[::]:8080
-2019-08-22 04:04:11,818 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, jdbc-h2, narayana-jta, resteasy]
+2019-08-24 12:49:57,839 INFO  [io.quarkus] (main) Quarkus 0.21.1 started in 0.011s. Listening on: http://[::]:8080
+2019-08-24 12:49:57,840 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy, keycloak, resteasy-jsonb]
 ~~~
 
-That’s `15 milliseconds` to start up.
+That’s `11 milliseconds` to start up.
+
+![serverless]({% image_path payment-native-runn.png %})
 
 And extremely low memory usage as reported by the Linux `ps` utility. While the app is running, open another Terminal 
 (click the `+` button on the terminal tabs line) and run:
@@ -169,17 +171,19 @@ And extremely low memory usage as reported by the Linux `ps` utility. While the 
 You should see something like:
 
 ~~~shell
-   PID   RSS COMMAND
- 16017 53816 target/payment-1.0-SNAPSHOT-runner
+  PID   RSS COMMAND
+ 69243 35932 target/payment-1.0-SNAPSHOT-runner
 ~~~
 
-This shows that our process is taking around `50 MB` of memory ([Resident Set Size](https://en.wikipedia.org/wiki/Resident_set_size), or RSS). Pretty compact!
+![serverless]({% image_path payment-native-pss.png %})
+
+This shows that our process is taking around `30 MB` of memory ([Resident Set Size](https://en.wikipedia.org/wiki/Resident_set_size), or RSS). Pretty compact!
 
 > NOTE: The RSS and memory usage of any app, including Quarkus, will vary depending your specific environment, and will rise as the application experiences load.
 
 Make sure the app is still working as expected (we’ll use `curl` this time to access it directly). In a new CdeReady Workspaces Terminal run:
 
-`curl http://localhost:8080/api/payment`
+`curl http://localhost:8080/payment`
 
 You should see:
 
@@ -207,11 +211,54 @@ The Knative Serving project provides `middleware primitives` that enable:
 
  * Point-in-time snapshots of deployed code and configurations
 
-In the lab, `Knative Serving` is already installed on OpenShift cluster but if you want to install Knative Serving on your own OpenShift cluster, 
+In the lab, `Knative Serving` is already `installed` on OpenShift cluster but if you want to install Knative Serving on your own OpenShift cluster, 
 you can play with [Installing the Knative Serving Operator](https://knative.dev/docs/install/knative-with-openshift/) as below:
 
 ![serverless]({% image_path knative_serving_tile_highlighted.png %})
 
+Before deploying the payment service using a native image, let's delete existing payment Kybernetes object such as Pod, DeploymentConfig, Service,
+
+First, create a new binary build within OpenShift
+
+`oc new-build quay.io/redhat/ubi-quarkus-native-runner --binary --name=payment-native-service -l app=payment-native-service`
+
+You should get a `--> Success message` at the end.
+
+> `NOTE`: This build uses the new [Red Hat Universal Base Image](Red Hat Universal Base Image), providing foundational software needed to 
+run most applications, while staying at a reasonable size.
+
+And then start and watch the build, which will take about a minute to complete:
+
+`oc start-build payment-native-service --from-file target/*-runner --follow`
+
+This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
+
+Once that’s done, deploy the new image as an OpenShift application:
+
+`oc new-app payment-native-service`
+
+and expose it to the world:
+
+`oc expose svc/payment-native-service`
+
+Finally, make sure it’s actually done rolling out:
+
+`oc rollout status -w dc/payment-native-service`
+
+Wait for that command to report replication controller `payment-native-service-1` successfully rolled out before continuing.
+
+And now we can access using `curl` once again. In the Terminal, run this command, which constructs the URL using `oc get route` and then calls curl to 
+access the endpoint:
+
+`curl $(oc get route payment-native-service -o=go-template --template={% raw %}'{{ .spec.host }}'{% endraw %})/payment`
+
+>`NOTE`: The above curl command constructs the URL to your running app on the cluster using the oc get route command.
+
+You should see:
+
+`hello quarkus-on-openshift from people-1-9sgsm`
+
+>`NOTE`: Your hostname (the Kubernetes pod in which your app runs) name will be different from the above.
 
 ####3. Accessing your application
 

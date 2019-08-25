@@ -968,7 +968,7 @@ Or runthe following maven plugin in CodeReady Workspaces`Terminal`:
 
 Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady Workspaces `Terminal`:
 
-`oc new-app  --docker-image mongo:4.0 --name=order-database`    
+`oc new-app --docker-image mongo:4.0 --name=order-database`    
 
 Once the MongoDB is deployed successfully, it will be showd in `Project Status`.
 
@@ -1030,13 +1030,203 @@ You will see the following result:
 
 ![openshift_login]({% image_path order_curl_result.png %})
 
-
 ####5. Developing and Deploying Payment Service
 
 ---
 
-To be added.......
+`Payment Service` offers shops online services for accepting electronic payments by a variety of payment methods including credit card, 
+bank-based payments when orders are checked out in shopping cart. Lets's go through quickly how the payment service get `REST` services to use 
+the `Keycloak` single sign-on with protecting `JAX-RS` applicaition on `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` 
+Web IDE and expand `payment-service` directory.
 
+![catalog]({% image_path codeready-workspace-payment-project.png %}){:width="500px"}
+
+In this step, we will learn how the payment Quarkus application can use `Keycloak` to protect your `JAX-RS` applications using bearer token authorization, 
+where these tokens are issued by a `Keycloak Server`.
+
+`Bearer Token Authorization` is the process of authorizing `HTTP requests` based on the existence and validity of a bearer token representing a subject 
+and his access context, where the token provides valuable information to determine the subject of the call as well whether or not a HTTP resource can be accessed.
+
+`Keycloak` is a `OAuth 2.0` compliant Authorization Server, capable of issuing access tokens so that you can use them to access protected resources. 
+We are not going to enter into the details on what `OAuth 2.0` is and how it works but give you a guideline on how to use `OAuth 2.0` in your `JAX-RS applications` 
+using the `Quarkus Keycloak Extension`.
+
+If you are already familiar with `Keycloak`, you’ll notice that the extension is basically another adapter implementation but specific for Quarkus applications. 
+Otherwise, you can find more information in [Keycloak documentation](https://keycloak.org/).
+
+##### Adding Maven Dependencies using Quarkus Extensions
+
+Execute the following command via CodeReady Workspaces `Terminal`:
+
+`mvn quarkus:add-extension -Dextensions="keycloak, resteasy-jsonb"`
+
+This command generates a Maven project, importing the `keycloak` extension which is an implementation of a Keycloak Adapter for Quarkus applications 
+and provides all the necessary capabilities to integrate with a Keycloak Server and perform bearer token authorization. Let's confirm your `pom.xml` as below:
+
+![payment]({% image_path payment-pom-dependency.png %})
+
+##### Writing the application
+
+Let’s start by implementing the `/api/users/me` endpoint. As you can see from the source code below it is just a regular `JAX-RS` resource:
+
+~~~java
+package org.acme.keycloak;
+
+import javax.annotation.security.RolesAllowed;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+import org.jboss.resteasy.annotations.cache.NoCache;
+import org.keycloak.KeycloakSecurityContext;
+
+public class UsersResource {
+
+    @Inject
+    KeycloakSecurityContext keycloakSecurityContext;
+
+    @GET
+    @Path("/me")
+    @RolesAllowed("user")
+    @Produces(MediaType.APPLICATION_JSON)
+    @NoCache
+    public User me() {
+        return new User(keycloakSecurityContext);
+    }
+
+    public class User {
+
+        private final String userName;
+
+        User(KeycloakSecurityContext securityContext) {
+            this.userName = securityContext.getToken().getPreferredUsername();
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+    }
+}
+~~~
+
+##### Configuring the application
+
+The Keycloak extension allows you to define the adapter configuration using either the `application.properties` file or using a `keycloak.json`. 
+Both files should be located at the src/main/resources directory.
+
+ * Configuring using the `application.properties` file as below:
+
+~~~java
+quarkus.keycloak.realm=quarkus
+quarkus.keycloak.auth-server-url=http://localhost:8180/auth
+quarkus.keycloak.resource=backend-service
+quarkus.keycloak.bearer-only=true
+quarkus.keycloak.credentials.secret=secret
+quarkus.keycloak.policy-enforcer.enable=true
+quarkus.keycloak.policy-enforcer.enforcement-mode=PERMISSIVE
+~~~
+
+ * Configuring using the `keycloak.json` file as below:
+
+~~~java
+{
+  "realm": "quarkus",
+  "auth-server-url": "http://localhost:8180/auth",
+  "resource": "backend-service",
+  "bearer-only" : true,
+  "credentials": {
+    "secret": "secret"
+  },
+  "policy-enforcer": {
+    "enforcement-mode": "PERMISSIVE"
+  }
+}
+~~~
+
+For more details about this file and all the supported options, please take a look at [Keycloak Adapter Config](https://www.keycloak.org/docs/latest/securing_apps/index.html#_java_adapter_config).
+
+##### Deploying Payment service with Keycloak server to OpenShift
+
+Run the following `oc` command to deploy a `Keycloak` to OpenShift via CodeReady Workspaces `Terminal`:
+
+`oc new-app --docker-image quay.io/keycloak/keycloak --name=payment-keycloak -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin`    
+
+Once the Keycloak is deployed successfully, it will be showd in `Project Status`.
+
+![order]({% image_path payment-keycloak-status.png %})
+
+Build the image using on OpenShift:
+
+`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=payment-service -l app=payment-service`
+
+This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
+
+ * Create a temp directory to store only previously-built application with necessary lib directory:
+
+`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
+
+ * Start and watch the build, which will take about minutes to complete:
+
+`oc start-build payment-service --from-dir=target/binary --follow`
+
+![payment]({% image_path payment-build-logs.png %})
+
+ * Deploy it as an OpenShift application after the build is done:
+
+`oc new-app payment-service`
+
+ * Create the route
+
+`oc expose svc/payment-service`
+
+ * Finally, make sure it's actually done rolling out:
+
+`oc rollout status -w dc/payment-service`
+
+Wait for that command to report replication controller `payment-service-1` successfully rolled out before continuing.
+
+>`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
+that is that we currently don't have any liveness check configured, but we will add that in the next steps.
+
+And now we can access using curl once again to find all inventories:
+
+* Testing the Application
+
+The application is using bearer token authorization and the first thing to do is obtain an access token from the Keycloak Server in order to 
+access the application resources:
+
+~~~shell
+export KEYCLOAK_URL="http://$(oc get route | grep payment-keycloak | awk '{print $2}')"
+
+export access_token=$(\
+    curl -X POST http://${KEYCLOAK_URL}/auth/realms/quarkus/protocol/openid-connect/token \
+    --user backend-service:secret \
+    -H 'content-type: application/x-www-form-urlencoded' \
+    -d 'username=daniel&password=daniel&grant_type=password' | jq --raw-output '.access_token' \
+ )
+~~~
+
+The example above obtains an access token for user `daniel`.
+
+Any user is allowed to access the `http://${PAYMENT_URL}/api/users/me` endpoint which basically returns a JSON payload with details about the user.
+
+~~~shell
+export PAYMENT_URL="http://$(oc get route | grep payment-service | awk '{print $2}')"
+
+curl -v -X GET \
+  http://${PAYMENT_URL}:8080/api/users/me \
+  -H "Authorization: Bearer "$access_token
+~~~
+
+You will see the following result:
+
+~~~shell
+bla bla bla
+~~~
+
+![openshift_login]({% image_path payment_curl_result.png %})
 
 ####6. Deploying WEB-UI Service
 
