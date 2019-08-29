@@ -1,4 +1,4 @@
-## Lab3 - Evoling Serverless Services
+## Lab3 - Evolving Serverless Services
 
 In this cloud-native application architecture, We now have multiple microservices to implement traditional application workloads and reactive system. 
 However, it's not necessary that whole applications/services have to run all the time(24/7) for serving funtions because a certain service can be 
@@ -220,7 +220,7 @@ Before deploying the payment service using a native image, let's delete existing
 
 First, create a new binary build within OpenShift
 
-`oc new-build quay.io/redhat/ubi-quarkus-native-runner --binary --name=payment-native-service -l app=payment-native-service`
+`oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:19.2.0 --binary --name=payment-native-service -l app=payment-native-service`
 
 You should get a `--> Success message` at the end.
 
@@ -260,6 +260,44 @@ You should see:
 
 >`NOTE`: Your hostname (the Kubernetes pod in which your app runs) name will be different from the above.
 
+Open `knative/service.yaml` to specify the Knative Serving custom resource align with the above payment service.
+
+~~~yaml
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: payment-service
+spec:
+  template:
+    metadata:
+      name: payment-service
+      annotations:
+        # disable istio-proxy injection
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - image: quay.io/rhdevelopers/knative-tutorial-greeter:quarkus
+        livenessProbe:
+          httpGet:
+            path: /healthz
+        readinessProbe:
+          httpGet:
+            path: /healthz
+~~~
+
+The service can be deployed using the following command via CodeReady Workspaces `Terminal`:
+
+`oc apply -n userXX-cloudnativeapps -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/cloudservice.yaml`
+
+After successful deployment of the service we should see a Kubernetes Deployment named similar to `payment-service-deployment` available:
+
+`export SVC_URL="oc get rt payment-service -o yaml | yq read - 'status.url'" && http $SVC_URL`
+
+The http command should return a response containing a line similar to Hi greeter ⇒ '6fee83923a9f' : 1
+
+> `NOTE`: Sometimes the response might not be returned immediately especially when the pod is coming up from dormant state. 
+In that case, repeat service invocation.
+
 ####3. Accessing your application
 
 ---
@@ -273,19 +311,128 @@ curl -v -H 'Host: getting-started-knative.example.com' $IP_ADDRESS/hello/greetin
 
 you can replace minikube ip with minishift ip if you are using OpenShift
 
-####4. Creating Tekton Pipeline in OpenShift
+####4. Creating Cloud-Native CI/CD Pipelines using Tekton 
 
 ---
 
+##### What is the Cloud-Native CI/CD Pipelines?
+
+There're lots of open source CI/CD tools to build, test, deploy, and manage cloud-natvie applications/microservices from on-premise to private, public, 
+and hybrid cloud. Each tool provides different features to integrate with existing platforms/systems such as `plugins`, `RESTful APIs`. This sometimes makes complex 
+for DevOps teams to create the CI/CD pipelines and maintain them on `Kubernetes clusters`. The `cloud-natvie CI/CD pipeline` should be defined and executed in 
+the Kubernetes native way. For example, the pipeline can be specified as Kubernetes resources using YAML format. 
+in the hybrid cloud. What
+
+`OpenShift Pipelines` provides a `cloud-native`, `continuous integration and delivery (CI/CD)` solution for building pipelines using [Tekton](https://tekton.dev/). 
+`Tekton` is a flexible, Kubernetes-native, open-source CI/CD framework that enables automating deployments across multiple platforms (Kubernetes, serverless, VMs, etc) 
+by abstracting away the underlying details.
+
+OpenShift Pipelines features:
+
+ * Standard CI/CD pipeline definition based on Tekton
+
+ * Build images with Kubernetes tools such as S2I, Buildah, Buildpacks, Kaniko, etc
+
+ * Deploy applications to multiple platforms such as Kubernetes, serverless and VMs
+
+ * Easy to extend and integrate with existing tools
+
+ * Scale pipelines on-demand
+
+ * Portable across any Kubernetes platform
+
+ * Designed for microservices and decentralized teams
+
+ * Integrated with the OpenShift Developer Console
+
+In the lab, `OpenShift Pipelines` is already `installed` on OpenShift cluster but if you want to install OpenShift Pipelines on `your own OpenShift cluster`, 
+OpenShift Pipelines is provided as an add-on on top of OpenShift that can be installed via an `operator` available in the `OpenShift OperatorHub`. 
+Follow [these instructions](https://github.com/openshift/pipelines-tutorial/blob/master/install-operator.md) in order to install OpenShift Pipelines 
+on OpenShift via the `OperatorHub` as below:
+
+![serverless]({% image_path operatorhub-pipeline.png %})
+
+##### What is Tekton?
+
+![severless]({% image_path tekton-arch.png %})
+
+`Tekton` defines a number of [Kubernetes custom resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) as 
+building blocks in order to standardize pipeline concepts and provide a terminology that is consistent across `CI/CD solutions`. These custom resources 
+are an extension of the `Kubernetes API` that let users create and interact with these objects using the `OpenShift CLI (oc)`, `kubectl`, and other Kubernetes tools.
+
+The `custom resources` needed to define a pipeline are listed below:
+
+ * `Task`: a reusable, loosely coupled number of steps that perform a specific task (e.g. building a container image)
+
+ * `Pipeline`: the definition of the pipeline and the tasks that it should perform
+
+ * `PipelineResource`: inputs (e.g. git repository) and outputs (e.g. image registry) to and out of a pipeline or task
+
+ * `TaskRun`: the execution and result (i.e. success or failure) of running an instance of task
+
+ * `PipelineRun`: the execution and result (i.e. success or failure) of running a pipeline
+
+![severless]({% image_path tekton-arch.png %})
+
+For further details on pipeline concepts, refer to the [Tekton documentation](https://github.com/tektoncd/pipeline/tree/master/docs#learn-more) that 
+provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
+
+In this lab, we will walk you through pipeline concepts and how to create and run a CI/CD pipeline for building and deploying `serverless applications` 
+on `Knative` on OpenShift.
+
 ##### Deploying Nexus
 
-To make maven builds faster, we will deploy `Sonatype Nexus`
+To make maven builds faster, we will deploy `Sonatype Nexus`. You need to replace `userXX` with your credential:
 
-`oc new-app sonatype/nexus`
+`oc new-app sonatype/nexus -n userXX-cloudnativeapps`
+
+Once you complete to deploy the Nexus server on OpenShift cluster, you can confirm it in `Project Status` page of OpenShift web console:
+
+![severless]({% image_path nexus-deployment.png %})
 
 ##### Creating Tekton Tasks
 
+`Tasks` consist of a number of steps that are executed sequentially. Each `task` is executed in a separate container within the same pod. 
+They can also have inputs and outputs in order to interact with other tasks in the pipeline.
+
+Here is an example of a Maven task for building a Maven-based Java application:
+
+~~~yaml
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: maven-build
+spec:
+  inputs:
+    resources:
+    - name: workspace-git
+      targetPath: /
+      type: git
+  steps:
+  - name: build
+    image: maven:3.6.0-jdk-8-slim
+    command:
+    - /usr/bin/mvn
+    args:
+    - install
+~~~
+
+When a `task` starts running, it starts a pod and runs each `step` sequentially in a separate container on the same pod. This task happens to have a 
+single step, but tasks can have multiple steps, and, since they run within the same pod, they have access to the same volumes in order to cache files, 
+access configmaps, secrets, etc. `Tasks` can also receive inputs (e.g., a git repository) and outputs (e.g., an image in a registry) in order to interact 
+with each other.
+
+Note that only the requirement for a git repository is declared on the task and not a specific git repository to be used. That allows `tasks` to be 
+reusable for multiple pipelines and purposes. You can find more examples of reusable `tasks` in the [Tekton Catalog](https://github.com/tektoncd/catalog) 
+and [OpenShift Catalog](https://github.com/openshift/pipelines-catalog) repositories.
+
+Install the `openshift-client` and `s2i-java` tasks from the catalog repository using `oc` or `kubectl`, which you will need for 
+creating a pipeline in the next section:
+
 Create the following Tekton tasks which will be used in the `Pipelines`
+
+$ oc create -f https://raw.githubusercontent.com/tektoncd/catalog/master/openshift-client/openshift-client-task.yaml
+$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-catalog/master/s2i-java-8/s2i-java-8-task.yaml
 
 ~~~shell
 oc create -f https://raw.githubusercontent.com/tektoncd/catalog/master/openshift-client/openshift-client-task.yaml \
@@ -295,9 +442,13 @@ oc create -f https://raw.githubusercontent.com/tektoncd/catalog/master/openshift
   -f https://raw.githubusercontent.com/redhat-developer-demos/pipelines-catalog/master/knative-client/kn-service-create-task.yaml
 ~~~
 
-Check the tasks created:
+You can take a look at the list of install tasks using the [Tekton CLI](https://github.com/tektoncd/cli/releases) that already installed 
+in CodeReady Workspaces `Terminal`:
 
 `tkn task ls`
+
+openshift-client   58 seconds ago
+s2i-java-8         1 minute ago
 
 ~~~shell
 NAME                AGE
@@ -308,15 +459,7 @@ quarkus-native      12 seconds ago
 s2i-quarkus         13 seconds ago
 ~~~
 
-~~~shell
-oc create serviceaccount pipeline && \
-oc adm policy add-scc-to-user privileged -z pipeline && \
-oc adm policy add-role-to-user edit -z pipeline && \
-oc adm policy add-scc-to-user privileged -z default && \
-oc adm policy add-scc-to-user anyuid -z default && \
-oc create -f https://raw.githubusercontent.com/redhat-developer-demos/pipelines-catalog/master/knative-client/pipeline-sa-roles.yaml -n userXX-cloudnativeapps && \
-oc policy add-role-to-user pipeline-roles -z pipeline --role-namespace=userXX-cloudnativeapps
-~~~
+##### Deploying the Payment application
 
 ##### Additional Resources:
 
