@@ -105,20 +105,11 @@ Open a `new` CodeReady Workspaces `Terminal` and invoke the RESTful endpoint usi
 
 We will use `Quarkus extension` to add `PostgreSQL JDBC Driver`. Go back to CodeReady Workspaces `Terminal` and run the following maven plugin:
 
-`mvn quarkus:add-extension -Dextensions="io.quarkus:quarkus-jdbc-postgresql"`
-
-Then, modify `quarkus.datasource.url, quarkus.datasource.drive` variables in `src/main/resources/application.properties` as below:
-
-~~~java
-quarkus.datasource.url=jdbc:postgresql:inventory
-quarkus.datasource.driver=org.postgresql.Driver
-~~~
-
-![inventory_service]({% image_path inventory_update_properties.png %})
+`mvn quarkus:add-extension -Dextensions="jdbc-postgresql"`
 
 Package the applicaiton via running the following maven plugin in CodeReady Workspaces`Terminal`:
 
-`mvn clean package -DskipTests`
+`mvn clean package -DskipTests -Dquarkus.profile=prod`
 
 > `NOTE`: You should `SKIP` the Unit test because you don't have PostgreSQL database in local environment.
 
@@ -251,6 +242,8 @@ Open `CatalogService.java` in `src/main/java/com/redhat/coolstore/service` direc
 
 Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces `Terminal`:
 
+`cd /projects/cloud-native-workshop-v2m4-labs/inventory-service/`
+
 `mvn clean package spring-boot:repackage -DskipTests`
 
 The build and deploy may take a minute or two. Wait for it to complete. You should see a `BUILD SUCCESS` at the
@@ -376,16 +369,16 @@ This will add the following to your `pom.xml`.
 
 ![codeready-workspace-maven]({% image_path catalog-pom-infinispan-client.png %})
 
-Now, let's create Cache Services using `cache-service` of `Red Hat JBoss Data Grid` to quickly set up clusters that give you optimal performance 
+Now, let's create Cache Services using `cart-cache` of `Red Hat JBoss Data Grid` to quickly set up clusters that give you optimal performance 
 and ease of use with minimal configuration.
 
-`Cache Service`(cache-service) provides an easy-to-use implementation of `Data Grid` for `OpenShift` that is designed to increase application 
-response time through high-performance caching. With cache-service you can create new caches only as copies of the default cache definition.
+`Cache Service`(cart-cache) provides an easy-to-use implementation of `Data Grid` for `OpenShift` that is designed to increase application 
+response time through high-performance caching. With cart-cache you can create new caches only as copies of the default cache definition.
 
 The Infinispan client is configurable in the `application.properties` file that can be provided in the `src/main/resources` directory. 
 These are the properties that can be configured in this file:
 
-`quarkus.infinispan-client.server-list=cache-service:11222`
+`quarkus.infinispan-client.server-list=cart-cache:11222`
 
 It is also possible to configure a `hotrod-client.properties` as described in the Infinispan user guide. Note that the `hotrod-client.properties` values 
 overwrite any matching property from the other configuration values(eg. near cache).
@@ -642,9 +635,9 @@ Or runthe following maven plugin in CodeReady Workspaces`Terminal`:
 
 ##### Deploying Cart service with JBoss Data Grid to OpenShift
 
-Run the following `oc` command to create a `cache-service` in OpenShift via CodeReady Workspaces `Terminal`:
+Run the following `oc` command to create a `cart-cache` in OpenShift via CodeReady Workspaces `Terminal`:
 
-`oc new-app cache-service -p APPLICATION_USER=developer -p APPLICATION_PASSWORD=developer -p NUMBER_OF_INSTANCES=3 -p REPLICATION_FACTOR=2`
+`oc new-app cart-cache -p APPLICATION_USER=developer -p APPLICATION_PASSWORD=developer -p NUMBER_OF_INSTANCES=3 -p REPLICATION_FACTOR=2`
 
  * `NUMBER_OF_INSTANCES` sets the number of nodes in the Data Grid for OpenShift cluster. The default is 1.
 
@@ -674,7 +667,7 @@ You can also create a cache service when you go to `Catalog > Developer Catalog`
 
 ![catalog]({% image_path catalog-cache-service.png %})
 
-Once the cache-service is deployed successfully, it will be showd in `Project Status`.
+Once the cart-cache is deployed successfully, it will be showd in `Project Status`.
 
 ![catalog]({% image_path catalog-cache-service-status.png %})
 
@@ -968,7 +961,7 @@ Or runthe following maven plugin in CodeReady Workspaces`Terminal`:
 
 Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady Workspaces `Terminal`:
 
-`oc new-app --docker-image mongo:4.0 --name=order-database`    
+`oc new-app --docker-image mongo:4.0 --name=order-database`
 
 Once the MongoDB is deployed successfully, it will be showd in `Project Status`.
 
