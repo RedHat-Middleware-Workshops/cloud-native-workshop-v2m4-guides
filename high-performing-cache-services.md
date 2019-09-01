@@ -1235,3 +1235,11 @@ and expand `coolstore-ui` directory.
 ![coolstore-ui]({% image_path codeready-workspace-coolstore-ui.png %}){:width="500px"}
 
 You will see javascripts for specific cloud-native services such as cart, catatlog, and order service as above.
+
+Create a template to specify `ImageStream`, `BuildConfig` of the web-ui service by running the folloing `oc` command via CodeReady Workspaces `Terminal`:
+
+`oc create -f https://raw.githubusercontent.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2-infra/ocp-4.1/files/coolstore-ui-bc-template.yaml`
+
+Create a template to deploy the web-ui service by running the folloing `oc` command via CodeReady Workspaces `Terminal`:
+
+`oc create -f https://raw.githubusercontent.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2-infra/ocp-4.1/files/coolstore-ui-dc-template.yaml`
