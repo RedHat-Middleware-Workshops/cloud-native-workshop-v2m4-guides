@@ -40,6 +40,9 @@ a cloud-native, continuous integration and delivery (CI/CD) Pipelines using `Tek
 In this lab, we'll deploy the `Payment Service` as a serverless application using `Knative Serving`, `Istio`, `Tekton Pipelines` and `Quarkus native application` 
 because the payment service doesn't need to be served for the end users as the other services like the shopping cart and catalog services.
 
+The `Apache Kafka Event` source enables `Knative Eventing` integration with Apache Kafka. When a message is produced to Apache Kafka, 
+the Apache Kafka Event Source will consume the produced message and post that message to the corresponding event sink.
+
 ##### What is Knative?
 
 ![Logo]({% image_path knative-audience.png %}){:width="700px"}

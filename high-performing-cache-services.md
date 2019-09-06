@@ -1,8 +1,8 @@
 ## Lab1 - Creating High-performing Cache Services
 
 In this lab, we'll develop 5 microservices into the cloud-native appliation architecture. These cloud-native applications
-will be allowed to communicate with athentication by `Single Sign-On` server. To do that, we will configure how to `authenticate REST API requests` 
-across services. In the end, we will optimize `data transaction performance` of the shopping cart service thru integrating with a `Cache(Data Grid) server` 
+will have transactions with multiple datasources such as `PostgreSQL` and `MongoDB`. Especially, we will learn how to configure datasources easily using 
+`Quarkus Extensions`. In the end, we will optimize `data transaction performance` of the shopping cart service thru integrating with a `Cache(Data Grid) server` 
 to increase end users'(customers) satification. And there's more fun facts how easy it is to deploy applications on OpenShift 4 via `oc` command line tool.
 
 #### Goals of this lab
@@ -69,8 +69,8 @@ you will see the following code sniffet.
 
 The REST services defines two endpoints:
 
-* `/inventory` that is accessible via `HTTP GET` which will return all known product Inventory entities as JSON
-* `/inventory/<itemId>` that is accessible via `HTTP GET` at for example `/inventory/329199` with the last path parameter being the location which 
+* `/api/inventory` that is accessible via `HTTP GET` which will return all known product Inventory entities as JSON
+* `/api/inventory/<itemId>` that is accessible via `HTTP GET` at for example `/inventory/329199` with the last path parameter being the location which 
 we want to check its inventory status.
 
 ![inventory_service]({% image_path inventoryResource.png %})
@@ -80,6 +80,12 @@ we want to check its inventory status.
 ~~~java
 quarkus.datasource.url=jdbc:h2:file://projects/database.db
 quarkus.datasource.driver=org.h2.Driver
+quarkus.datasource.username=inventory
+quarkus.datasource.password=mysecretpassword
+quarkus.datasource.max-size=8
+quarkus.datasource.min-size=2
+quarkus.hibernate-orm.database.generation=drop-and-create
+quarkus.hibernate-orm.log.sql=false
 ~~~
 
 Let's run the inventory application locally using `maven plugin command` via CodeReady Workspaces `Terminal`:
@@ -94,8 +100,9 @@ You should see a bunch of log output that ends with:
 
 Open a `new` CodeReady Workspaces `Terminal` and invoke the RESTful endpoint using the following CURL commands. The output looks like here:
 
-`curl http://localhost:8080/services/inventory ; echo`
-`curl http://localhost:8080/services/inventory/329199 ; echo`
+`curl http://localhost:8080/api/inventory ; echo`
+
+`curl http://localhost:8080/api/inventory/329199 ; echo`
 
 ![inventory_service]({% image_path inventory_local_test.png %})
 
@@ -150,7 +157,7 @@ oc new-app -e POSTGRESQL_USER=inventory \
 
  * Build the image using on OpenShift:
 
-`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory-service -l app=inventory-service`
+`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory -l app=inventory`
 
 This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
 
@@ -160,23 +167,23 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 
  * Start and watch the build, which will take about minutes to complete:
 
-`oc start-build inventory-service --from-dir=target/binary --follow`
+`oc start-build inventory --from-dir=target/binary --follow`
 
 ![inventory]({% image_path inventory-build-logs.png %})
 
  * Deploy it as an OpenShift application after the build is done and override the Postgres URL to specify our production Postgres credentials:
 
-`oc new-app inventory-service -e QUARKUS_DATASOURCE_URL=jdbc:postgresql://inventory-database:5432/inventory`
+`oc new-app inventory -e QUARKUS_DATASOURCE_URL=jdbc:postgresql://inventory-database:5432/inventory`
 
  * Create the route
 
-`oc expose svc/inventory-service`
+`oc expose svc/inventory`
 
  * Finally, make sure it's actually done rolling out:
 
-`oc rollout status -w dc/inventory-service`
+`oc rollout status -w dc/inventory`
 
-Wait for that command to report replication controller `inventory-service-1` successfully rolled out before continuing.
+Wait for that command to report replication controller `inventory-1` successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
 that is that we currently don't have any liveness check configured, but we will add that in the next steps.
@@ -185,9 +192,9 @@ And now we can access using curl once again to find all inventories:
 
 * Get the route URL
 
-`export URL="http://$(oc get route | grep inventory-service | awk '{print $2}')"`
+`export URL="http://$(oc get route | grep inventory | awk '{print $2}')"`
 
-`curl $URL/services/inventory ; echo`
+`curl $URL/api/inventory ; echo`
 
 You will see the following result:
 
@@ -242,7 +249,7 @@ Open `CatalogService.java` in `src/main/java/com/redhat/coolstore/service` direc
 
 Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces `Terminal`:
 
-`cd /projects/cloud-native-workshop-v2m4-labs/inventory-service/`
+`cd /projects/cloud-native-workshop-v2m4-labs/catalog-service/`
 
 `mvn clean package spring-boot:repackage -DskipTests`
 
@@ -258,35 +265,35 @@ Make sure if the current project is `userXX-cloudnativeapps`.
 
 ~~~shell
 oc new-app -e POSTGRESQL_USER=catalog \
-             -e POSTGRESQL_PASSWORD=mysecretpassword \
-             -e POSTGRESQL_DATABASE=catalog \
-             openshift/postgresql:10 \
-             --name=catalog-database
+    -e POSTGRESQL_PASSWORD=mysecretpassword \
+    -e POSTGRESQL_DATABASE=catalog \
+    openshift/postgresql:10 \
+    --name=catalog-database
 ~~~
 
  * Build the image using on OpenShift:
 
-`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=catalog-service -l app=catalog-service`
+`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=catalog -l app=catalog`
 
  * Start and watch the build, which will take about minutes to complete:
 
-`oc start-build catalog-service --from-file=target/catalog-1.0.0-SNAPSHOT.jar --follow`
+`oc start-build catalog --from-file=target/catalog-1.0.0-SNAPSHOT.jar --follow`
 
 ![catalog]({% image_path catalog-build-logs.png %})
 
  * Deploy it as an OpenShift application after the build is done and override the Postgres URL to specify our production Postgres credentials:
 
-`oc new-app catalog-service`
+`oc new-app catalog`
 
  * Create the route
 
-`oc expose service catalog-service`
+`oc expose service catalog`
 
  * Finally, make sure it's actually done rolling out:
 
-`oc rollout status -w dc/catalog-service`
+`oc rollout status -w dc/catalog`
 
-Wait for that command to report replication controller `catalog-service-1` successfully rolled out before continuing.
+Wait for that command to report replication controller `catalog-1` successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
 that is that we currently don't have any liveness check configured, but we will add that in the next steps.
@@ -295,9 +302,9 @@ And now we can access using curl once again to find a certain inventory:
 
 * Get the route URL
 
-`export URL="http://$(oc get route | grep catalog-service | awk '{print $2}')"`
+`export URL="http://$(oc get route | grep catalog | awk '{print $2}')"`
 
-`curl $URL/services/product/329299 ; echo`
+`curl $URL/api/product/329299 ; echo`
 
 You will see the following result:
 
@@ -306,7 +313,7 @@ You will see the following result:
 ![openshift_login]({% image_path catalog_curl_result.png %})
 
 So now `Catalog` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console 
-with running 4 pods such as catalog-service, catalog-database, inventory-service, and inventory-database.
+with running 4 pods such as catalog, catalog-database, inventory, and inventory-database.
 
 ![catalog]({% image_path catalog-project-status.png %})
 
@@ -317,7 +324,7 @@ with running 4 pods such as catalog-service, catalog-database, inventory-service
 `Shopping Cart Service` manages shopping cart for each customer. Lets's go through quickly how the cart service works and built on 
 `Quarkus` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `cart-service` directory.
 
-![catalog]({% image_path codeready-workspace-cart-project.png %}){:width="500px"}
+![cart]({% image_path codeready-workspace-cart-project.png %}){:width="500px"}
 
 Let's figure out the `basic structure of Quarkus project` in terms of how `models, services, and RESTful APIs` are already implemented to serve 
 functions of the shopping cart service. 
@@ -333,26 +340,7 @@ And you will see that `POST`, `GET` methods exist to serve the shopping cart ser
 You can also have a look at `PromotionService`, `ShippingService` in `src/main/java/com/redhat/cloudnative/service` to understand how to 
 define `@ApplicationScoped` in each funtion service.
 
-![catalog]({% image_path cart-services-code.png %})
-
-Let's run the cart-service application locally to test if fuctions work correctly. Run this Quarkus application as 
-`Development Mode` using `quarkus-maven-plugin` or click on `Build and Run Locally` in `Commands Palette`:
-
-![codeready-workspace-maven]({% image_path quarkus-dev-run-paletter.png %})
-
-`cd /projects/cloud-native-workshop-v2m4-labs/cart-service`
-
-`mvn compile quarkus:dev`
-
-Then, access the following endpoints using `curl` and the result looks like:
-
-`curl -X POST http://localhost:8080/cart/1111/329199/50`
-
-`curl http://localhost:8080/cart/1111`
-
-~~~java
-bla bla bla
-~~~
+![cart]({% image_path cart-services-code.png %})
 
 ##### Developing Quarkus Infinispan Client
 
@@ -367,7 +355,7 @@ by running the following from the command line in your project base directory vi
 
 This will add the following to your `pom.xml`.
 
-![codeready-workspace-maven]({% image_path catalog-pom-infinispan-client.png %})
+![cart]({% image_path catalog-pom-infinispan-client.png %})
 
 Now, let's create Cache Services using `cart-cache` of `Red Hat JBoss Data Grid` to quickly set up clusters that give you optimal performance 
 and ease of use with minimal configuration.
@@ -400,7 +388,7 @@ The default serialization is done using a library based on `protobuf`. We need t
 
 We already have`cart.proto` in the `META-INF directory` of the cart project. These files will automatically be picked up at initialization time.
 
-![catalog]({% image_path catalog-cart-proto.png %})
+![cart]({% image_path catalog-cart-proto.png %})
 
 The next thing to do is to provide a `org.infinispan.protostream.MessageMarshaller` implementation for each user class defined in the proto schema. 
 This class is then provided via `@Produces` in a similar fashion to the code based proto schema definition above.
@@ -627,9 +615,11 @@ bla bla or cp pre-built codes from somewhere in the repo
 
 Package the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
 
-![codeready-workspace-maven]({% image_path quarkus-dev-run-packageforOcp.png %})
+![cart]({% image_path quarkus-dev-run-packageforOcp.png %})
 
-Or runthe following maven plugin in CodeReady Workspaces`Terminal`:
+Or run the following maven plugin in CodeReady Workspaces`Terminal`:
+
+`cd /projects/cloud-native-workshop-v2m4-labs/cart-service/`
 
 `mvn clean package -DskipTests`
 
@@ -637,7 +627,7 @@ Or runthe following maven plugin in CodeReady Workspaces`Terminal`:
 
 Run the following `oc` command to create a `cart-cache` in OpenShift via CodeReady Workspaces `Terminal`:
 
-`oc new-app cart-cache -p APPLICATION_USER=developer -p APPLICATION_PASSWORD=developer -p NUMBER_OF_INSTANCES=3 -p REPLICATION_FACTOR=2`
+`oc new-app jboss/infinispan-server:10.0.0.Beta3 --name=datagrid-service`
 
  * `NUMBER_OF_INSTANCES` sets the number of nodes in the Data Grid for OpenShift cluster. The default is 1.
 
@@ -663,17 +653,13 @@ user experience with features and benefits as below:
 
  * `Protect data` - Obtain comprehensive data security with encryption and role-based access.
 
-You can also create a cache service when you go to `Catalog > Developer Catalog` in OpenShift web console and select `data grid service`.
+Once the cart-cache is deployed successfully, it will be showd in `Workloads > Pods`.
 
-![catalog]({% image_path catalog-cache-service.png %})
-
-Once the cart-cache is deployed successfully, it will be showd in `Project Status`.
-
-![catalog]({% image_path catalog-cache-service-status.png %})
+![cart]({% image_path datagrid-pod.png %})
 
 Build the image using on OpenShift:
 
-`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=cart-service -l app=cart-service`
+`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=cart -l app=cart`
 
 This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
 
@@ -683,23 +669,23 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 
  * Start and watch the build, which will take about minutes to complete:
 
-`oc start-build cart-service --from-dir=target/binary --follow`
+`oc start-build cart --from-dir=target/binary --follow`
 
-![inventory]({% image_path cart-build-logs.png %})
+![cart]({% image_path cart-build-logs.png %})
 
  * Deploy it as an OpenShift application after the build is done:
 
-`oc new-app cart-service`
+`oc new-app cart`
 
  * Create the route
 
-`oc expose svc/cart-service`
+`oc expose svc/cart`
 
  * Finally, make sure it's actually done rolling out:
 
-`oc rollout status -w dc/cart-service`
+`oc rollout status -w dc/cart`
 
-Wait for that command to report replication controller `cart-service-1` successfully rolled out before continuing.
+Wait for that command to report replication controller `cart-1` successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
 that is that we currently don't have any liveness check configured, but we will add that in the next steps.
@@ -708,7 +694,7 @@ And now we can access using curl once again to find all inventories:
 
 * Get the route URL
 
-`export URL="http://$(oc get route | grep cart-service | awk '{print $2}')"`
+`export URL="http://$(oc get route | grep cart | awk '{print $2}')"`
 
 `curl -X POST $URL/cart/1111/329199/50 ; echo`
 
@@ -719,8 +705,6 @@ You will see the following result:
 ~~~shell
 bla bla
 ~~~
-
-![openshift_login]({% image_path inventory_curl_result.png %})
 
 ####4. Developing and Deploying Order Service
 
@@ -780,6 +764,7 @@ try {
         order.setDiscount(document.getDouble("discount"));
         order.setShippingFee(document.getDouble("shippingFee"));
         order.setShippingDiscount(document.getDouble("shippingDiscount"));
+        order.setOrderStatus(document.getString("orderStatus"));
         list.add(order);
     }
 } finally {
@@ -798,7 +783,8 @@ Document document = new Document()
         .append("retailPrice", order.getRetailPrice())
         .append("discount", order.getDiscount())
         .append("shippingFee", order.getShippingFee())
-        .append("shippingDiscount", order.getShippingDiscount());
+        .append("shippingDiscount", order.getShippingDiscount())
+        .append("orderStatus", order.getOrderStatus());
 getCollection().insertOne(document);
 ~~~
 
@@ -807,7 +793,7 @@ Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each ma
  * `// TODO: Add JAX-RS annotations here` marker:
 
 ~~~java
-@Path("/orders")
+@Path("/api/orders")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 ~~~
@@ -867,9 +853,12 @@ public void encode(BsonWriter writer, Order Order, EncoderContext encoderContext
     doc.put("customerName", Order.getCustomerName());
     doc.put("customerEmail", Order.getCustomerEmail());
     doc.put("orderValue", Order.getOrderValue());
+    doc.put("retailPrice", Order.getRetailPrice());
     doc.put("discount", Order.getDiscount());
     doc.put("shippingFee", Order.getShippingFee());
     doc.put("shippingDiscount", Order.getShippingDiscount());
+    doc.put("id", Order.getId());
+    doc.put("orderStatus", Order.getOrderStatus());
     documentCodec.encode(writer, doc, encoderContext);
 }
 
@@ -910,6 +899,7 @@ public Order decode(BsonReader reader, DecoderContext decoderContext) {
     order.setDiscount(document.getDouble("discount"));
     order.setShippingFee(document.getDouble("shippingFee"));
     order.setShippingDiscount(document.getDouble("shippingDiscount"));
+    order.setOrderStatus(document.getString("orderStatus"));
     return order;
 }
 ~~~
@@ -951,7 +941,7 @@ ackage the cart application via clicking on `Package for OpenShift` in `Commands
 
 ![codeready-workspace-maven]({% image_path quarkus-dev-run-packageforOcp.png %})
 
-Or runthe following maven plugin in CodeReady Workspaces`Terminal`:
+Or run the following maven plugin in CodeReady Workspaces`Terminal`:
 
 `mvn clean package -DskipTests`
 
@@ -969,7 +959,7 @@ Once the MongoDB is deployed successfully, it will be showd in `Project Status`.
 
 Build the image using on OpenShift:
 
-`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=order-service -l app=order-service`
+`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=order -l app=order`
 
 This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
 
@@ -979,23 +969,23 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 
  * Start and watch the build, which will take about minutes to complete:
 
-`oc start-build order-service --from-dir=target/binary --follow`
+`oc start-build order --from-dir=target/binary --follow`
 
 ![order]({% image_path order-build-logs.png %})
 
  * Deploy it as an OpenShift application after the build is done:
 
-`oc new-app order-service`
+`oc new-app order`
 
  * Create the route
 
-`oc expose svc/order-service`
+`oc expose svc/order`
 
  * Finally, make sure it's actually done rolling out:
 
-`oc rollout status -w dc/order-service`
+`oc rollout status -w dc/order`
 
-Wait for that command to report replication controller `order-service-1` successfully rolled out before continuing.
+Wait for that command to report replication controller `order-1` successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
 that is that we currently don't have any liveness check configured, but we will add that in the next steps.
@@ -1004,224 +994,17 @@ And now we can access using curl once again to find all inventories:
 
 * Get the route URL
 
-`export URL="http://$(oc get route | grep order-service | awk '{print $2}')"`
+`export URL="http://$(oc get route | grep order | awk '{print $2}')"`
+
+`curl $URL/api/orders ; echo`
+
+You will see empty result because you didn't add any shopping items yet:
 
 ~~~shell
-curl -X POST $URL/orders \
-  -H "Content-Type: application/json" \
-  -d '{"id": "1", "customerName": "Dan", "customerEmail": "dan@example.com", "orderValue": "3", "retailPrice": "100", "discount": "0.3", "shippingFee": "20", "shippingDiscount": "0.2"}' 
+[]
 ~~~
 
-
-`curl $URL/orders ; echo`
-
-You will see the following result:
-
-~~~shell
-[{"customerEmail":"dan@example.com","customerName":"Dan","discount":0.3,"id":"1","orderValue":3.0,"retailPrice":100.0,"shippingDiscount":0.2,"shippingFee":20.0}]
-~~~
-
-![openshift_login]({% image_path order_curl_result.png %})
-
-####5. Developing and Deploying Payment Service
-
----
-
-`Payment Service` offers shops online services for accepting electronic payments by a variety of payment methods including credit card, 
-bank-based payments when orders are checked out in shopping cart. Lets's go through quickly how the payment service get `REST` services to use 
-the `Keycloak` single sign-on with protecting `JAX-RS` applicaition on `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` 
-Web IDE and expand `payment-service` directory.
-
-![catalog]({% image_path codeready-workspace-payment-project.png %}){:width="500px"}
-
-In this step, we will learn how the payment Quarkus application can use `Keycloak` to protect your `JAX-RS` applications using bearer token authorization, 
-where these tokens are issued by a `Keycloak Server`.
-
-`Bearer Token Authorization` is the process of authorizing `HTTP requests` based on the existence and validity of a bearer token representing a subject 
-and his access context, where the token provides valuable information to determine the subject of the call as well whether or not a HTTP resource can be accessed.
-
-`Keycloak` is a `OAuth 2.0` compliant Authorization Server, capable of issuing access tokens so that you can use them to access protected resources. 
-We are not going to enter into the details on what `OAuth 2.0` is and how it works but give you a guideline on how to use `OAuth 2.0` in your `JAX-RS applications` 
-using the `Quarkus Keycloak Extension`.
-
-If you are already familiar with `Keycloak`, you’ll notice that the extension is basically another adapter implementation but specific for Quarkus applications. 
-Otherwise, you can find more information in [Keycloak documentation](https://keycloak.org/).
-
-##### Adding Maven Dependencies using Quarkus Extensions
-
-Execute the following command via CodeReady Workspaces `Terminal`:
-
-`mvn quarkus:add-extension -Dextensions="keycloak, resteasy-jsonb"`
-
-This command generates a Maven project, importing the `keycloak` extension which is an implementation of a Keycloak Adapter for Quarkus applications 
-and provides all the necessary capabilities to integrate with a Keycloak Server and perform bearer token authorization. Let's confirm your `pom.xml` as below:
-
-![payment]({% image_path payment-pom-dependency.png %})
-
-##### Writing the application
-
-Let’s start by implementing the `/api/users/me` endpoint. As you can see from the source code below it is just a regular `JAX-RS` resource:
-
-~~~java
-package org.acme.keycloak;
-
-import javax.annotation.security.RolesAllowed;
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-import org.jboss.resteasy.annotations.cache.NoCache;
-import org.keycloak.KeycloakSecurityContext;
-
-public class UsersResource {
-
-    @Inject
-    KeycloakSecurityContext keycloakSecurityContext;
-
-    @GET
-    @Path("/me")
-    @RolesAllowed("user")
-    @Produces(MediaType.APPLICATION_JSON)
-    @NoCache
-    public User me() {
-        return new User(keycloakSecurityContext);
-    }
-
-    public class User {
-
-        private final String userName;
-
-        User(KeycloakSecurityContext securityContext) {
-            this.userName = securityContext.getToken().getPreferredUsername();
-        }
-
-        public String getUserName() {
-            return userName;
-        }
-    }
-}
-~~~
-
-##### Configuring the application
-
-The Keycloak extension allows you to define the adapter configuration using either the `application.properties` file or using a `keycloak.json`. 
-Both files should be located at the src/main/resources directory.
-
- * Configuring using the `application.properties` file as below:
-
-~~~java
-quarkus.keycloak.realm=quarkus
-quarkus.keycloak.auth-server-url=http://localhost:8180/auth
-quarkus.keycloak.resource=backend-service
-quarkus.keycloak.bearer-only=true
-quarkus.keycloak.credentials.secret=secret
-quarkus.keycloak.policy-enforcer.enable=true
-quarkus.keycloak.policy-enforcer.enforcement-mode=PERMISSIVE
-~~~
-
- * Configuring using the `keycloak.json` file as below:
-
-~~~java
-{
-  "realm": "quarkus",
-  "auth-server-url": "http://localhost:8180/auth",
-  "resource": "backend-service",
-  "bearer-only" : true,
-  "credentials": {
-    "secret": "secret"
-  },
-  "policy-enforcer": {
-    "enforcement-mode": "PERMISSIVE"
-  }
-}
-~~~
-
-For more details about this file and all the supported options, please take a look at [Keycloak Adapter Config](https://www.keycloak.org/docs/latest/securing_apps/index.html#_java_adapter_config).
-
-##### Deploying Payment service with Keycloak server to OpenShift
-
-Run the following `oc` command to deploy a `Keycloak` to OpenShift via CodeReady Workspaces `Terminal`:
-
-`oc new-app --docker-image quay.io/keycloak/keycloak --name=payment-keycloak -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin`    
-
-Once the Keycloak is deployed successfully, it will be showd in `Project Status`.
-
-![order]({% image_path payment-keycloak-status.png %})
-
-Build the image using on OpenShift:
-
-`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=payment-service -l app=payment-service`
-
-This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
-
- * Create a temp directory to store only previously-built application with necessary lib directory:
-
-`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
-
- * Start and watch the build, which will take about minutes to complete:
-
-`oc start-build payment-service --from-dir=target/binary --follow`
-
-![payment]({% image_path payment-build-logs.png %})
-
- * Deploy it as an OpenShift application after the build is done:
-
-`oc new-app payment-service`
-
- * Create the route
-
-`oc expose svc/payment-service`
-
- * Finally, make sure it's actually done rolling out:
-
-`oc rollout status -w dc/payment-service`
-
-Wait for that command to report replication controller `payment-service-1` successfully rolled out before continuing.
-
->`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
-that is that we currently don't have any liveness check configured, but we will add that in the next steps.
-
-And now we can access using curl once again to find all inventories:
-
-* Testing the Application
-
-The application is using bearer token authorization and the first thing to do is obtain an access token from the Keycloak Server in order to 
-access the application resources:
-
-~~~shell
-export KEYCLOAK_URL="http://$(oc get route | grep payment-keycloak | awk '{print $2}')"
-
-export access_token=$(\
-    curl -X POST http://${KEYCLOAK_URL}/auth/realms/quarkus/protocol/openid-connect/token \
-    --user backend-service:secret \
-    -H 'content-type: application/x-www-form-urlencoded' \
-    -d 'username=daniel&password=daniel&grant_type=password' | jq --raw-output '.access_token' \
- )
-~~~
-
-The example above obtains an access token for user `daniel`.
-
-Any user is allowed to access the `http://${PAYMENT_URL}/api/users/me` endpoint which basically returns a JSON payload with details about the user.
-
-~~~shell
-export PAYMENT_URL="http://$(oc get route | grep payment-service | awk '{print $2}')"
-
-curl -v -X GET \
-  http://${PAYMENT_URL}:8080/api/users/me \
-  -H "Authorization: Bearer "$access_token
-~~~
-
-You will see the following result:
-
-~~~shell
-bla bla bla
-~~~
-
-![openshift_login]({% image_path payment_curl_result.png %})
-
-####6. Deploying WEB-UI Service
+####5. Deploying WEB-UI Service
 
 ---
 
@@ -1236,10 +1019,37 @@ and expand `coolstore-ui` directory.
 
 You will see javascripts for specific cloud-native services such as cart, catatlog, and order service as above.
 
-Create a template to specify `ImageStream`, `BuildConfig` of the web-ui service by running the folloing `oc` command via CodeReady Workspaces `Terminal`:
+Now, we will deploy a presentation layer to OpenShift cluster using `Nodeshift` command line tool, a programmable API that you can use to deploy Node.js projects to `OpenShift`. 
 
-`oc create -f https://raw.githubusercontent.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2-infra/ocp-4.1/files/coolstore-ui-bc-template.yaml`
+ * Install the `Nodeshift` tool via CodeReady Workspaces `Terminal`:
 
-Create a template to deploy the web-ui service by running the folloing `oc` command via CodeReady Workspaces `Terminal`:
+`npm install --save-dev nodeshift`
 
-`oc create -f https://raw.githubusercontent.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2-infra/ocp-4.1/files/coolstore-ui-dc-template.yaml`
+ * Deploy the web-ui service using `Nodeshift` via CodeReady Workspaces `Terminal` and it will take a couple of minutes to complete the web-ui application deployment:
+
+`npm run nodeshift`
+
+![coolstore-ui]({% image_path coolstore-ui-deploy.png %})
+
+ * Create the route
+
+`oc expose svc/coolstore-ui`
+
+Go to `Networking > Routes` in OpenShift web console and click on the route URL of `coolstore-ui`:
+
+![coolstore-ui]({% image_path web-ui-route.png %})
+
+You will see the prouct page of `Red Hat Cool Store` as below:
+
+![coolstore-ui]({% image_path web-ui-landing.png %})
+
+#### Summary
+
+In this scenario we developed five microservices with `REST API` exposure to communicate with the other microservices. We also used a variety of application 
+runtimes such as `Quarkus`, `Spring Boot`, and `NodeJS` to compile, package, and containerize applications which is a major capability of the advanced cloud-native architecture.
+
+To deploy the cloud-native applications with multiple datasources on `OpenShift` cluster, `Quarkus` provides an easy way to connect multiple datasources and 
+obtain a reference to those datasources such as `PostgreSQL` and `MongoDB` in code.
+
+In the end, we optimized `data transaction performance` of the shopping cart service thru integrating with a `JBoss Data Grid` 
+to increase end users'(customers) satification. `Congratulations!`
