@@ -19,7 +19,7 @@ The goal is to develop advanced cloud-native applications on `Red Hat Runtimes` 
 
 ![goal]({% image_path lab2-goal.png %})
 
-####1. Creating Kafka Topics
+####1. Creating a Kafka Cluster and Topics
 
 ---
 
@@ -40,11 +40,47 @@ AMQ Streams is `already installed` using the following `Operators` so we don't n
 
  * `User Operator` - Responsible for managing Kafka users within a Kafka cluster running within an OpenShift cluster.
 
-Architecture diagram of the `AMQ Strems Cluster` Operator is here:
+Architecture diagram of the `AMQ Strems Cluster` Operator is here.
 
 ![amqstreams]({% image_path kafka-operators-arch.png %}){:width="900px"}
 
-We will create two `Kafka topics` as `Orders` and `Payments`
+ * Creating a `Kafka cluster` in `userXX-cloudnativeapp` project
+
+Click on `Kafka` in `Developer Catalog` left menu.
+
+![kafka]({% image_path kafka-catalog.png %})
+
+Click on `Create` to represent a Kafka cluster using AMQ Streams Operator.
+
+![kafka]({% image_path kafka-create.png %})
+
+You will enter `YAML` editor that defines a `Kafka` object. Keep the all values witout any changes then click on `Create` on the bottom.
+
+![kafka]({% image_path kafka-create-detail.png %})
+
+Next, we will create `Kafka Topics` in `Developer Catalog` left menu. Click on `Kafka Topic`.
+
+![kafka]({% image_path kafka-topic-catalog.png %})
+
+Click on `Create` to represent a `topic inside a Kafka cluster`.
+
+![kafka]({% image_path kafka-topic-create.png %})
+
+You will enter `YAML` editor that defines a `KafkaTopic` object. Change the name with `orders` then click on `Create` on the bottom.
+
+![kafka]({% image_path kafka-topic-orders-create.png %})
+
+Create a new topic in `Installed Operators` lefe menu and click on `Create Kafka Topic`. Be sure to create it under `userXX-cloudnativeapp` project.
+
+![kafka]({% image_path kafka-another-topic-create.png %})
+
+Change the name with `payments` then click on `Create` on the bottom.
+
+![kafka]({% image_path kafka-topic-payments-create.png %})
+
+`Well done!` You completed to create two Kafka Topics as `payments` and `orders`.
+
+![kafka]({% image_path kafka-topics-created.png %})
 
 ####2. Developing and Deploying Payment Service
 
@@ -257,3 +293,9 @@ You will see the following result in `Pod Terminal`:
 ~~~
 
 ![payment]({% image_path payment_curl_result.png %})
+
+####3. Adding Kafka Client to Cart Service
+
+---
+
+Let's add..

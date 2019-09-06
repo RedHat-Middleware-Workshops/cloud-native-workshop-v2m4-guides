@@ -1,4 +1,4 @@
-## Lab1 - Creating High-performing Cache Services
+## Lab1 - Creating High-performing Cacheable Service
 
 In this lab, we'll develop 5 microservices into the cloud-native appliation architecture. These cloud-native applications
 will have transactions with multiple datasources such as `PostgreSQL` and `MongoDB`. Especially, we will learn how to configure datasources easily using 
@@ -1000,9 +1000,7 @@ And now we can access using curl once again to find all inventories:
 
 You will see empty result because you didn't add any shopping items yet:
 
-~~~shell
-[]
-~~~
+`[]`
 
 ####5. Deploying WEB-UI Service
 
