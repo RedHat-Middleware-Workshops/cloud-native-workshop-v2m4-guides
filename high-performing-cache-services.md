@@ -757,14 +757,12 @@ try {
         Document document = cursor.next();
         Order order = new Order();
         order.setId(document.getString("id"));
-        order.setCustomerName(document.getString("customerName"));
-        order.setCustomerEmail(document.getString("customerEmail"));
-        order.setOrderValue(document.getDouble("orderValue"));
-        order.setRetailPrice(document.getDouble("retailPrice"));
-        order.setDiscount(document.getDouble("discount"));
-        order.setShippingFee(document.getDouble("shippingFee"));
-        order.setShippingDiscount(document.getDouble("shippingDiscount"));
-        order.setOrderStatus(document.getString("orderStatus"));
+        order.setName(document.getString("name"));
+        order.setTotal(document.getString("total"));
+        order.setCcNumber(document.getString("ccNumber"));
+        order.setCcExp(document.getString("ccExp"));
+        order.setBillingAddress(document.getString("billingAddress"));
+        order.setStatus(document.getString("status"));
         list.add(order);
     }
 } finally {
@@ -777,14 +775,12 @@ try {
 ~~~java
 Document document = new Document()
         .append("id", order.getId())
-        .append("customerName", order.getCustomerName())
-        .append("customerEmail", order.getCustomerEmail())
-        .append("orderValue", order.getOrderValue())
-        .append("retailPrice", order.getRetailPrice())
-        .append("discount", order.getDiscount())
-        .append("shippingFee", order.getShippingFee())
-        .append("shippingDiscount", order.getShippingDiscount())
-        .append("orderStatus", order.getOrderStatus());
+        .append("name", order.getName())
+        .append("total", order.getTotal())
+        .append("ccNumber", order.getCcNumber())
+        .append("ccExp", order.getCcExp())
+        .append("billingAddress", order.getBillingAddress())
+        .append("status", order.getStatus());
 getCollection().insertOne(document);
 ~~~
 
@@ -804,7 +800,7 @@ Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each ma
 @Inject OrderService orderService;
 ~~~
 
- * `// TODO: Add list(), add() methods here` marker:
+ * `// TODO: Add list(), add(), updateStatus() methods here` marker:
 
 ~~~java
 @GET
@@ -815,6 +811,13 @@ public List<Order> list() {
 @POST
 public List<Order> add(Order order) {
     orderService.add(order);
+    return list();
+}
+
+@GET
+@Path("/{orderId}/{status}")
+public List<Order> updateStatus(@PathParam("orderId") String orderId, @PathParam("status") String status) {
+    orderService.updateStatus(orderId, status);
     return list();
 }
 ~~~
@@ -830,7 +833,6 @@ so we advise you to do so, you can find more information in the [MongoDB documen
 Open `application.properties` in `src/main/resources/` and add the following configuration:
 
 `quarkus.mongodb.connection-string = mongodb://order-database:27017`
-
 
 ![order]({% image_path order_application_properties.png %})
 
@@ -850,15 +852,13 @@ Edit the `com.redhat.cloudnative.codec.OrderCodec` class as follows:
 @Override
 public void encode(BsonWriter writer, Order Order, EncoderContext encoderContext) {
     Document doc = new Document();
-    doc.put("customerName", Order.getCustomerName());
-    doc.put("customerEmail", Order.getCustomerEmail());
-    doc.put("orderValue", Order.getOrderValue());
-    doc.put("retailPrice", Order.getRetailPrice());
-    doc.put("discount", Order.getDiscount());
-    doc.put("shippingFee", Order.getShippingFee());
-    doc.put("shippingDiscount", Order.getShippingDiscount());
     doc.put("id", Order.getId());
-    doc.put("orderStatus", Order.getOrderStatus());
+    doc.put("name", Order.getName());
+    doc.put("total", Order.getTotal());
+    doc.put("ccNumber", Order.getCcNumber());
+    doc.put("ccExp", Order.getCcExp());
+    doc.put("billingAddress", Order.getBillingAddress());
+    doc.put("status", Order.getStatus());
     documentCodec.encode(writer, doc, encoderContext);
 }
 
@@ -892,14 +892,12 @@ public Order decode(BsonReader reader, DecoderContext decoderContext) {
     if (document.getString("id") != null) {
         order.setId(document.getString("id"));
     }
-    order.setCustomerName(document.getString("customerName"));
-    order.setCustomerEmail(document.getString("customerEmail"));
-    order.setOrderValue(document.getDouble("orderValue"));
-    order.setRetailPrice(document.getDouble("retailPrice"));
-    order.setDiscount(document.getDouble("discount"));
-    order.setShippingFee(document.getDouble("shippingFee"));
-    order.setShippingDiscount(document.getDouble("shippingDiscount"));
-    order.setOrderStatus(document.getString("orderStatus"));
+    order.setName(document.getString("name"));
+    order.setTotal(document.getString("total"));
+    order.setCcNumber(document.getString("ccNumber"));
+    order.setCcExp(document.getString("ccExp"));
+    order.setBillingAddress(document.getString("billingAddress"));
+    order.setStatus(document.getString("status"));
     return order;
 }
 ~~~
