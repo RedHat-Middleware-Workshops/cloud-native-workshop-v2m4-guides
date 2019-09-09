@@ -1,7 +1,10 @@
 ## Lab2 - Creating Event-Driven/Reactive Services
 
-In this lab, we'll develop `Event-Driven/Reactive` applications into the cloud-native appliation architecture. These cloud-native applications will 
-read data from and write data to the `Apache Kafka cluster` using `AMQ Streams`. `AMQ Streams` is based on `Apache Kafka`, a popular platform for 
+`Traditional microservices architecture` is typically composed of many individual services with different functions. Each application service has probably many clients that need to communicate with the service for fetching data. Also, clients can be application services to other clients. It will become more complex to handle `data streams` because everything can be a stream of data such as `end-user clicks`, `RESTful APIs`, `IoT devices data`, and more when these services are running on `multi-cloud` and `hybrid cloud` infrastructure.
+
+In an `event-driven architecture`, we can treat data streams as `events` using `reactive programming` and `distributed messaging platform`. `Reactive programming` is an asynchronous programming paradigm concerned with data streams and the propagation of change. In the previous lab, we developed Inventory, Catalog, Shopping Cart and Order services with obvious interactions. 
+
+In this lab, we'll change `Shoppiong Cart`, `Order`, and create a new `Payment` as `Event-Driven/Reactive` applications into the cloud-native appliation architecture. These cloud-native applications will read data from and write data to the `Apache Kafka cluster`. `AMQ Streams` is based on `Apache Kafka`, a popular platform for 
 streaming data delivery and processing. `AMQ Streams` makes it easy to run `Apache Kafka` on OpenShift with key features:
 
  * Designed for horizontal scalability
@@ -110,8 +113,7 @@ and provides all the necessary capabilities to integrate with the Kafka clusters
 
 ##### Writing the application
 
-Let’s start by implementing the `PaymentResource` to handle `Kafka event` from the order service. As you can see from the source code below it is to create `Kafka producer` 
-and payload the `COMPLETED` or `FAILED` result:
+Let’s start by implementing the `PaymentResource` to handle `Kafka event` from the order service. As you can see from the source code below it is to create `Kafka producer` and payload the `COMPLETED` or `FAILED` result:
 
  * `// TODO: Add Messaging ConfigProperty here` marker:
 
@@ -298,4 +300,75 @@ You will see the following result in `Pod Terminal`:
 
 ---
 
-Let's add..
+Let’s start by implementing the `Kafka Client` to create `Orders Topic` in `CartResource`. Add `ConfigProperty` annotation to specify bootstrapServers, ordersTopic, ordersTopicValueSerializer, and ordersTopicKeySerializer. Open `src/main/java/com/redhat/cloudnative/CartResource` and add the following codes:
+
+ * `// TODO: Add annotation of orders messaging configuration here` marker:
+
+~~~java
+@ConfigProperty(name = "mp.messaging.outgoing.orders.bootstrap.servers")
+public String bootstrapServers;
+
+@ConfigProperty(name = "mp.messaging.outgoing.orders.topic")
+public String ordersTopic;
+
+@ConfigProperty(name = "mp.messaging.outgoing.orders.value.serializer")
+public String ordersTopicValueSerializer;
+
+@ConfigProperty(name = "mp.messaging.outgoing.orders.key.serializer")
+public String ordersTopicKeySerializer;
+~~~
+
+ * `// TODO: Add KafkaProducer method here` marker:
+
+~~~java
+public void init(@Observes StartupEvent ev) {
+    Properties props = new Properties();
+
+    props.put("bootstrap.servers", bootstrapServers);
+    props.put("value.serializer", ordersTopicValueSerializer);
+    props.put("key.serializer", ordersTopicKeySerializer);
+    producer = new KafkaProducer<String, String>(props);
+}
+~~~
+
+Next, we will define the keys and values along with the above configueration in `CartResource`. Open `application.properties` in `src/main/resources/` and add the following configuration:
+
+ * `# TODO: Add Kafka messaging keys and values here` marker:
+
+~~~java
+mp.messaging.outgoing.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+mp.messaging.outgoing.orders.connector=smallrye-kafka
+mp.messaging.outgoing.orders.topic=orders
+mp.messaging.outgoing.orders.value.serializer=org.apache.kafka.common.serialization.StringSerializer
+mp.messaging.outgoing.orders.key.serializer=org.apache.kafka.common.serialization.StringSerializer
+~~~
+
+##### Re-Deploying Cart service to OpenShift
+
+Package the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
+
+![cart]({% image_path quarkus-dev-run-packageforOcp.png %})
+
+Or run the following maven plugin in CodeReady Workspaces`Terminal`:
+
+`cd /projects/cloud-native-workshop-v2m4-labs/cart-service/`
+
+`mvn clean package -DskipTests`
+
+Rebuild a container image based the cart artifact that we just packaged, which will take about minutes to complete:
+
+`oc start-build cart --from-dir=target/binary --follow`
+
+![cart]({% image_path cart-build-logs.png %})
+
+The cart service will be redeployed automatically via [OpenShift Deployment triggers](https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations) after it completes to build.
+
+Let's confirm if the cart and order services works correctly via coolstore GUI test.
+
+### Summary
+
+In this scenario we developed `Event-Driven/Reactive` cloud-native applictions to deal with data streams from the shopping cart service to the order service and payment service using `Apache Kafka Topics`. To do that, the shopping cart service produces `order` messages and the order service subscribes the orders topic to add a new order to `MongoDB` as well as receives the `payments topic` to update the payment result in coolstore web-ui. In the meantime, the payment-service receives the `orders topic` to produce payment processing result messages in the `payments topic` for the order service.
+
+In order to implement this cloud-native application architecture, we use `Quarkus Kafka extension` to implement stream processing applications based on `Apache Kafka`. Especially, `AMQ Streams` enables you to create `Apache Kafka cluster` and `Topics` with easy user experiences via OpenShift developer catalog.  
+
+In the end, we have message-driven microservices for implementing reactive systems, where all the components interact using asynchronous messages passing. Most importantly, `Quarkus` is perfectly suited to implement event-driven microservices and reactive systems. `Congratulations!`

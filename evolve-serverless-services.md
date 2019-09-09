@@ -134,6 +134,8 @@ as opposed to every time the application starts, which is the case with other ap
 Create a native executable by once again opening the command palette and choose `Build Native Quarkus App`. This will execute `mvn clean package -Pnative` 
 behind the scenes. The `-Pnative` argument selects the native maven profile which invokes the Graal compiler.
 
+![serverless]({% image_path native-image-build-palette.png %})
+
 `This will take about 3-4 minutes to finish. Wait for it!`
 
 ![serverless]({% image_path native-image-build.png %})
@@ -219,11 +221,11 @@ you can play with [Installing the Knative Serving Operator](https://knative.dev/
 
 ![serverless]({% image_path knative_serving_tile_highlighted.png %})
 
-Before deploying the payment service using a native image, let's delete existing payment Kybernetes object such as Pod, DeploymentConfig, Service,
+Before deploying the payment service using a native image, let's delete existing payment Kubernetes object such as Pod, DeploymentConfig, Service,
 
 First, create a new binary build within OpenShift
 
-`oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:19.2.0 --binary --name=payment-native-service -l app=payment-native-service`
+`oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:19.2.0 --binary --name=payment -l app=payment`
 
 You should get a `--> Success message` at the end.
 
@@ -232,36 +234,25 @@ run most applications, while staying at a reasonable size.
 
 And then start and watch the build, which will take about a minute to complete:
 
-`oc start-build payment-native-service --from-file target/*-runner --follow`
+`oc start-build payment --from-file target/*-runner --follow`
 
 This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
 
 Once that’s done, deploy the new image as an OpenShift application:
 
-`oc new-app payment-native-service`
+`oc new-app payment`
 
 and expose it to the world:
 
-`oc expose svc/payment-native-service`
+`oc expose svc/payment`
 
 Finally, make sure it’s actually done rolling out:
 
-`oc rollout status -w dc/payment-native-service`
+`oc rollout status -w dc/payment`
 
-Wait for that command to report replication controller `payment-native-service-1` successfully rolled out before continuing.
+Wait for that command to report replication controller `payment-1` successfully rolled out before continuing.
 
-And now we can access using `curl` once again. In the Terminal, run this command, which constructs the URL using `oc get route` and then calls curl to 
-access the endpoint:
 
-`curl $(oc get route payment-native-service -o=go-template --template={% raw %}'{{ .spec.host }}'{% endraw %})/payment`
-
->`NOTE`: The above curl command constructs the URL to your running app on the cluster using the oc get route command.
-
-You should see:
-
-`hello quarkus-on-openshift from people-1-9sgsm`
-
->`NOTE`: Your hostname (the Kubernetes pod in which your app runs) name will be different from the above.
 
 Open `knative/service.yaml` to specify the Knative Serving custom resource align with the above payment service.
 
@@ -269,28 +260,23 @@ Open `knative/service.yaml` to specify the Knative Serving custom resource align
 apiVersion: serving.knative.dev/v1alpha1
 kind: Service
 metadata:
-  name: payment-service
+  name: payment
 spec:
   template:
     metadata:
-      name: payment-service
+      name: payment
       annotations:
         # disable istio-proxy injection
         sidecar.istio.io/inject: "false"
     spec:
       containers:
-      - image: quay.io/rhdevelopers/knative-tutorial-greeter:quarkus
-        livenessProbe:
-          httpGet:
-            path: /healthz
-        readinessProbe:
-          httpGet:
-            path: /healthz
+        # Replace Project name userXX-cloudnativeapps with project in which payment is deployed
+      - image: default-route-openshift-image-registry.apps.cluster-seoul-feb6.seoul-feb6.open.redhat.com/user0-cloudnativeapps/payment:latest
 ~~~
 
 The service can be deployed using the following command via CodeReady Workspaces `Terminal`:
 
-`oc apply -n userXX-cloudnativeapps -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/cloudservice.yaml`
+`oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/cloudservice.yaml`
 
 After successful deployment of the service we should see a Kubernetes Deployment named similar to `payment-service-deployment` available:
 
@@ -463,6 +449,17 @@ s2i-quarkus         13 seconds ago
 ~~~
 
 ##### Deploying the Payment application
+
+### Summary
+
+In this scenario we developed five microservices with `REST API` exposure to communicate with the other microservices. We also used a variety of application 
+runtimes such as `Quarkus`, `Spring Boot`, and `NodeJS` to compile, package, and containerize applications which is a major capability of the advanced cloud-native architecture.
+
+To deploy the cloud-native applications with multiple datasources on `OpenShift` cluster, `Quarkus` provides an easy way to connect multiple datasources and 
+obtain a reference to those datasources such as `PostgreSQL` and `MongoDB` in code.
+
+In the end, we optimized `data transaction performance` of the shopping cart service thru integrating with a `JBoss Data Grid` 
+to increase end users'(customers) satification. `Congratulations!`
 
 ##### Additional Resources:
 
