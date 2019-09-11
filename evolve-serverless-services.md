@@ -238,23 +238,17 @@ And then start and watch the build, which will take about a minute to complete:
 
 This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
 
-Once that’s done, deploy the new image as an OpenShift application:
+Once that’s done, go to `Builds > Image Streams` on the left menu then input `payment` to show the payment imagestream. Click on `payment`:
 
-`oc new-app payment`
+![serverless]({% image_path payment-is.png %})
 
-and expose it to the world:
+In `Overview` tab, copy the `IMAGE REPOSITORY` to update it in the `Knative Serving Resouce`.
 
-`oc expose svc/payment`
+![serverless]({% image_path payment-is-oveview.png %})
 
-Finally, make sure it’s actually done rolling out:
+Open `knative/knative-serving-service.yaml` to specify the Knative Serving custom resource align with the above payment service.
 
-`oc rollout status -w dc/payment`
-
-Wait for that command to report replication controller `payment-1` successfully rolled out before continuing.
-
-
-
-Open `knative/service.yaml` to specify the Knative Serving custom resource align with the above payment service.
+ * Replace `IMAGE REPOSITORY` URL with `YOUR_IMAGE_SERVICE_URL` in the following YAML:
 
 ~~~yaml
 apiVersion: serving.knative.dev/v1alpha1
@@ -271,36 +265,111 @@ spec:
     spec:
       containers:
         # Replace Project name userXX-cloudnativeapps with project in which payment is deployed
-      - image: default-route-openshift-image-registry.apps.cluster-seoul-feb6.seoul-feb6.open.redhat.com/user0-cloudnativeapps/payment:latest
+      - image: YOUR_IMAGE_SERVICE_URL:latest
 ~~~
 
 The service can be deployed using the following command via CodeReady Workspaces `Terminal`:
 
-`oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/cloudservice.yaml`
+`oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/knative-serving-service.yaml`
 
-After successful deployment of the service we should see a Kubernetes Deployment named similar to `payment-service-deployment` available:
+After successful creation of the service we should see a Kubernetes Deployment named similar to `payment-service-v1-deployment` available.
+Go to  `Home > Status` on the left menu and click on `payment-service-v1-deployment`. You will confirm `1` pod is `available` now.
 
-`export SVC_URL="oc get rt payment-service -o yaml | yq read - 'status.url'" && http $SVC_URL`
+![serverless]({% image_path payment-serving-deployment.png %})
 
-The http command should return a response containing a line similar to Hi greeter ⇒ '6fee83923a9f' : 1
+Let's find out why `Qaurkus` is named with `SuperSonic Subatomic Java`. Go to `Workload > Pods` on the left menu and click on `payment-service-v1-deployment-xxxxx`.
 
-> `NOTE`: Sometimes the response might not be returned immediately especially when the pod is coming up from dormant state. 
-In that case, repeat service invocation.
+![serverless]({% image_path payment-pod-status.png %})
 
-####3. Accessing your application
+Click on `Logs` tab menu and scroll down to end. You will see that the payment service is started in around `5s` with `Kafka connection`. It's `Supersonic!!!!`
+
+![serverless]({% image_path payment-start-log.png %})
+
+Let's `leave the payment service` without any request via WEB UI or RESTful API more than `30 seconds`. You're probably wondering why we need to wait more than `30 seconds`? Don't worry about it because we will walk you through the reason from now on.
+
+In the lab environment, `Knative Serving` and `Knative Eventing` components are already installed and you can only view permission of `Knative Serving` namespace/project.
+Go to `Workloads > Config Maps` in `knative-serving` project via OpenShift web console and click on `config-autoscaler`.
+
+![serverless]({% image_path knative-serving-config.png %})
+
+Once you click on `config-autoscaler`, you will see the details on how Knative autoscaling feature is specified when you click on `YAML` tab.
+
+As default, Knative will scale down to zero `automatically` when the service(i.e. payment) has no request in 30 seconds. This capability is how `Knative` handles your cloud-native applications for `Serverless workloads`.
+
+ * `scale-to-zero-grace-period: 30s`
+
+![serverless]({% image_path scale-to-zero-grace-period.png %})
+
+In the meantime, it probably took at least 30 seconds so go back to `Home > Status` on the left menu and click on `payment-service-v1-deployment`. You will confirm `0` pod is `available` now. 
+
+![serverless]({% image_path payment-serving-down-to-zero.png %})
+
+`Congratulations!` We completed to deploy the payment service using `Quarkus native image` and `Knative Serving` quicker than traditional Java applications. This is not the end about Knative capabilites sowWe will see how the payment service will scale up `magically` in the following exercises.
+
+####3. Enable Knative Eventing integration with Apache Kafka Event
 
 ---
 
-The application is now exposed as an internal service. If you are using minikube or minishift, you can access it using:
+`Apache Kafka Event source` enables `Knative Eventing` integration with Apache Kafka. When a message is produced to Apache Kafka, the `Apache Kafka Event Source` will consume the produced message and post that message to the corresponding event sink.
 
-INGRESSGATEWAY=istio-ingressgateway
-IP_ADDRESS="$(minikube ip):$(kubectl get svc $INGRESSGATEWAY --namespace istio-system --output 'jsonpath={.spec.ports[?(@.port==80)].nodePort}')" 
+`Knative Eventing` is a system that is designed to address a common need for cloud native development and provides composable primitives to enable `late-binding` event sources and event consumers with below goals:
 
-curl -v -H 'Host: getting-started-knative.example.com' $IP_ADDRESS/hello/greeting/redhat
+ * Services are loosely coupled during development and deployed independently.
 
-you can replace minikube ip with minishift ip if you are using OpenShift
+ * Producer can generate events before a consumer is listening, and a consumer can express an interest in an event or class of events that is not yet being produced.
 
-####4. Creating Cloud-Native CI/CD Pipelines using Tekton 
+ * Services can be connected to create new applications without modifying producer or consumer, and with the ability to select a specific subset of events from a particular producer.
+
+In this lab, `Knative Eventing` is already `installed` but if you want to install it in your own `OpenShift` cluster then you can install it via `Knative Eventing Operator` in OpenShift web console.
+
+Create the `KafkaSource` custom objects, by configuring the required `consumerGroup`, `bootstrapServers` and `topics` values on the CR file of your source.
+
+Open `knative/kafka-event-source.yaml` to specify the Knative Serving custom resource align with the above payment service.
+
+ * Replace `IMAGE REPOSITORY` URL with `YOUR_IMAGE_SERVICE_URL` in the following YAML:
+
+~~~yaml
+apiVersion: sources.eventing.knative.dev/v1alpha1
+kind: KafkaSource
+metadata:
+  name: kafka-source
+spec:
+  consumerGroup: payment-consumer-group
+  bootstrapServers: my-cluster-kafka-bootstrap:9092
+  topics: orders
+  sink:
+    apiVersion: serving.knative.dev/v1alpha1
+    kind: Service
+    name: payment
+~~~
+
+####4. End to End Function Testing
+
+---
+
+Let's go shopping some cool items via the frontend service(`Coolstore WEB UI`) then run the following shopping scenarios:
+
+ * 1) Add a `Red Hat Fedora` to `Cart`
+
+![serverless]({% image_path add-to-cart.png %})
+
+ * 2) Click on `Checkout` button.
+
+![serverless]({% image_path checkout.png %})
+
+ * 3) `Input` your `Credit Card information` to pay the item you chose
+
+ ![serverless]({% image_path input-cc-info.png %})
+
+ * 4) Confirm `Payment Status` of the your shopping items in the Orders list. It should be `Processing`.
+
+ ![serverless]({% image_path payment-processing.png %})
+
+ * 5) Reload `All Orders` page to confirm if the Payment Status changed to `COMPLETED` or `FAILED`.
+
+ ![serverless]({% image_path payment-completedorfailed.png %})
+
+####5. Creating Cloud-Native CI/CD Pipelines using Tekton 
 
 ---
 
@@ -343,8 +412,6 @@ on OpenShift via the `OperatorHub` as below:
 
 ##### What is Tekton?
 
-![severless]({% image_path tekton-arch.png %})
-
 `Tekton` defines a number of [Kubernetes custom resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) as 
 building blocks in order to standardize pipeline concepts and provide a terminology that is consistent across `CI/CD solutions`. These custom resources 
 are an extension of the `Kubernetes API` that let users create and interact with these objects using the `OpenShift CLI (oc)`, `kubectl`, and other Kubernetes tools.
@@ -373,7 +440,7 @@ on `Knative` on OpenShift.
 
 To make maven builds faster, we will deploy `Sonatype Nexus`. You need to replace `userXX` with your credential:
 
-`oc new-app sonatype/nexus -n userXX-cloudnativeapps`
+`oc new-app sonatype/nexus`
 
 Once you complete to deploy the Nexus server on OpenShift cluster, you can confirm it in `Project Status` page of OpenShift web console:
 
@@ -420,8 +487,9 @@ creating a pipeline in the next section:
 
 Create the following Tekton tasks which will be used in the `Pipelines`
 
-$ oc create -f https://raw.githubusercontent.com/tektoncd/catalog/master/openshift-client/openshift-client-task.yaml
-$ oc create -f https://raw.githubusercontent.com/openshift/pipelines-catalog/master/s2i-java-8/s2i-java-8-task.yaml
+`oc create -f knative/openshift-client-task.yaml`
+
+`oc create -f knative/s2i-java-8/s2i-java-8-task.yaml`
 
 ~~~shell
 oc create -f https://raw.githubusercontent.com/tektoncd/catalog/master/openshift-client/openshift-client-task.yaml \
@@ -447,8 +515,6 @@ quarkus-jvm         12 seconds ago
 quarkus-native      12 seconds ago
 s2i-quarkus         13 seconds ago
 ~~~
-
-##### Deploying the Payment application
 
 ### Summary
 
