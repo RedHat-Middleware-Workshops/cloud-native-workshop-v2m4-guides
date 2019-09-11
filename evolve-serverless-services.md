@@ -131,8 +131,117 @@ Within the `pom.xml` is the declaration for the Quarkus Maven plugin which conta
 We use a profile because, you will see very soon, packaging the native image takes a few seconds. However, this compilation time is only incurred once, 
 as opposed to every time the application starts, which is the case with other approaches for building and executing JARs.
 
-Create a native executable by once again opening the command palette and choose `Build Native Quarkus App`. This will execute `mvn clean package -Pnative` 
-behind the scenes. The `-Pnative` argument selects the native maven profile which invokes the Graal compiler.
+##### Build Native Image and Run it Locally
+
+Let's find out why `Qaurkus` is named with `SuperSonic Subatomic Subatomic Java`. In order to run the payment service locally, we need to a Kafka server locally so we will run a `native image` without `Kafka relevant codes and configuration`.
+
+ * `Comment` all properties in `src/main/resources/application.properties` 
+
+~~~java
+# Outgoing stream
+#mp.messaging.outgoing.payments.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+#mp.messaging.outgoing.payments.connector=smallrye-kafka
+#mp.messaging.outgoing.payments.topic=payments
+#mp.messaging.outgoing.payments.value.serializer=org.apache.kafka.common.serialization.StringSerializer
+#mp.messaging.outgoing.payments.key.serializer=org.apache.kafka.common.serialization.StringSerializer
+~~~
+
+ * `Comment` the following Kafka codes in `src/main/resources/PaymentResources.java`  
+
+~~~java
+//    @ConfigProperty(name = "mp.messaging.outgoing.payments.bootstrap.servers")
+//    public String bootstrapServers;
+//
+//    @ConfigProperty(name = "mp.messaging.outgoing.payments.topic")
+//    public String paymentsTopic;
+//
+//    @ConfigProperty(name = "mp.messaging.outgoing.payments.value.serializer")
+//    public String paymentsTopicValueSerializer;
+//
+//    @ConfigProperty(name = "mp.messaging.outgoing.payments.key.serializer")
+//    public String paymentsTopicKeySerializer;
+//
+//    private Producer<String, String> producer;
+~~~
+
+ * private void pass(String orderId, String paymentId, String remarks)
+~~~java
+//        producer.send(new ProducerRecord<String, String>(paymentsTopic, payload.toString()));
+~~~
+
+ * private void fail(String orderId, String paymentId, String remarks)
+~~~java
+//        producer.send(new ProducerRecord<String, String>(paymentsTopic, payload.toString()));
+~~~
+
+ * public void init(@Observes StartupEvent ev)
+~~~java
+//        props.put("key.serializer", paymentsTopicKeySerializer);
+//        producer = new KafkaProducer<String, String>(props);
+~~~
+
+Create a `native executable` via CodeReady Workspaces `Terminal`:
+
+`mvn package -Pnative`
+
+![serverless]({% image_path payment-native-image-build.png %})
+
+Since our environment here is Linux, you can just run it. In the CodeReady Workspaces `Terminal`, run:
+
+`target/payment-1.0-SNAPSHOT-runner`
+
+Notice the amazingly fast startup time:
+
+~~~shell
+2019-09-11 13:32:16,260 INFO  [io.sma.rea.mes.ext.MediatorManager] (main) Deployment done... start processing
+2019-09-11 13:32:16,261 INFO  [io.sma.rea.mes.imp.ConfiguredChannelFactory] (main) Found incoming connectors: [smallrye-kafka]
+2019-09-11 13:32:16,261 INFO  [io.sma.rea.mes.imp.ConfiguredChannelFactory] (main) Found outgoing connectors: [smallrye-kafka]
+2019-09-11 13:32:16,261 INFO  [io.sma.rea.mes.imp.ConfiguredChannelFactory] (main) Stream manager initializing...
+2019-09-11 13:32:16,261 INFO  [io.sma.rea.mes.ext.MediatorManager] (main) Initializing mediators
+2019-09-11 13:32:16,261 INFO  [io.sma.rea.mes.ext.MediatorManager] (main) Connecting mediators
+2019-09-11 13:32:16,261 INFO  [io.quarkus] (main) Quarkus 0.21.2 started in 0.016s. Listening on: http://[::]:8080
+2019-09-11 13:32:16,261 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy, smallrye-context-propagation, smallrye-reactive-messaging, smallrye-reactive-messagin
+g-kafka, smallrye-reactive-streams-operators, vertx]
+~~~
+
+That’s `16 milliseconds` to start up.
+
+![serverless]({% image_path payment-native-runn.png %})
+
+And extremely low memory usage as reported by the Linux `ps` utility. While the app is running, open another Terminal 
+(click the `+` button on the terminal tabs line) and run:
+
+`ps -o pid,rss,command -p $(pgrep -f runner)`
+
+You should see something like:
+
+~~~shell
+  PID   RSS COMMAND
+ 17509 58304 target/payment-1.0-SNAPSHOT-runner
+~~~
+
+![serverless]({% image_path payment-native-pss.png %})
+
+This shows that our process is taking around `50 MB` of memory ([Resident Set Size](https://en.wikipedia.org/wiki/Resident_set_size), or RSS). Pretty compact!
+
+> NOTE: The RSS and memory usage of any app, including Quarkus, will vary depending your specific environment, and will rise as the application experiences load.
+
+Make sure the app is still working as expected (we’ll use `curl` this time to access it directly). In a new CdeReady Workspaces Terminal run:
+
+`curl -s -w '%{http_code}' -o /dev/null http://localhost:8080 ; echo`
+
+You should see the return code:
+
+`200`
+
+`Congratuations!` You’ve now built a Java application as a native executable JAR and a Linux native binary. We’ll explore the benefits of native 
+binaries later in when we start deploying to Kubernetes.
+
+Before moving to the next step, go to the first Terminal tab and press `CTRL+C` to stop our native app (or close the Terminal window).
+
+##### Re-Build Native Image and Run it on OpenShift
+
+`Uncomment` all above codes and properties and create a native executable by `once again` opening the command palette. Choose `Build Native Quarkus App`. This will execute `mvn clean package -Pnative` behind the scenes. The `-Pnative` argument selects the native maven profile which invokes the Graal compiler.
 
 ![serverless]({% image_path native-image-build-palette.png %})
 
@@ -149,53 +258,6 @@ installed and then use `mvn clean package -Pnative -Dnative-image.docker-build=t
 
 In addition to the regular files, the build will produce `target/payment-1.0-SNAPSHOT-runner`. This is a native Linux binary. Not a shell script, 
 or a JAR file, but a native binary.
-
-
-##### Run native image
-
-Since our environment here is Linux, you can just run it. In the CodeReady Workspaces Terminal, run:
-
-`target/payment-1.0-SNAPSHOT-runner`
-
-Notice the amazingly fast startup time:
-
-~~~shell
-2019-08-24 12:49:57,839 INFO  [io.quarkus] (main) Quarkus 0.21.1 started in 0.011s. Listening on: http://[::]:8080
-2019-08-24 12:49:57,840 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy, keycloak, resteasy-jsonb]
-~~~
-
-That’s `11 milliseconds` to start up.
-
-![serverless]({% image_path payment-native-runn.png %})
-
-And extremely low memory usage as reported by the Linux `ps` utility. While the app is running, open another Terminal 
-(click the `+` button on the terminal tabs line) and run:
-
-`ps -o pid,rss,command -p $(pgrep -f runner)`
-
-You should see something like:
-
-~~~shell
-  PID   RSS COMMAND
- 69243 35932 target/payment-1.0-SNAPSHOT-runner
-~~~
-
-![serverless]({% image_path payment-native-pss.png %})
-
-This shows that our process is taking around `30 MB` of memory ([Resident Set Size](https://en.wikipedia.org/wiki/Resident_set_size), or RSS). Pretty compact!
-
-> NOTE: The RSS and memory usage of any app, including Quarkus, will vary depending your specific environment, and will rise as the application experiences load.
-
-Make sure the app is still working as expected (we’ll use `curl` this time to access it directly). In a new CdeReady Workspaces Terminal run:
-
-`curl http://localhost:8080/payment`
-
-You should see:
-
-`hello quarkus from <your-hostname>`
-
-`Congratuations!` You’ve now built a Java application as an executable JAR and a Linux native binary. We’ll explore the benefits of native 
-binaries later in when we start deploying to Kubernetes.
 
 Before moving to the next step, go to the first Terminal tab and press `CTRL+C` to stop our native app (or close the Terminal window).
 
@@ -324,9 +386,7 @@ In this lab, `Knative Eventing` is already `installed` but if you want to instal
 
 Create the `KafkaSource` custom objects, by configuring the required `consumerGroup`, `bootstrapServers` and `topics` values on the CR file of your source.
 
-Open `knative/kafka-event-source.yaml` to specify the Knative Serving custom resource align with the above payment service.
-
- * Replace `IMAGE REPOSITORY` URL with `YOUR_IMAGE_SERVICE_URL` in the following YAML:
+Open `knative/kafka-event-source.yaml` to define `KafkaSource` to integrate with the `Knative Eventing`. Copy the following `YAML` to `knative/kafka-event-source.yaml`.
 
 ~~~yaml
 apiVersion: sources.eventing.knative.dev/v1alpha1
@@ -342,6 +402,14 @@ spec:
     kind: Service
     name: payment
 ~~~
+
+The source can be deployed using the following command via CodeReady Workspaces `Terminal`:
+
+`oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/kafka-event-source.yaml`
+
+![serverless]({% image_path kafka-event-source.png %})
+
+`Great job!!` We completed to deploy a payment service as `serverless application` using `knative serving` then the `Apache Kafka Event source` enables `Knative Eventing` integration with `Apache Kafka`. Let's make sure if whole functions work properly for the end-user perspective.
 
 ####4. End to End Function Testing
 
