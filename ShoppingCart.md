@@ -283,6 +283,60 @@ And then we need to make sure we add it to the application.properties file
 quarkus.infinispan-client.server-list=datagrid-service:11222
 ```
 
+#### Adding Kafka to our midst
+By now we have added our REST API, Cache for our Cart. Quite often, other services or functions would need the data we are working with. And same in this case, once a user checks out, there are other services like the Order Service and the Payment Service that will need this information, and would most likely want to process further. 
+So we need to make sure we can send a Kafka message to topic 'orders'.
+
+To do that add the following methods in the CartResource
+
+The init method as it denotes creates the Kafka configuration, we have externalized this configuration and injected the variables as properties on the class.
+
+```
+    public void init(@Observes StartupEvent ev) {
+        Properties props = new Properties();
+
+        props.put("bootstrap.servers", bootstrapServers);
+        props.put("value.serializer", ordersTopicValueSerializer);
+        props.put("key.serializer", ordersTopicKeySerializer);
+        producer = new KafkaProducer<String, String>(props);
+    }
+```
+
+The Send Order method is quite simple, it takes the Order POJO as a param and serializes that into JSON to send over the KafkaTopic. 
+
+```
+    private void sendOrder(Order order, String cartId) {
+        order.setKey(cartId);
+        order.setTotal(shoppingCartService.getShoppingCart(cartId).getCartTotal() + "");
+        producer.send(new ProducerRecord<String, String>(ordersTopic, Json.encode(order)));
+        log.info("Sent message: " + Json.encode(order));
+    }
+```
+
+Now that we have those methods, lets call the sendOrder and we should do it in our checkout method like following:
+```
+    @POST
+    @Path("/checkout/{cartId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "checkout")
+    public ShoppingCart checkout(@PathParam("cartId") String cartId, Order order) {
+        sendOrder(order, cartId);
+        return shoppingCartService.checkout(cartId);
+    }
+
+```
+
+Almost there; Next lets add the configuration to our application.properties file
+
+```
+mp.messaging.outgoing.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+mp.messaging.outgoing.orders.connector=smallrye-kafka
+mp.messaging.outgoing.orders.topic=orders
+mp.messaging.outgoing.orders.value.serializer=org.apache.kafka.common.serialization.StringSerializer
+mp.messaging.outgoing.orders.key.serializer=org.apache.kafka.common.serialization.StringSerializer
+```
+
 #### Package and Deploy the cart-service
 Package the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
 
@@ -327,5 +381,4 @@ Wait for that command to report replication controller `cart-1` successfully rol
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
 
 Like we had done before, you can test the serice by appending /swagger-ui to the URL
-
 
