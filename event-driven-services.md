@@ -260,7 +260,7 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 Wait for that command to report replication controller `payment-1` successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
-that is that we currently don't have any liveness check configured, but we will add that in the next steps.
+that is that we currently don't have any liveness check configured.
 
 And now we can access using curl once again to find all inventories:
 

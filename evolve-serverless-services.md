@@ -417,7 +417,7 @@ Let's go shopping some cool items via the frontend service(`Coolstore WEB UI`) t
 
 ![serverless]({% image_path add-to-cart.png %})
 
- * 2) Click on `Checkout` button.
+ * 2) Click on `Checkout` button in `Your Shopping Cart` and input the credit card information. The `Card Info` should be `16 `digits.
 
 ![serverless]({% image_path checkout.png %})
 
@@ -425,11 +425,13 @@ Let's go shopping some cool items via the frontend service(`Coolstore WEB UI`) t
 
  ![serverless]({% image_path input-cc-info.png %})
 
- * 4) Confirm `Payment Status` of the your shopping items in the Orders list. It should be `Processing`.
+ * 4) Confirm `Payment Status` of the your shopping items in the `All Orders` tab. It should be `Processing`.
 
  ![serverless]({% image_path payment-processing.png %})
 
- * 5) Reload `All Orders` page to confirm if the Payment Status changed to `COMPLETED` or `FAILED`.
+ * 5) Reload `All Orders` page to confirm after at least `5s` if the Payment Status changed to `COMPLETED` or `FAILED`.
+
+ >`Note`: If the status is still `Processing`, the order service is processing incoming Kafka messages and store thme in MongoDB. Please reload the page a few times more. 
 
  ![serverless]({% image_path payment-completedorfailed.png %})
 
