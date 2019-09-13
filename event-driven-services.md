@@ -300,40 +300,50 @@ You will see the following result in `Pod Terminal`:
 
 ---
 
-Let’s start by implementing the `Kafka Client` to create `Orders Topic` in `CartResource`. Add `ConfigProperty` annotation to specify bootstrapServers, ordersTopic, ordersTopicValueSerializer, and ordersTopicKeySerializer. Open `src/main/java/com/redhat/cloudnative/CartResource` and add the following codes:
+By now we have added our `REST API`, `Cache` for our `Cart`. Quite often, other services or functions would need the data we are working with. And same in this case, once a user checks out, there are other services like the `Order Service` and the `Payment Service` that will need this information, and would most likely want to process further. So we need to make sure we can send a `Kafka` message to topic `orders`.
 
- * `// TODO: Add annotation of orders messaging configuration here` marker:
+To do that add the following methods in the `CartResource`.
 
-~~~java
-@ConfigProperty(name = "mp.messaging.outgoing.orders.bootstrap.servers")
-public String bootstrapServers;
-
-@ConfigProperty(name = "mp.messaging.outgoing.orders.topic")
-public String ordersTopic;
-
-@ConfigProperty(name = "mp.messaging.outgoing.orders.value.serializer")
-public String ordersTopicValueSerializer;
-
-@ConfigProperty(name = "mp.messaging.outgoing.orders.key.serializer")
-public String ordersTopicKeySerializer;
-~~~
-
- * `// TODO: Add KafkaProducer method here` marker:
+The init method as it denotes creates the Kafka configuration, we have externalized this configuration and injected the variables as properties on the class.
 
 ~~~java
-public void init(@Observes StartupEvent ev) {
-    Properties props = new Properties();
+    public void init(@Observes StartupEvent ev) {
+        Properties props = new Properties();
 
-    props.put("bootstrap.servers", bootstrapServers);
-    props.put("value.serializer", ordersTopicValueSerializer);
-    props.put("key.serializer", ordersTopicKeySerializer);
-    producer = new KafkaProducer<String, String>(props);
-}
+        props.put("bootstrap.servers", bootstrapServers);
+        props.put("value.serializer", ordersTopicValueSerializer);
+        props.put("key.serializer", ordersTopicKeySerializer);
+        producer = new KafkaProducer<String, String>(props);
+    }
 ~~~
 
-Next, we will define the keys and values along with the above configueration in `CartResource`. Open `application.properties` in `src/main/resources/` and add the following configuration:
+The `sendOrder` method is quite simple, it takes the Order POJO as a param and serializes that into JSON to send over the `KafkaTopic`. 
 
- * `# TODO: Add Kafka messaging keys and values here` marker:
+~~~java
+    private void sendOrder(Order order, String cartId) {
+        order.setKey(cartId);
+        order.setTotal(shoppingCartService.getShoppingCart(cartId).getCartTotal() + "");
+        producer.send(new ProducerRecord<String, String>(ordersTopic, Json.encode(order)));
+        log.info("Sent message: " + Json.encode(order));
+    }
+~~~
+
+Now that we have those methods, lets call the `sendOrder` and we should do it in our `checkout` method like following:
+
+~~~java
+    @POST
+    @Path("/checkout/{cartId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "checkout")
+    public ShoppingCart checkout(@PathParam("cartId") String cartId, Order order) {
+        sendOrder(order, cartId);
+        return shoppingCartService.checkout(cartId);
+    }
+
+~~~
+
+Almost there; Next lets add the configuration to our `application.properties` file:
 
 ~~~java
 mp.messaging.outgoing.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092

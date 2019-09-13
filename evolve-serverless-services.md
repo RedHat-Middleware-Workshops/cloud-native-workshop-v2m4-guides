@@ -285,7 +285,11 @@ you can play with [Installing the Knative Serving Operator](https://knative.dev/
 
 Before deploying the payment service using a native image, let's delete existing payment Kubernetes object such as Pod, DeploymentConfig, Service,
 
-First, create a new binary build within OpenShift
+First, we need to delete existing `BuildConfig` based an excutable Jar that we deployed it in lab 2.
+
+`oc delete bc/payment`
+
+Create a new binary build within OpenShift
 
 `oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:19.2.0 --binary --name=payment -l app=payment`
 
@@ -338,14 +342,6 @@ After successful creation of the service we should see a Kubernetes Deployment n
 Go to  `Home > Status` on the left menu and click on `payment-service-v1-deployment`. You will confirm `1` pod is `available` now.
 
 ![serverless]({% image_path payment-serving-deployment.png %})
-
-Let's find out why `Qaurkus` is named with `SuperSonic Subatomic Java`. Go to `Workload > Pods` on the left menu and click on `payment-service-v1-deployment-xxxxx`.
-
-![serverless]({% image_path payment-pod-status.png %})
-
-Click on `Logs` tab menu and scroll down to end. You will see that the payment service is started in around `5s` with `Kafka connection`. It's `Supersonic!!!!`
-
-![serverless]({% image_path payment-start-log.png %})
 
 Let's `leave the payment service` without any request via WEB UI or RESTful API more than `30 seconds`. You're probably wondering why we need to wait more than `30 seconds`? Don't worry about it because we will walk you through the reason from now on.
 
@@ -411,13 +407,13 @@ The source can be deployed using the following command via CodeReady Workspaces 
 
 `Great job!!` We completed to deploy a payment service as `serverless application` using `knative serving` then the `Apache Kafka Event source` enables `Knative Eventing` integration with `Apache Kafka`. Let's make sure if whole functions work properly for the end-user perspective.
 
-####4. End to End Function Testing
+####4. End to End Functional Testing
 
 ---
 
 Let's go shopping some cool items via the frontend service(`Coolstore WEB UI`) then run the following shopping scenarios:
 
- * 1) Add a `Red Hat Fedora` to `Cart`
+ * 1) Add a `Red Hat Fedora` to `Cart` via click on `Add to Cart` then you will see the `Success! Added!` message under the top munu.
 
 ![serverless]({% image_path add-to-cart.png %})
 
