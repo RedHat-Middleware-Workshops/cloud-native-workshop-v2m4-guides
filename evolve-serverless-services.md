@@ -582,6 +582,11 @@ quarkus-native      12 seconds ago
 s2i-quarkus         13 seconds ago
 ~~~
 
+tkn pipeline start ccn-deploy-pipeline \
+        -r app-git=quarkus-todo-git \
+        -r app-image=quarkus-todo-image \
+        -s pipeline
+
 ### Summary
 
 In this scenario we developed five microservices with `REST API` exposure to communicate with the other microservices. We also used a variety of application 

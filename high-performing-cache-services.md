@@ -1,9 +1,9 @@
 ## Lab1 - Creating High-performing Cacheable Service
 
-In this lab, we`ll develop 5 microservices into the cloud-native appliation architecture. These cloud-native applications
+In this lab, we'll develop 5 microservices into the cloud-native appliation architecture. These cloud-native applications
 will have transactions with multiple datasources such as `PostgreSQL` and `MongoDB`. Especially, we will learn how to configure datasources easily using 
 `Quarkus Extensions`. In the end, we will optimize `data transaction performance` of the shopping cart service thru integrating with a `Cache(Data Grid) server` 
-to increase end users`(customers) satification. And there`s more fun facts how easy it is to deploy applications on OpenShift 4 via `oc` command line tool.
+to increase end users'(customers) satification. And there's more fun facts how easy it is to deploy applications on OpenShift 4 via `oc` command line tool.
 
 #### Goals of this lab
 
@@ -18,7 +18,7 @@ The goal is to develop advanced cloud-native applications on `Red Hat Runtimes` 
 
 ---
 
-`Inventory Service` serves inventory and availability data for retail products. Lets`s go through quickly how the inventory service works and built on 
+`Inventory Service` serves inventory and availability data for retail products. Lets's go through quickly how the inventory service works and built on 
 `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `inventory-service` directory.
 
 ![inventory_service]({% image_path codeready-workspace-inventory-project.png %}){:width="500px"}
@@ -58,13 +58,13 @@ public class Inventory extends PanacheEntity {
  * By using Use public fields, there is no need for functionless getters and setters (those that simply get or set the field). You simply refer to fields like Inventory.location without the need to write a Inventory.geLocation() implementation. Panache will 
 auto-generate any getters and setters you do not write, or you can develop your own getters/setters that do more than get/set, which will be called when the field is accessed directly.
 
-The `PanacheEntity` superclass comes with lots of super useful static methods and you can add your own in your derived entity class, and much like traditional object-oriented programming it`s natural and recommended to place custom queries as close to the entity as possible, ideally within the entity definition itself. 
+The `PanacheEntity` superclass comes with lots of super useful static methods and you can add your own in your derived entity class, and much like traditional object-oriented programming it's natural and recommended to place custom queries as close to the entity as possible, ideally within the entity definition itself. 
 Users can just start using your entity Inventory by typing Inventory, and getting completion for all the operations in a single place.
 
 When an entity is annotated with `@Cacheable`, all its field values are cached except for collections and relations to other entities.
 This means the entity can be loaded without querying the database, but be careful as it implies the loaded entity might not reflect recent changes in the database.
 
-Next, Let's find out how `inventory service` exposes `RESTful APIs` on Quarkus. Open `InventoryResource.java` in `src/main/java/com/redhat/cloudnative/` and 
+Next, let's find out how `inventory service` exposes `RESTful APIs` on Quarkus. Open `InventoryResource.java` in `src/main/java/com/redhat/cloudnative/` and 
 you will see the following code sniffet.
 
 The REST services defines two endpoints:
@@ -118,7 +118,7 @@ Package the applicaiton via running the following maven plugin in CodeReady Work
 
 `mvn clean package -DskipTests -Dquarkus.profile=prod`
 
-> `NOTE`: You should `SKIP` the Unit test because you don`t have PostgreSQL database in local environment.
+> `NOTE`: You should `SKIP` the Unit test because you don't have PostgreSQL database in local environment.
 
 Let's create a cloud-native applications projects in OpenShift cluster and deploy the inventory service as a Linux container.
 To deploy applicaitons to OpenShift via `oc` tool, we need to copy login command and Login OpenShift cluster:
@@ -179,20 +179,20 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 
 `oc expose svc/inventory`
 
- * Finally, make sure it`s actually done rolling out:
+ * Finally, make sure it's actually done rolling out:
 
 `oc rollout status -w dc/inventory`
 
 Wait for that command to report replication controller `inventory-1` successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
-that is that we currently don`t have any liveness check configured.
+that is that we currently don't have any liveness check configured, but we will add that in the next steps.
 
 And now we can access using curl once again to find all inventories:
 
 * Get the route URL
 
-`export URL="http://$(oc get route | grep inventory | awk `{print $2}`)"`
+`export URL="http://$(oc get route | grep inventory | awk '{print $2}')"`
 
 `curl $URL/api/inventory ; echo`
 
@@ -215,13 +215,13 @@ with its single replica running in 1 pod, along with the Postgres database pod.
 
 ---
 
-`Catalog Service` serves products and prices for retail products. Lets`s go through quickly how the catalog service works and built on 
+`Catalog Service` serves products and prices for retail products. Lets's go through quickly how the catalog service works and built on 
 `Spring Boot` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `catalog-service` directory.
 
 ![catalog]({% image_path codeready-workspace-catalog-project.png %}){:width="500px"}
 
-First of all, we won`t implement the catalog application to retrieve data because of all funtions are already built when we imported this project from Git server.
-There`re a few interesting things what we need to take a look at this Spring Boot application before we will deploy it to OpenShift cluster.
+First of all, we won't implement the catalog application to retrieve data because of all funtions are already built when we imported this project from Git server.
+There're a few interesting things what we need to take a look at this Spring Boot application before we will deploy it to OpenShift cluster.
 
 This catalog service is not using the default BOM (Bill of material) that Spring Boot projects typically use. Instead, we are using
 a BOM provided by Red Hat as part of the [Snowdrop](http://snowdrop.me/) project.
@@ -289,20 +289,20 @@ oc new-app -e POSTGRESQL_USER=catalog \
 
 `oc expose service catalog`
 
- * Finally, make sure it`s actually done rolling out:
+ * Finally, make sure it's actually done rolling out:
 
 `oc rollout status -w dc/catalog`
 
 Wait for that command to report replication controller `catalog-1` successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
-that is that we currently don`t have any liveness check configured.
+that is that we currently don't have any liveness check configured, but we will add that in the next steps.
 
 And now we can access using curl once again to find a certain inventory:
 
 * Get the route URL
 
-`export URL="http://$(oc get route | grep catalog | awk `{print $2}`)"`
+`export URL="http://$(oc get route | grep catalog | awk '{print $2}')"`
 
 `curl $URL/api/product/329299 ; echo`
 
@@ -321,13 +321,398 @@ with running 4 pods such as catalog, catalog-database, inventory, and inventory-
 
 ---
 
+`Shopping Cart Service` manages shopping cart for each customer. Lets's go through quickly how the cart service works and built on 
+`Quarkus` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `cart-service` directory.
 
+![cart]({% image_path codeready-workspace-cart-project.png %}){:width="500px"}
+
+Let's figure out the `basic structure of Quarkus project` in terms of how `models, services, and RESTful APIs` are already implemented to serve 
+functions of the shopping cart service. 
+
+Open `CartResource.java` in `src/main/java/com/redhat/cloudnative/` to understand how this application exposes `REST` endpoints on Quarkus in simple codes.
+And you will see that `POST`, `GET` methods exist to serve the shopping cart service in terms of creating a new shopping cart, get details of a certain cart, and delete an existing cart.
+
+ * `@Path`, `@GET` and `@PathParam` are the standard `JAX-RS annotations` used to define how to access the service.
+ * `@Inject` is Standard CDI annotation to use `ShoppingCartService` for creating, updating, deleting `ShoppingCart`.
+
+![catalog]({% image_path cart-resource.png %})
+
+You can also have a look at `PromotionService`, `ShippingService` in `src/main/java/com/redhat/cloudnative/service` to understand how to 
+define `@ApplicationScoped` in each funtion service.
+
+![cart]({% image_path cart-services-code.png %})
+
+##### Developing Quarkus Infinispan Client
+
+We confirmed that the cart service serves designed CRUD funtions as we expected. Now, we will transform into `high-performing cache service` by 
+addin a `In Memory Data Grid` server that allows running in a server outside of application processes. More importantly, we will learn how 
+`Quarkus Infinispan Client` extension provides functionality to allow the client that can connect to the data grid server when running in Quarkus.
+
+Once you have the cart service built on Quarkus project configured you can add the `infinispan-client extension` to the project 
+by running the following from the command line in your project base directory via CodeReady Workspaces `Terminal`:
+
+`mvn quarkus:add-extension -Dextensions="infinispan-client"`
+
+This will add the following to your `pom.xml`.
+
+![cart]({% image_path catalog-pom-infinispan-client.png %})
+
+Now, let's create Cache Services using `cart-cache` of `Red Hat JBoss Data Grid` to quickly set up clusters that give you optimal performance 
+and ease of use with minimal configuration.
+
+`Cache Service`(cart-cache) provides an easy-to-use implementation of `Data Grid` for `OpenShift` that is designed to increase application 
+response time through high-performance caching. With cart-cache you can create new caches only as copies of the default cache definition.
+
+The Infinispan client is configurable in the `application.properties` file that can be provided in the `src/main/resources` directory. 
+These are the properties that can be configured in this file:
+
+`quarkus.infinispan-client.server-list=cart-cache:11222`
+
+It is also possible to configure a `hotrod-client.properties` as described in the Infinispan user guide. Note that the `hotrod-client.properties` values 
+overwrite any matching property from the other configuration values(eg. near cache).
+
+By default the client will support keys and values of the following types: byte[], primitive wrappers (eg. Integer, Long, Double etc.), String, Date and Instant. 
+User types require some additional steps that are detailed here. Let’s say we have the following user classes in cart service:
+
+ * `Product`
+
+ * `Promotion`
+
+ * `ShoppingCart`
+
+ * `ShoppingCartItem`
+
+The default serialization is done using a library based on `protobuf`. We need to define the proto buf schema and a marshaller for each user type(s).
+
+> `NOTE`: Annotation based proto stream marshalling is not yet supported in the Quarkus Infinispan client. This will be added soon, allowing you to only annotate your classes, skipping the following steps.
+
+We already have`cart.proto` in the `META-INF directory` of the cart project. These files will automatically be picked up at initialization time.
+
+![cart]({% image_path catalog-cart-proto.png %})
+
+The next thing to do is to provide a `org.infinispan.protostream.MessageMarshaller` implementation for each user class defined in the proto schema. 
+This class is then provided via `@Produces` in a similar fashion to the code based proto schema definition above.
+
+Here is the Marshaller class for our `Product`, `Promotion`, `ShoppingCart`, and `ShoppingCartItem` classes.
+
+ * Create `ProductMarshaller.java` in `src/main/java/com/redhat/cloudnative/model` and copy the following codes to the Java file.
+
+~~~java
+package com.redhat.cloudnative.model;
+
+import com.redhat.cloudnative.model.Product;
+import org.infinispan.protostream.MessageMarshaller;
+
+import java.io.IOException;
+
+public class ProductMarshaller implements MessageMarshaller<Product> {
+
+    @Override
+    public Product readFrom(ProtoStreamReader reader) throws IOException {
+        String itemId = reader.readString("itemId");
+        String name = reader.readString("name");
+        String desc = reader.readString("desc");
+        double price = reader.readDouble("price");
+
+        return new Product(itemId, name, desc, price);
+    }
+
+    @Override
+    public void writeTo(ProtoStreamWriter writer, Product product) throws IOException {
+        writer.writeString("itemId", product.getItemId());
+        writer.writeString("name", product.getName());
+        writer.writeString("desc", product.getDesc());
+        writer.writeDouble("price", product.getPrice());
+    }
+
+    @Override
+    public Class<? extends Product> getJavaClass() {
+        return Product.class;
+    }
+
+    @Override
+    public String getTypeName() {
+        return "coolstore.Product";
+    }
+
+}
+~~~
+
+ * Create `PromotionMarhsaller.java` in `src/main/java/com/redhat/cloudnative/model` and copy the following codes to the Java file.
+
+~~~java
+package com.redhat.cloudnative.model;
+
+import com.redhat.cloudnative.model.Promotion;
+import org.infinispan.protostream.MessageMarshaller;
+
+import java.io.IOException;
+
+public class PromotionMarhsaller implements MessageMarshaller<Promotion> {
+
+    @Override
+    public Promotion readFrom(ProtoStreamReader reader) throws IOException {
+        String itemId = reader.readString("itemId");
+        double percentOff = reader.readDouble("percentOff");
+        return new Promotion(itemId, percentOff);
+    }
+
+    @Override
+    public void writeTo(ProtoStreamWriter writer, Promotion promotion) throws IOException {
+        writer.writeString("itemId", promotion.getItemId());
+        writer.writeDouble("percentOff", promotion.getPercentOff());
+    }
+
+    @Override
+    public Class<? extends Promotion> getJavaClass() {
+        return Promotion.class;
+    }
+
+    @Override
+    public String getTypeName() {
+        return "coolstore.Promotion";
+    }
+}
+~~~
+
+ * Create `ShoppingCartItemMarshaller.java` in `src/main/java/com/redhat/cloudnative/model` and copy the following codes to the Java file.
+
+~~~java
+package com.redhat.cloudnative.model;
+
+import com.redhat.cloudnative.model.Product;
+import com.redhat.cloudnative.model.ShoppingCartItem;
+import org.infinispan.protostream.MessageMarshaller;
+
+import java.io.IOException;
+
+public class ShoppingCartItemMarshaller implements MessageMarshaller<ShoppingCartItem> {
+
+    @Override
+    public ShoppingCartItem readFrom(ProtoStreamReader reader) throws IOException {
+        double price = reader.readDouble("price");
+        int quantity = reader.readInt("quantity");
+        double promoSavings = reader.readDouble("promoSavings");
+        Product product = reader.readObject("product", Product.class);
+
+        return new ShoppingCartItem(price, quantity, promoSavings, product);
+    }
+
+    @Override
+    public void writeTo(ProtoStreamWriter writer, ShoppingCartItem shoppingCartItem) throws IOException {
+        writer.writeDouble("price", shoppingCartItem.getPrice());
+        writer.writeInt("quantity", shoppingCartItem.getQuantity());
+        writer.writeDouble("promoSavings", shoppingCartItem.getPromoSavings());
+        writer.writeObject("product", shoppingCartItem.getProduct(), Product.class);
+    }
+
+    @Override
+    public Class<? extends ShoppingCartItem> getJavaClass() {
+        return ShoppingCartItem.class;
+    }
+
+    @Override
+    public String getTypeName() {
+        return "coolstore.ShoppingCartItem";
+    }
+}
+~~~
+
+ * Create `ShoppingCartMarshaller.java` in `src/main/java/com/redhat/cloudnative/model` and copy the following codes to the Java file.
+
+~~~java
+package com.redhat.cloudnative.model;
+
+import com.redhat.cloudnative.model.ShoppingCart;
+import com.redhat.cloudnative.model.ShoppingCartItem;
+import org.infinispan.protostream.MessageMarshaller;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ShoppingCartMarshaller implements MessageMarshaller<ShoppingCart> {
+
+    @Override
+    public ShoppingCart readFrom(ProtoStreamReader reader) throws IOException {
+        double cartItemTotal = reader.readDouble("cartItemTotal");
+        double cartItemPromoSavings = reader.readDouble("cartItemPromoSavings");
+        double shippingTotal = reader.readDouble("shippingTotal");
+        double shippingPromoSavings = reader.readDouble("shippingPromoSavings");
+        double cartTotal = reader.readDouble("cartTotal");
+        String cartId = reader.readString("cartId");
+        List<ShoppingCartItem> shoppingCartItemList = new ArrayList<>();
+        shoppingCartItemList = reader.readCollection("shoppingCartItemList", shoppingCartItemList, ShoppingCartItem.class);
+
+        return new ShoppingCart(cartItemTotal, cartItemPromoSavings, shippingTotal, shippingPromoSavings, cartTotal, cartId, shoppingCartItemList);
+    }
+
+    @Override
+    public void writeTo(ProtoStreamWriter writer, ShoppingCart shoppingCart) throws IOException {
+        writer.writeDouble("cartItemTotal", shoppingCart.getCartItemTotal());
+        writer.writeDouble("cartItemPromoSavings", shoppingCart.getCartItemPromoSavings());
+        writer.writeDouble("shippingTotal", shoppingCart.getShippingTotal());
+        writer.writeDouble("shippingPromoSavings", shoppingCart.getShippingPromoSavings());
+        writer.writeDouble("cartTotal", shoppingCart.getCartTotal());
+        writer.writeString("cartId", shoppingCart.getCartId());
+        writer.writeCollection("shoppingCartItemList", shoppingCart.getShoppingCartItemList(), ShoppingCartItem.class);
+    }
+
+    @Override
+    public Class<? extends ShoppingCart> getJavaClass() {
+        return ShoppingCart.class;
+    }
+
+    @Override
+    public String getTypeName() {
+        return "coolstore.ShoppingCart";
+    }
+
+}
+~~~
+
+ * Create `MarshallerConfig.java` in `src/main/java/com/redhat/cloudnative/model` and copy the following codes to the Java file.
+
+~~~java
+package com.redhat.cloudnative.model;
+
+import org.infinispan.protostream.MessageMarshaller;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+
+@ApplicationScoped
+public class MarshallerConfig {
+
+    @Produces
+    MessageMarshaller promotionMarshaller(){
+        return new PromotionMarhsaller();
+    }
+
+    @Produces
+    MessageMarshaller productMarshaller(){
+        return new ProductMarshaller();
+    }
+
+    @Produces
+    MessageMarshaller shoppingCartItemMarhsaller(){
+        return new ShoppingCartItemMarshaller();
+    }
+
+    @Produces
+    MessageMarshaller shoppingCartMarshaller(){
+        return new ShoppingCartMarshaller();
+    }
+
+}
+~~~
+
+Add `Dependency Injection` to `ShoppingCartServiceImpl` class as below:
+
+~~~java
+bla bla or cp pre-built codes from somewhere in the repo
+~~~
+
+Package the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
+
+![cart]({% image_path quarkus-dev-run-packageforOcp.png %})
+
+Or run the following maven plugin in CodeReady Workspaces`Terminal`:
+
+`cd /projects/cloud-native-workshop-v2m4-labs/cart-service/`
+
+`mvn clean package -DskipTests`
+
+##### Deploying Cart service with JBoss Data Grid to OpenShift
+
+Run the following `oc` command to create a `cart-cache` in OpenShift via CodeReady Workspaces `Terminal`:
+
+`oc new-app jboss/infinispan-server:10.0.0.Beta3 --name=datagrid-service`
+
+ * `NUMBER_OF_INSTANCES` sets the number of nodes in the Data Grid for OpenShift cluster. The default is 1.
+
+ * `APPLICATION_USER` creates a user to securely access the cache. There is no default value. You must always create a user.
+ 
+ * `APPLICATION_PASSWORD` specifies a password for the user. If you do not set a password, the service template randomly generates one and stores it as a secret.
+ 
+ * `REPLICATION_FACTOR` specifies the number of copies for each cache entry. The default is 1.
+
+[Red Hat® Data Grid](https://access.redhat.com/documentation/en-us/red_hat_data_grid/7.3/html-single/red_hat_data_grid_for_openshift/index) is an 
+in-memory, distributed, NoSQL datastore solution. Your applications can access, process, and analyze data at in-memory speed to deliver a superior 
+user experience with features and benefits as below:
+
+ * `Act faster` - Quickly access your data through fast, low-latency data processing using memory (RAM) and distributed parallel execution.
+
+ * `Scale quickly` - Achieve linear scalability with data partitioning and distribution across cluster nodes.
+
+ * `Always available` - Gain high availability through data replication across cluster nodes.
+
+ * `Fault tolerance` - Attain fault tolerance and recover from disaster through cross-datacenter georeplication and clustering.
+
+ * `More productivity` - Gain development flexibly and greater productivity with a highly versatile, functionally rich NoSQL data store.
+
+ * `Protect data` - Obtain comprehensive data security with encryption and role-based access.
+
+Once the cart-cache is deployed successfully, it will be showd in `Workloads > Pods`.
+
+![cart]({% image_path datagrid-pod.png %})
+
+Build the image using on OpenShift:
+
+`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=cart -l app=cart`
+
+This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
+
+ * Create a temp directory to store only previously-built application with necessary lib directory:
+
+`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
+
+ * Start and watch the build, which will take about minutes to complete:
+
+`oc start-build cart --from-dir=target/binary --follow`
+
+![cart]({% image_path cart-build-logs.png %})
+
+ * Deploy it as an OpenShift application after the build is done:
+
+`oc new-app cart`
+
+ * Create the route
+
+`oc expose svc/cart`
+
+ * Finally, make sure it's actually done rolling out:
+
+`oc rollout status -w dc/cart`
+
+Wait for that command to report replication controller `cart-1` successfully rolled out before continuing.
+
+>`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
+that is that we currently don't have any liveness check configured, but we will add that in the next steps.
+
+And now we can access using curl once again to find all inventories:
+
+* Get the route URL
+
+`export URL="http://$(oc get route | grep cart | awk '{print $2}')"`
+
+`curl -X POST $URL/cart/1111/329199/50 ; echo`
+
+`curl h$URL/cart/1111 ; echo`
+
+You will see the following result:
+
+~~~shell
+bla bla
+~~~
 
 ####4. Developing and Deploying Order Service
 
 ---
 
-`Order Service` manages all orders when customers checkout items in the shopping cart. Lets`s go through quickly how the order service get `REST` services to use the `MongoDB` database with `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `order-service` directory.
+`Order Service` manages all orders when customers checkout items in the shopping cart. Lets's go through quickly how the order service get 
+`REST` services to use the `MongoDB` database with `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and 
+expand `order-service` directory.
 
 ![catalog]({% image_path codeready-workspace-order-project.png %}){:width="500px"}
 
@@ -340,7 +725,8 @@ Execute the following command via CodeReady Workspaces `Terminal`:
 
 `mvn quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client"`
 
-This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, the quarkus-mongodb-client extension has been added to your `pom.xml`.
+This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, 
+the quarkus-mongodb-client extension has been added to your `pom.xml`.
 
 ![catalog]({% image_path order-pom-dependency.png %})
 
@@ -352,7 +738,8 @@ First, let’s have a look at the `Order` bean in `src/main/java/com/redhat/clou
 
 Nothing fancy. One important thing to note is that having a default constructor is required by the `JSON serialization layer`.
 
-Now, open a `com.redhat.cloudnative.OrderService` that will be the business layer of our application and `store/load` the orders from the mongoDB database. Add the following Java codes at each market.
+Now, open a `com.redhat.cloudnative.OrderService` that will be the business layer of our application and `store/load` the orders from the mongoDB database.
+Add the following Java codes at each market.
 
  * `// TODO: Inject MongoClient here` marker:
 
@@ -592,24 +979,24 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 
 `oc expose svc/order`
 
- * Finally, make sure it`s actually done rolling out:
+ * Finally, make sure it's actually done rolling out:
 
 `oc rollout status -w dc/order`
 
 Wait for that command to report replication controller `order-1` successfully rolled out before continuing.
 
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
-that is that we currently don`t have any liveness check configured.
+that is that we currently don't have any liveness check configured, but we will add that in the next steps.
 
 And now we can access using curl once again to find all inventories:
 
 * Get the route URL
 
-`export URL="http://$(oc get route | grep order | awk `{print $2}`)"`
+`export URL="http://$(oc get route | grep order | awk '{print $2}')"`
 
 `curl $URL/api/orders ; echo`
 
-You will see empty result because you didn`t add any shopping items yet:
+You will see empty result because you didn't add any shopping items yet:
 
 `[]`
 
@@ -621,7 +1008,7 @@ You will see empty result because you didn`t add any shopping items yet:
 [Node.js](https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i) container. 
 [Red Hat OpenShift Application Runtimes](https://developers.redhat.com/products/rhoar) includes `Node.js` support in enterprise prouction environment.
 
-Lets`s go through quickly how the frontend service works and built on `Node.js` runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE 
+Lets's go through quickly how the frontend service works and built on `Node.js` runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE 
 and expand `coolstore-ui` directory.
 
 ![coolstore-ui]({% image_path codeready-workspace-coolstore-ui.png %}){:width="500px"}
