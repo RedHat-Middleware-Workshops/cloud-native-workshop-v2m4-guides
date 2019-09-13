@@ -2,9 +2,9 @@
 
 `Traditional microservices architecture` is typically composed of many individual services with different functions. Each application service has probably many clients that need to communicate with the service for fetching data. Also, clients can be application services to other clients. It will become more complex to handle `data streams` because everything can be a stream of data such as `end-user clicks`, `RESTful APIs`, `IoT devices data`, and more when these services are running on `multi-cloud` and `hybrid cloud` infrastructure.
 
-In an `event-driven architecture`, we can treat data streams as `events` using `reactive programming` and `distributed messaging platform`. `Reactive programming` is an asynchronous programming paradigm concerned with data streams and the propagation of change. In the previous lab, we developed Inventory, Catalog, Shopping Cart and Order services with obvious interactions. 
+In an `event-driven architecture`, we can treat data streams as `events` using `reactive programming` and `distributed messaging platform`. `Reactive programming` is an asynchronous programming paradigm concerned with data streams and the propagation of change. In the previous lab, we developed Inventory, Catalog, Shopping Cart and Order services with obvious interactions.
 
-In this lab, we'll change `Shoppiong Cart`, `Order`, and create a new `Payment` as `Event-Driven/Reactive` applications into the cloud-native appliation architecture. These cloud-native applications will read data from and write data to the `Apache Kafka cluster`. `AMQ Streams` is based on `Apache Kafka`, a popular platform for 
+In this lab, we'll change `Shoppiong Cart`, `Order`, and create a new `Payment` as `Event-Driven/Reactive` applications into the cloud-native appliation architecture. These cloud-native applications will read data from and write data to the `Apache Kafka cluster`. `AMQ Streams` is based on `Apache Kafka`, a popular platform for
 streaming data delivery and processing. `AMQ Streams` makes it easy to run `Apache Kafka` on OpenShift with key features:
 
  * Designed for horizontal scalability
@@ -17,7 +17,7 @@ streaming data delivery and processing. `AMQ Streams` makes it easy to run `Apac
 
 ---
 
-The goal is to develop advanced cloud-native applications on `Red Hat Runtimes` and deploy them on `OpenShift 4` including 
+The goal is to develop advanced cloud-native applications on `Red Hat Runtimes` and deploy them on `OpenShift 4` including
 `Apache Kafka in AMQ Streams` for distributed messaing capabilities. After this lab, you should end up with something like:
 
 ![goal]({% image_path lab2-goal.png %})
@@ -26,13 +26,13 @@ The goal is to develop advanced cloud-native applications on `Red Hat Runtimes` 
 
 ---
 
-[Strimzi](https://strimzi.io/) is an open source project that provides container images and operators for running 
-[Apache Kafka](https://developers.redhat.com/videos/youtube/CZhOJ_ysIiI/) on [Kubernetes](https://developers.redhat.com/topics/kubernetes/) and 
-[Red Hat OpenShift](https://developers.redhat.com/openshift/). `Scalability` is one of the flagship features of Apache Kafka. It is achieved by partitioning the data 
-and distributing them across multiple brokers. Such data sharding has also a big impact on how `Kafka clients` connect to the brokers. This is especially visible 
+[Strimzi](https://strimzi.io/) is an open source project that provides container images and operators for running
+[Apache Kafka](https://developers.redhat.com/videos/youtube/CZhOJ_ysIiI/) on [Kubernetes](https://developers.redhat.com/topics/kubernetes/) and
+[Red Hat OpenShift](https://developers.redhat.com/openshift/). `Scalability` is one of the flagship features of Apache Kafka. It is achieved by partitioning the data
+and distributing them across multiple brokers. Such data sharding has also a big impact on how `Kafka clients` connect to the brokers. This is especially visible
 when `Kafka` is running within a platform like `Kubernetes` but is accessed from outside of that platform.
 
-In this lab, we will use `productized` and `supported` versions of the Strimzi and Apache Kafka projects are available with `AMQ Streams` as part of the 
+In this lab, we will use `productized` and `supported` versions of the Strimzi and Apache Kafka projects are available with `AMQ Streams` as part of the
 [Red Hat AMQ product](https://www.redhat.com/en/technologies/jboss-middleware/amq?extIdCarryOver=true&sc_cid=701f2000001OH7TAAW).
 
 AMQ Streams is `already installed` using the following `Operators` so we don't nee to install it in this lab:
@@ -89,14 +89,14 @@ Change the name with `payments` then click on `Create` on the bottom.
 
 ---
 
-`Payment Service` offers shops online services for accepting electronic payments by a variety of payment methods including credit card, 
-bank-based payments when orders are checked out in shopping cart. Lets's go through quickly how the payment service get `REST` services to use 
-`Kafka Topics` on `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` 
+`Payment Service` offers shops online services for accepting electronic payments by a variety of payment methods including credit card,
+bank-based payments when orders are checked out in shopping cart. Lets's go through quickly how the payment service get `REST` services to use
+`Kafka Topics` on `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces`
 Web IDE and expand `payment-service` directory.
 
 ![catalog]({% image_path codeready-workspace-payment-project.png %}){:width="500px"}
 
-In this step, we will learn how the payment Quarkus application can use `Kafka Topics` to receive `order event` as well as send `PaymentAction` such as 
+In this step, we will learn how the payment Quarkus application can use `Kafka Topics` to receive `order event` as well as send `PaymentAction` such as
 `Completed` and `Failed`.
 
 
@@ -106,57 +106,62 @@ Execute the following command via CodeReady Workspaces `Terminal`:
 
 `mvn quarkus:add-extension -Dextensions="kafka"`
 
-This command generates a Maven project, importing the `Kafka connector` extensions for Quarkus applications 
+This command generates a Maven project, importing the `Kafka connector` extensions for Quarkus applications
 and provides all the necessary capabilities to integrate with the Kafka clusters and produce `payments topic`. Let's confirm your `pom.xml` as below:
 
 ![payment]({% image_path payment-pom-dependency.png %})
 
 ##### Writing the application
 
-Let’s start by implementing the `PaymentResource` to handle `Kafka event` from the order service. As you can see from the source code below it is to create `Kafka producer` and payload the `COMPLETED` or `FAILED` result:
+Let’s start by implementing the `PaymentResource` to handle `Kafka event` from the order service. As you can see from the source code below it is to create a Kafka _Consumer_ and Kafka _Producer_ to process the payload and generate a `COMPLETED` or `FAILED` result:
 
  * `// TODO: Add Messaging ConfigProperty here` marker:
 
 ~~~java
-@ConfigProperty(name = "mp.messaging.outgoing.payments.bootstrap.servers")
-public String bootstrapServers;
+    @ConfigProperty(name = "mp.messaging.outgoing.payments.bootstrap.servers")
+    public String bootstrapServers;
 
-@ConfigProperty(name = "mp.messaging.outgoing.payments.topic")
-public String paymentsTopic;
+    @ConfigProperty(name = "mp.messaging.outgoing.payments.topic")
+    public String paymentsTopic;
 
-@ConfigProperty(name = "mp.messaging.outgoing.payments.value.serializer")
-public String paymentsTopicValueSerializer;
+    @ConfigProperty(name = "mp.messaging.outgoing.payments.value.serializer")
+    public String paymentsTopicValueSerializer;
 
-@ConfigProperty(name = "mp.messaging.outgoing.payments.key.serializer")
-public String paymentsTopicKeySerializer;
+    @ConfigProperty(name = "mp.messaging.outgoing.payments.key.serializer")
+    public String paymentsTopicKeySerializer;
+
+    private Producer<String, String> producer;
+
+    public static final Logger log = LoggerFactory.getLogger(PaymentResource.class);
+
 ~~~
 
  * `// TODO: Add handleCloudEvent method here` marker:
 
 ~~~java
-@POST
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.TEXT_PLAIN)
-public void handleCloudEvent(String cloudEventJson) {
-    String orderId = "unknown";
-    String paymentId = "" + ((int)(Math.floor(Math.random() * 100000)));
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public void handleCloudEvent(String cloudEventJson) {
+        String orderId = "unknown";
+        String paymentId = "" + ((int)(Math.floor(Math.random() * 100000)));
 
-    try {
-        log.info("received event: " + cloudEventJson);
-        JsonObject event = new JsonObject(cloudEventJson);
-        orderId = event.getString("key");
-        Double total = event.getDouble("total");
-        JsonObject ccDetails = event.getJsonObject("creditCard");
-        String name = event.getString("name");
+        try {
+            log.info("received event: " + cloudEventJson);
+            JsonObject event = new JsonObject(cloudEventJson);
+            orderId = event.getString("key");
+            Double total = event.getDouble("total");
+            JsonObject ccDetails = event.getJsonObject("creditCard");
+            String name = event.getString("name");
 
-        if (!ccDetails.getString("number").startsWith("4")) {
-              fail(orderId, paymentId, "Invalid Credit Card: " + ccDetails.getString("number"));
+            if (!ccDetails.getString("number").startsWith("4")) {
+                 fail(orderId, paymentId, "Invalid Credit Card: " + ccDetails.getString("number"));
+            }
+             pass(orderId, paymentId, "Payment of " + total + " succeeded for " + name + " CC details: " + ccDetails.toString());
+        } catch (Exception ex) {
+             fail(orderId, paymentId, "Unknown error: " + ex.getMessage() + " for payment: " + cloudEventJson);
         }
-          pass(orderId, paymentId, "Payment of " + total + " succeeded for " + name + " CC details: " + ccDetails.toString());
-    } catch (Exception ex) {
-          fail(orderId, paymentId, "Unknown error: " + ex.getMessage() + " for payment: " + cloudEventJson);
     }
-}
 ~~~
 
  * `// TODO: Add pass method here` marker:
@@ -187,6 +192,19 @@ private void fail(String orderId, String paymentId, String remarks) {
 }
 ~~~
 
+* `// TODO: Add consumer method here` marker:
+
+~~~java
+    @Incoming("orders")
+    public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
+            throws IOException {
+
+        log.info("Kafka message with value = {} arrived", message.getPayload());
+        handleCloudEvent(message.getPayload());
+        return message.ack();
+    }
+~~~
+
  * `// TODO: Add init method here` marker:
 
 ~~~java
@@ -200,19 +218,32 @@ public void init(@Observes StartupEvent ev) {
 }
 ~~~
 
+This method will consume Kafka streams from the `orders` topic and call our `handleCloudEvent` method. Later on we'll delete this method and use Knative Events to handle the incoming stream. But for now we'll use this method to listen to the topic.
+
 ##### Configuring the application
 
-The Keycloak extension allows you to define the adapter configuration using either the `application.properties` file or using a `keycloak.json`. 
+The Keycloak extension allows you to define the adapter configuration using either the `application.properties` file or using a `keycloak.json`.
 Both files should be located at the src/main/resources directory.
 
  * Configuring using the `application.properties` file as below:
 
 ~~~java
+# Outgoing stream
 mp.messaging.outgoing.payments.bootstrap.servers=my-cluster-kafka-bootstrap:9092
 mp.messaging.outgoing.payments.connector=smallrye-kafka
 mp.messaging.outgoing.payments.topic=payments
 mp.messaging.outgoing.payments.value.serializer=org.apache.kafka.common.serialization.StringSerializer
 mp.messaging.outgoing.payments.key.serializer=org.apache.kafka.common.serialization.StringSerializer
+
+# Incoming stream (unneeded when using Knative events)
+mp.messaging.incoming.orders.connector=smallrye-kafka
+mp.messaging.incoming.orders.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.orders.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+mp.messaging.incoming.orders.group.id=payment-order-service
+mp.messaging.incoming.orders.auto.offset.reset=earliest
+mp.messaging.incoming.orders.enable.auto.commit=true
+mp.messaging.incoming.orders.request.timeout.ms=30000
 ~~~
 
 For more details about this file and all the supported options, please take a look at [Keycloak Adapter Config](https://www.keycloak.org/docs/latest/securing_apps/index.html#_java_adapter_config).
@@ -317,7 +348,7 @@ The init method as it denotes creates the Kafka configuration, we have externali
     }
 ~~~
 
-The `sendOrder` method is quite simple, it takes the Order POJO as a param and serializes that into JSON to send over the `KafkaTopic`. 
+The `sendOrder` method is quite simple, it takes the Order POJO as a param and serializes that into JSON to send over the `KafkaTopic`.
 
 ~~~java
     private void sendOrder(Order order, String cartId) {
@@ -379,6 +410,6 @@ Let's confirm if the cart and order services works correctly via coolstore GUI t
 
 In this scenario we developed `Event-Driven/Reactive` cloud-native applictions to deal with data streams from the shopping cart service to the order service and payment service using `Apache Kafka Topics`. To do that, the shopping cart service produces `order` messages and the order service subscribes the orders topic to add a new order to `MongoDB` as well as receives the `payments topic` to update the payment result in coolstore web-ui. In the meantime, the payment-service receives the `orders topic` to produce payment processing result messages in the `payments topic` for the order service.
 
-In order to implement this cloud-native application architecture, we use `Quarkus Kafka extension` to implement stream processing applications based on `Apache Kafka`. Especially, `AMQ Streams` enables you to create `Apache Kafka cluster` and `Topics` with easy user experiences via OpenShift developer catalog.  
+In order to implement this cloud-native application architecture, we use `Quarkus Kafka extension` to implement stream processing applications based on `Apache Kafka`. Especially, `AMQ Streams` enables you to create `Apache Kafka cluster` and `Topics` with easy user experiences via OpenShift developer catalog.
 
 In the end, we have message-driven microservices for implementing reactive systems, where all the components interact using asynchronous messages passing. Most importantly, `Quarkus` is perfectly suited to implement event-driven microservices and reactive systems. `Congratulations!`
