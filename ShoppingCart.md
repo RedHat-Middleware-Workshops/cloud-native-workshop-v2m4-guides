@@ -13,10 +13,10 @@ The Shopping cart also throws out a Kafka message to the topic Orders, when chec
 Last and perhaps worth mentioning the REST+Swagger UI also part of the REST API support in Quarkus.
 
 What is a Shopping Cart in our context?
-A Shopping cart has a list of Shopping Items.
-Quantity of a product in the Items list
-Discount and promotional details. 
-We will see these in more details when we look at our model.
+- A Shopping cart has a list of Shopping Items.
+- Quantity of a product in the Items list
+- Discount and promotional details. 
+- We will see these in more details when we look at our model.
 
 For this lab, we are using the code ready workspaces, make sure you have the following project open in your workspace
 
@@ -26,11 +26,11 @@ cloud-native-workshop-v3m4-labs
 
 #### Building REST API with Quarkus
 The cart is quite simple; All the information from the browser i.e., via our Angular App is via JSON. 
-What is the endpoint is '/api/cart':
-GET request '/{cartId}' gets the items in the cart, or creates a new unique ID if one is not present
-POST to '/{cartId}/{itemId}/{quantity}' will add items to the cart
-DELETE '/{cartId}/{itemId}/{quantity}' will remove items from the cart
-And finally '/checkout/{cartId}' will remove the items and invoke the checkout procedure
+What is the endpoint '/api/cart'?:
+- GET request '/{cartId}' gets the items in the cart, or creates a new unique ID if one is not present
+- POST to '/{cartId}/{itemId}/{quantity}' will add items to the cart
+- DELETE '/{cartId}/{itemId}/{quantity}' will remove items from the cart
+- And finally '/checkout/{cartId}' will remove the items and invoke the checkout procedure
 
 Let's take a look at how we do this with Quarkus. 
 In our project and in our main package i.e., com.redhat.cloudnative is the CartResource. Let's take a look at the getCart method.
