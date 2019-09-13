@@ -340,8 +340,7 @@ For this lab, we are using the code ready workspaces, make sure you have the fol
 
 ##### Building REST API with Quarkus
 
-The cart is quite simple; All the information from the browser i.e., via our `Angular App` is via `JSON`. What is the endpoint is `/api/cart`: GET request `/{cartId}` gets the items in the cart, or creates a new unique ID if one is not present `POST` to `/{cartId}/{itemId}/{quantity}` will add items to the cart `DELETE` `/{cartId}/{itemId}/{quantity}` will remove items from the cart
-And finally `/checkout/{cartId}` will remove the items and invoke the checkout procedure
+The cart is quite simple; All the information from the browser i.e., via our `Angular App` is via `JSON`. What is the endpoint is `/api/cart`: GET request `/{cartId}` gets the items in the cart, or creates a new unique ID if one is not present `POST` to `/{cartId}/{itemId}/{quantity}` will add items to the cart DELETE `/{cartId}/{itemId}/{quantity}` will remove items from the cart. And finally `/checkout/{cartId}` will remove the items and invoke the checkout procedure
 
 Let's take a look at how we do this with Quarkus. In our project and in our main package i.e., com.redhat.cloudnative is the `CartResource`. Let's take a look at the getCart method.
 
@@ -536,9 +535,7 @@ public class ProductMarshaller implements MessageMarshaller<Product> {
 
 So now we have the capability to read from a `ProtoStream` and `Write` to it. And this will be done directly into our cache. We have already created the other model classes and mashallers, feel free to look around.
 
-Now its time to configure our `RemoteCache`, since its not embedded into our service. 
-
-Open the file `com.redhat.cloudnative.Producers`.
+Now its time to configure our `RemoteCache`, since its not embedded into our service. Open the file `com.redhat.cloudnative.Producers`.
 
 We use the producer to ensure our RemoteCache gets instantiated. We create methods called getCache and getConfigBuilder
 
@@ -580,8 +577,7 @@ We use the producer to ensure our RemoteCache gets instantiated. We create metho
     }
 ~~~
 
-`Perfect`, now we have all the building blocks ready to use the cache. 
-Lets start using our cache. 
+`Perfect`, now we have all the building blocks ready to use the cache. Lets start using our cache. 
 
 First we need to make sure we will inject our cache in our service like this in `com.redhat.cloudnative.service.ShoppingCartServiceImpl`
 
@@ -641,9 +637,7 @@ Like we had done before, you can test the serice by appending /swagger-ui to the
 
 ---
 
-`Order Service` manages all orders when customers checkout items in the shopping cart. Lets`s go through quickly how the order service get 
-`REST` services to use the `MongoDB` database with `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and 
-expand `order-service` directory.
+`Order Service` manages all orders when customers checkout items in the shopping cart. Lets`s go through quickly how the order service get `REST` services to use the `MongoDB` database with `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `order-service` directory.
 
 ![catalog]({% image_path codeready-workspace-order-project.png %}){:width="500px"}
 
@@ -656,8 +650,7 @@ Execute the following command via CodeReady Workspaces `Terminal`:
 
 `mvn quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client"`
 
-This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, 
-the quarkus-mongodb-client extension has been added to your `pom.xml`.
+This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, the quarkus-mongodb-client extension has been added to your `pom.xml`.
 
 ![catalog]({% image_path order-pom-dependency.png %})
 
@@ -669,8 +662,7 @@ First, let’s have a look at the `Order` bean in `src/main/java/com/redhat/clou
 
 Nothing fancy. One important thing to note is that having a default constructor is required by the `JSON serialization layer`.
 
-Now, open a `com.redhat.cloudnative.OrderService` that will be the business layer of our application and `store/load` the orders from the mongoDB database.
-Add the following Java codes at each market.
+Now, open a `com.redhat.cloudnative.OrderService` that will be the business layer of our application and `store/load` the orders from the mongoDB database. Add the following Java codes at each market.
 
  * `// TODO: Inject MongoClient here` marker:
 
@@ -979,4 +971,4 @@ To deploy the cloud-native applications with multiple datasources on `OpenShift`
 obtain a reference to those datasources such as `PostgreSQL` and `MongoDB` in code.
 
 In the end, we optimized `data transaction performance` of the shopping cart service thru integrating with a `JBoss Data Grid` 
-to increase end users`(customers) satification. `Congratulations!`
+to increase end users'(customers) satification. `Congratulations!`
