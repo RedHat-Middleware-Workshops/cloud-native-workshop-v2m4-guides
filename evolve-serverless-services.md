@@ -748,14 +748,9 @@ Looking back at the project, you should see that the PetClinic image is successf
 
 ### Summary
 
-In this scenario we developed five microservices with `REST API` exposure to communicate with the other microservices. We also used a variety of application 
-runtimes such as `Quarkus`, `Spring Boot`, and `NodeJS` to compile, package, and containerize applications which is a major capability of the advanced cloud-native architecture.
+In this module, we learned how to develop cloud-native application using multiple Java runtimes(Quarkus, Spring Boot), Javascript and different datasources(i.e. PostgreSQL, MongoDB) to handle a variety of business use cases which are real-time `request/response` communication using REST APIs, high performing `cacheable service` using `JBoss Data Grid,` event-driven/reactive shopping cart service using `Apache Kafka` in `Red Hat AMQ Streams`, and in the end, we treated the payment service as `Serverless` application using `Knative` with Serving, Eventing, Pipeline(TeckTon).
 
-To deploy the cloud-native applications with multiple datasources on `OpenShift` cluster, `Quarkus` provides an easy way to connect multiple datasources and 
-obtain a reference to those datasources such as `PostgreSQL` and `MongoDB` in code.
-
-In the end, we optimized `data transaction performance` of the shopping cart service thru integrating with a `JBoss Data Grid` 
-to increase end users'(customers) satification. `Congratulations!`
+`Red Hat Runtimes` enables enterprise developers to design the advanced cloud-native architecture and develop, build, deploy the cloud-native application on hybrid cloud on `OpenShift Container Platform`. `Congratulations!`
 
 ##### Additional Resources:
 
