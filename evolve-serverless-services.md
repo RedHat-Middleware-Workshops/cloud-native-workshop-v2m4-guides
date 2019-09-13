@@ -435,7 +435,7 @@ Let's go shopping some cool items via the frontend service(`Coolstore WEB UI`) t
 
  ![serverless]({% image_path payment-completedorfailed.png %})
 
-####5. Creating Cloud-Native CI/CD Pipelines using Tekton 
+####(Bonus Lab) Creating Cloud-Native CI/CD Pipelines using Tekton 
 
 ---
 
@@ -502,17 +502,27 @@ provides an excellent guide for understanding various parameters and attributes 
 In this lab, we will walk you through pipeline concepts and how to create and run a CI/CD pipeline for building and deploying `serverless applications` 
 on `Knative` on OpenShift.
 
-##### Deploying Nexus
+##### Deploy Sample Application
 
-To make maven builds faster, we will deploy `Sonatype Nexus`. You need to replace `userXX` with your credential:
+Change a project for the sample application that you will be using in this lab and replace your username with `userXX`:
 
-`oc new-app sonatype/nexus`
+`oc project userXX-cloudnative-pipeline`
 
-Once you complete to deploy the Nexus server on OpenShift cluster, you can confirm it in `Project Status` page of OpenShift web console:
+You will use the [Spring PetClinic](https://github.com/spring-projects/spring-petclinic) sample application during this tutorial, which is a simple Spring Boot application.
 
-![severless]({% image_path nexus-deployment.png %})
+Create the Kubernetes objects for deploying the PetClinic app on OpenShift. The deployment will not complete since there are no container images built for the PetClinic application yet. That you will do in the following sections through a CI/CD pipeline.
 
-##### Creating Tekton Tasks
+Replace your username with `userXX-cloudnative-pipeline`:
+
+![serverless]({% image_path petclinic-namespace.png %})
+
+`oc create -f knative/pipeline/petclinic.yaml`
+
+You should be able to see the deployment in the OpenShift Web Console.
+
+![serverless]({% image_path petclinic-deployed-1.png %})
+
+##### Install Tasks
 
 `Tasks` consist of a number of steps that are executed sequentially. Each `task` is executed in a separate container within the same pod. 
 They can also have inputs and outputs in order to interact with other tasks in the pipeline.
@@ -551,41 +561,190 @@ and [OpenShift Catalog](https://github.com/openshift/pipelines-catalog) reposito
 Install the `openshift-client` and `s2i-java` tasks from the catalog repository using `oc` or `kubectl`, which you will need for 
 creating a pipeline in the next section:
 
-Create the following Tekton tasks which will be used in the `Pipelines`
+Create the following Tekton tasks which will be used in the `Pipelines`:
 
-`oc create -f knative/openshift-client-task.yaml`
+`oc create -f knative/pipeline/openshift-client-task.yaml`
 
-`oc create -f knative/s2i-java-8/s2i-java-8-task.yaml`
-
-~~~shell
-oc create -f https://raw.githubusercontent.com/tektoncd/catalog/master/openshift-client/openshift-client-task.yaml \
-  -f https://raw.githubusercontent.com/redhat-developer-demos/pipelines-catalog/master/quarkus/s2i-quarkus-task.yaml \
-  -f https://raw.githubusercontent.com/redhat-developer-demos/pipelines-catalog/master/quarkus/quarkus-native-task.yaml \
-  -f https://raw.githubusercontent.com/redhat-developer-demos/pipelines-catalog/master/quarkus/quarkus-jvm-task.yaml \
-  -f https://raw.githubusercontent.com/redhat-developer-demos/pipelines-catalog/master/knative-client/kn-service-create-task.yaml
-~~~
+`oc create -f knative/pipeline/s2i-java-8-task.yaml`
 
 You can take a look at the list of install tasks using the [Tekton CLI](https://github.com/tektoncd/cli/releases) that already installed 
 in CodeReady Workspaces `Terminal`:
 
 `tkn task ls`
 
-openshift-client   58 seconds ago
-s2i-java-8         1 minute ago
-
 ~~~shell
-NAME                AGE
-kn-create-service   12 seconds ago
-openshift-client    13 seconds ago
-quarkus-jvm         12 seconds ago
-quarkus-native      12 seconds ago
-s2i-quarkus         13 seconds ago
+openshift-client   50 seconds ago
+s2i-java-8         20 seconds ago
 ~~~
 
-tkn pipeline start ccn-deploy-pipeline \
-        -r app-git=quarkus-todo-git \
-        -r app-image=quarkus-todo-image \
-        -s pipeline
+##### Create Pipeline
+
+A pipeline defines a number of tasks that should be executed and how they interact with each other via their inputs and outputs.
+
+In this lad, we will create a pipeline that takes the source code of PetClinic application from GitHub and then builds and deploys it on OpenShift using [Source-to-Image (S2I)](https://docs.openshift.com/container-platform/4.1/builds/understanding-image-builds.html#build-strategy-s2i_understanding-image-builds).
+
+![serverless]({% image_path pipeline-diagram.png %})
+
+Here is the YAML file that represents the above pipeline:
+
+~~~yaml
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: petclinic-deploy-pipeline
+spec:
+  resources:
+  - name: app-git
+    type: git
+  - name: app-image
+    type: image
+  tasks:
+  - name: build
+    taskRef:
+      name: s2i-java-8
+    params:
+      - name: TLSVERIFY
+        value: "false"
+    resources:
+      inputs:
+      - name: source
+        resource: app-git
+      outputs:
+      - name: image
+        resource: app-image
+  - name: deploy
+    taskRef:
+      name: openshift-client
+    runAfter:
+      - build
+~~~
+
+This pipeline performs the following:
+
+ * Clones the source code of the application from a Git repository (`app-git` resource)
+
+ * Builds the container image using the s2i-java-8 task that generates a Dockerfile for the application and uses [Buildah](https://buildah.io/) to build the image
+
+ * The application image is pushed to an image registry (`app-image` resource)
+
+ * The new application image is deployed on OpenShift using the `openshift-cli`
+
+You might have noticed that there are no references to the PetClinic Git repository and its image in the registry. That's because `Pipelines` in Tekton are designed to be generic and re-usable across environments and stages through the application's lifecycle. `Pipelines` abstract away the specifics of the Git source repository and image to be produced as `resources`. When triggering a pipeline, you can provide different Git repositories and image registries to be used during pipeline execution. Be patient! You will do that in a little bit in the next section.
+
+The execution order of `tasks` is determined by dependencies that are defined between the tasks via `inputs` and `outputs` as well as explicit orders that are defined via `runAfter`.
+
+In the OpenShift web console, you can click on `Add → Import YAML` at the top right of the screen while you are in the `userXX-cloudnative-pipeline` project.
+
+![serverless]({% image_path console-import-yaml-1.png %})
+
+Paste the YAML into the textfield, and click on `Create`.
+
+![serverless]({% image_path console-import-yaml-2.png %})
+
+Check the list of pipelines you have created in CodeReady Workspaces `Terminal`:
+
+`tkn pipeline ls`
+
+~~~shell
+NAME                       AGE              LAST RUN   STARTED   DURATION   STATUS
+petclinic-deploy-pipeline  8 seconds ago   ---        ---       ---        ---
+~~~
+
+##### Trigger Pipeline
+
+Now that the pipeline is created, you can trigger it to execute the tasks specified in the pipeline. Triggering pipelines is an area that is under development and in the next release it will be possible to be done via the OpenShift web console and Tekton CLI. In this tutorial, you will trigger the pipeline through creating the Kubernetes objects (the hard way!) in order to learn the mechanics of triggering.
+
+First, you should create a number of `PipelineResources` that contain the specifics of the Git repository and image registry to be used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
+
+The following `PipelineResource` defines the Git repository and reference for the PetClinic application. Create the following pipeline resources via the OpenShift web console via `Add → Import YAML`:
+
+~~~yaml
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: petclinic-git
+spec:
+  type: git
+  params:
+  - name: url
+    value: https://github.com/spring-projects/spring-petclinic
+~~~
+
+And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Create the following pipeline resources via the OpenShift web console via `Add → Import YAML`. Replace your username with `userXX`:
+
+~~~yaml
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: petclinic-image
+spec:
+  type: image
+  params:
+  - name: url
+    value: image-registry.openshift-image-registry.svc:5000/userXX-cloudnative-pipeline/spring-petclinic
+~~~
+
+Create the above pipeline resources via the OpenShift web console via `Add → Import YAML`.
+
+You can see the list of resources created in CodeReady Workspaces `Terminal`:
+
+`tkn resource ls`
+
+~~~shell
+NAME              TYPE    DETAILS
+petclinic-git     git     url: https://github.com/spring-projects/spring-petclinic
+petclinic-image   image   url: image-registry.openshift-image-registry.svc:5000/userXX-cloudnative-pipeline/spring-petclinic
+~~~
+
+A `PipelineRun` is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. You can start the pipeline in CodeReady Workspaces `Terminal`:
+
+~~~shell
+tkn pipeline start petclinic-deploy-pipeline \
+      -r app-git=petclinic-git \
+      -r app-image=petclinic-image \
+      -s pipeline
+~~~
+
+The result looks like:
+
+`Pipelinerun started: petclinic-deploy-pipeline-run-97kdv`
+
+The `-r` flag specifies the PipelineResources that should be provided to the pipeline and the `-s` flag specifies the service account to be used for running the pipeline.
+
+As soon as you started the `petclinic-deploy-pipeline pipeline`, a pipelinerun is instantiated and pods are created to execute the tasks that are defined in the pipeline.
+
+`tkn pipeline list`
+
+~~~shell
+NAME                        AGE              LAST RUN                              STARTED          DURATION   STATUS
+petclinic-deploy-pipeline   21 seconds ago   petclinic-deploy-pipeline-run-97kdv   11 seconds ago   ---        Running
+~~~
+
+Check out the logs of the pipelinerun as it runs using the `tkn pipeline logs` command which interactively allows you to pick the pipelinerun of your interest and inspect the logs:
+
+~~~shell
+tkn pipeline logs -f                                                                                             
+? Select pipeline : petclinic-deploy-pipeline
+? Select pipelinerun : petclinic-deploy-pipeline-run-97kdv started 39 seconds ago
+
+...
+[build : nop] Build successful
+[deploy : build-step-oc] deploymentconfig.apps.openshift.io/spring-petclinic rolled out
+[deploy : nop] Build successful
+~~~
+
+After a few minutes, the pipeline would finish successfully.
+
+`tkn pipeline list `
+
+~~~shell
+NAME                        AGE             LAST RUN                              STARTED         DURATION    STATUS
+petclinic-deploy-pipeline   7 minutes ago   petclinic-deploy-pipeline-run-97kdv   5 minutes ago   4 minutes   Succeeded
+~~~
+
+Looking back at the project, you should see that the PetClinic image is successfully built and deployed.
+
+![serverless]({% image_path petclinic-deployed-2.png %})
 
 ### Summary
 
