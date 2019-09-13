@@ -846,7 +846,7 @@ public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
 }
 ~~~
 
-`Quarkus` will  register the `CodecProvider` for you.
+`Quarkus` will register the `CodecProvider` for you.
 
 Finally, when getting the `MongoCollection` from the database you can use directly the `Order` class instead of the `Document` one, 
 the codec will automatically map the `Document` to/from your `Order` class.
