@@ -1,4 +1,4 @@
-## Lab3 - Evolving Serverless Services
+## Lab3 - Evolving services with Serverless
 
 In this cloud-native application architecture, We now have multiple microservices to implement traditional application workloads and reactive system. 
 However, it's not necessary that whole applications/services have to run all the time(24/7) for serving funtions because a certain service can be 
