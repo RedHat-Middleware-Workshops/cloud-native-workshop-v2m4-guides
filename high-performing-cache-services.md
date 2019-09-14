@@ -490,7 +490,6 @@ public class ProductMarshaller implements MessageMarshaller<Product> {
         return "coolstore.Product";
     }
 
-
 }
 ~~~
 
@@ -554,12 +553,12 @@ Let's take a look at how we do this with Quarkus. In our project and in our main
 
 ~~~java
 // TODO
- public ShoppingCart getCart(@PathParam("cartId") String cartId) {	 
- return shoppingCartService.getShoppingCart(cartId);	 
- }
+    public ShoppingCart getCart(@PathParam("cartId") String cartId) {	 
+        return shoppingCartService.getShoppingCart(cartId);	 
+    }
 ~~~
 
-The code above is using the `ShoppingCartService`, which is injected into the CartResource via the Dependency Injection. The ShoppingCartService take a cartId as a parameter and returns the associated ShoppingCart. So that's perfect, however, for our Endpoint i.e., CartResource to respond, we need to define a couple of things:
+The code above is using the `ShoppingCartService`, which is injected into the CartResource via the Dependency Injection. The ShoppingCartService take a cartId as a parameter and returns the associated ShoppingCart. So that's perfect, however, for our Endpoint i.e., `CartResource` to respond, we need to define a couple of things:
 
  * The type of HTTPRequest
 
@@ -570,10 +569,10 @@ The code above is using the `ShoppingCartService`, which is injected into the Ca
  Add the following code on top of the `getCart` method
 
 ~~~java
- @GET     
- @Produces(MediaType.TEXT_PLAIN)     
- @Path("/{cartId}")     
- @Operation(summary = "get the contents of cart by cartId")     
+    @GET     
+    @Produces(MediaType.TEXT_PLAIN)     
+    @Path("/{cartId}")     
+    @Operation(summary = "get the contents of cart by cartId")     
 ~~~
 
 We have now successfully stated that the method adheres to a GET request and accepts data in `plain text`. The path would be `/api/cart/{cartId}`
