@@ -407,6 +407,8 @@ The source can be deployed using the following command via CodeReady Workspaces 
 
 `Great job!!` We completed to deploy a payment service as `serverless application` using `knative serving` then the `Apache Kafka Event source` enables `Knative Eventing` integration with `Apache Kafka`. Let's make sure if whole functions work properly for the end-user perspective.
 
+Let's make sure if the payment service works properly with Knative features via Coolstore Web UI.
+
 ####4. End to End Functional Testing
 
 ---
