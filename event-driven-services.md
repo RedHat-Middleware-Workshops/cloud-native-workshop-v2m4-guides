@@ -530,6 +530,28 @@ public class KafkaPaymentsConsumer {
 }
 ~~~
 
+Almost there; Next lets add the configuration to our `application.properties` file:
+
+~~~java
+mp.messaging.incoming.payments.connector=smallrye-kafka
+mp.messaging.incoming.payments.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.payments.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.payments.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+mp.messaging.incoming.payments.group.id=order-service
+mp.messaging.incoming.payments.auto.offset.reset=earliest
+mp.messaging.incoming.payments.enable.auto.commit=true
+mp.messaging.incoming.payments.request.timeout.ms=30000
+
+mp.messaging.incoming.orders.connector=smallrye-kafka
+mp.messaging.incoming.orders.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.orders.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+mp.messaging.incoming.orders.group.id=order-service
+mp.messaging.incoming.orders.auto.offset.reset=earliest
+mp.messaging.incoming.orders.enable.auto.commit=true
+mp.messaging.incoming.orders.request.timeout.ms=30000
+~~~
+
 ##### Re-Deploying Order service to OpenShift
 
 Package the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
