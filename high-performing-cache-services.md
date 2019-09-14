@@ -444,6 +444,12 @@ Lets go ahead and create a `Marshaller `for our Product class which will do exac
 Create a new Java class called `ProductMarshaller.java` in `com.redhat.cloudnative.model`
 
 ~~~java
+
+import com.redhat.cloudnative.model.Product;
+import org.infinispan.protostream.MessageMarshaller;
+
+import java.io.IOException;
+
 public class ProductMarshaller implements MessageMarshaller<Product> {
 
     /**
@@ -861,7 +867,7 @@ private MongoCollection<Order> getCollection(){
 
 ##### Building and Deploying Application to OpenShift
 
-ackage the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
+Package the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
 
 ![codeready-workspace-maven]({% image_path quarkus-dev-run-packageforOcp.png %})
 
