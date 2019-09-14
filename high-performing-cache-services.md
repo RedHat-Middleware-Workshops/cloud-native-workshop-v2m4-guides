@@ -329,12 +329,12 @@ In a nutshell, the Cart service is RESTful and built with Quarkus.
 
 ##### What are the building blocks of the Shopping cart a.k.a cart-service? 
 
-It uses a Red Hat`s Distributed `Data Grid` technology to store all shopping carts and assigns a unique id to them. It uses the `Quarkus Infinispan client` to do this.
+It uses a Red Hat's Distributed `Data Grid` technology to store all shopping carts and assigns a unique id to them. It uses the `Quarkus Infinispan client` to do this.
 The Shopping cart makes a call via the Quarkus Rest client to fetch all items in the Catalog. In the end, Shopping cart also throws out a `Kafka` message to the topic Orders, when checking out. For that, we use the `Quarkus Kafka client` in the next lab. Last and perhaps worth mentioning the `REST+Swagger UI` also part of the REST API support in `Quarkus`.
 
 What is a `Shopping Cart` in our context? A Shopping cart has a list of Shopping Items. Quantity of a product in the Items list `Discount` and promotional details. We will see these in more details when we look at our model.
 
-For this lab, we are using the code ready workspaces, make sure you have the following project open in your workspace. Lets`s go through quickly how the cart service works and built on  `Quarkus` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `cart-service` directory.
+For this lab, we are using the code ready workspaces, make sure you have the following project open in your workspace. Lets's go through quickly how the cart service works and built on `Quarkus` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `cart-service` directory.
 
 ![cart]({% image_path codeready-workspace-cart-project.png %}){:width="500px"}
 
@@ -342,16 +342,16 @@ For this lab, we are using the code ready workspaces, make sure you have the fol
 
 The cart is quite simple; All the information from the browser i.e., via our `Angular App` is via `JSON`. What is the endpoint is `/api/cart`: GET request `/{cartId}` gets the items in the cart, or creates a new unique ID if one is not present `POST` to `/{cartId}/{itemId}/{quantity}` will add items to the cart DELETE `/{cartId}/{itemId}/{quantity}` will remove items from the cart. And finally `/checkout/{cartId}` will remove the items and invoke the checkout procedure
 
-Let's take a look at how we do this with Quarkus. In our project and in our main package i.e., com.redhat.cloudnative is the `CartResource`. Let's take a look at the getCart method.
+Let's take a look at how we do this with Quarkus. In our project and in our main package i.e., `com.redhat.cloudnative` is the `CartResource`. Let's take a look at the getCart method.
 
 ~~~java
 // TODO
- public ShoppingCart getCart(@PathParam("cartId") String cartId) {	 
- return shoppingCartService.getShoppingCart(cartId);	 
- }
+public ShoppingCart getCart(@PathParam("cartId") String cartId) {	 
+    return shoppingCartService.getShoppingCart(cartId);	 
+}
 ~~~
 
-The code above is using the `ShoppingCartService`, which is injected into the CartResource via the Dependency Injection. The ShoppingCartService take a cartId as a parameter and returns the associated ShoppingCart. So that's perfect, however, for our Endpoint i.e., CartResource to respond, we need to define a couple of things:
+The code above is using the `ShoppingCartService`, which is injected into the CartResource via the Dependency Injection. The ShoppingCartService take a cartId as a parameter and returns the associated ShoppingCart. So that's perfect, however, for our Endpoint i.e., `CartResource` to respond, we need to define a couple of things:
 
  * The type of HTTPRequest
 
@@ -405,7 +405,7 @@ Lets create a simple version of the cache service in our cluster. Open the Termi
 
 `oc new-app jboss/infinispan-server:10.0.0.Beta3 --name=datagrid-service`
 
->NOTE: This will create a single instance of infinispan server the community version of the DataGrid. At the time of writing this guide, the infinspan client for Quarkus does not work with DataGrid, and Quarkus itself is also a community project.
+>`NOTE`: This will create a single instance of infinispan server the community version of the DataGrid. At the time of writing this guide, the infinspan client for Quarkus does not work with DataGrid, and Quarkus itself is also a community project.
 
 Once deployed you should see the newly created `datagrid-service` in your project dashboard as follows:
 
@@ -459,7 +459,7 @@ message Promotion {
 
 * ShoppingCartItem has Product
 
-But we havent defined the Product yet. Lets go ahead and do that.
+But we havent defined the `Product` yet. Lets go ahead and do that.
 
 ~~~java
 message Product {
@@ -561,8 +561,6 @@ We use the producer to ensure our RemoteCache gets instantiated. We create metho
         serCtx.registerMarshaller(new PromotionMarhsaller());
         return manager.getCache();
     }
-
-
 
     protected ConfigurationBuilder getConfigBuilder() {
         ConfigurationBuilder cfg = null;
