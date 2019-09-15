@@ -325,63 +325,18 @@ By now, you have deployed some of the essential elements for the Coolstore appli
 
 ##### Let's get started!
 
-In a nutshell, the Cart service is RESTful and built with Quarkus. 
+In a nutshell, the Cart service is RESTful and built with Quarkus using the Red Hat's Distributed `Data Grid` technology.
 
 ##### What are the building blocks of the Shopping cart a.k.a cart-service? 
 
-It uses a Red Hat`s Distributed `Data Grid` technology to store all shopping carts and assigns a unique id to them. It uses the `Quarkus Infinispan client` to do this.
+It uses a Red Hat's Distributed `Data Grid` technology to store all shopping carts and assigns a unique id to them. It uses the `Quarkus Infinispan client` to do this.
 The Shopping cart makes a call via the Quarkus Rest client to fetch all items in the Catalog. In the end, Shopping cart also throws out a `Kafka` message to the topic Orders, when checking out. For that, we use the `Quarkus Kafka client` in the next lab. Last and perhaps worth mentioning the `REST+Swagger UI` also part of the REST API support in `Quarkus`.
 
 What is a `Shopping Cart` in our context? A Shopping cart has a list of Shopping Items. Quantity of a product in the Items list `Discount` and promotional details. We will see these in more details when we look at our model.
 
-For this lab, we are using the code ready workspaces, make sure you have the following project open in your workspace. Lets`s go through quickly how the cart service works and built on  `Quarkus` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `cart-service` directory.
+For this lab, we are using the code ready workspaces, make sure you have the following project open in your workspace. Lets's go through quickly how the cart service works and built on `Quarkus` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `cart-service` directory.
 
 ![cart]({% image_path codeready-workspace-cart-project.png %}){:width="500px"}
-
-##### Building REST API with Quarkus
-
-The cart is quite simple; All the information from the browser i.e., via our `Angular App` is via `JSON`. What is the endpoint is `/api/cart`: GET request `/{cartId}` gets the items in the cart, or creates a new unique ID if one is not present `POST` to `/{cartId}/{itemId}/{quantity}` will add items to the cart DELETE `/{cartId}/{itemId}/{quantity}` will remove items from the cart. And finally `/checkout/{cartId}` will remove the items and invoke the checkout procedure
-
-Let's take a look at how we do this with Quarkus. In our project and in our main package i.e., com.redhat.cloudnative is the `CartResource`. Let's take a look at the getCart method.
-
-~~~java
-// TODO
- public ShoppingCart getCart(@PathParam("cartId") String cartId) {	 
- return shoppingCartService.getShoppingCart(cartId);	 
- }
-~~~
-
-The code above is using the `ShoppingCartService`, which is injected into the CartResource via the Dependency Injection. The ShoppingCartService take a cartId as a parameter and returns the associated ShoppingCart. So that's perfect, however, for our Endpoint i.e., CartResource to respond, we need to define a couple of things:
-
- * The type of HTTPRequest
-
- * The type of data it can receive
-
- * The path it resolves too
-
- Add the following code on top of the `getCart` method
-
-~~~java
- @GET     
- @Produces(MediaType.TEXT_PLAIN)     
- @Path("/{cartId}")     
- @Operation(summary = "get the contents of cart by cartId")     
-~~~
-
-We have now successfully stated that the method adheres to a GET request and accepts data in `plain text`. The path would be `/api/cart/{cartId}`
-finally, we add the @Operation for some documentation, which is important for other developers using our service.
-
-Take this opportunity to look at some of the other methods. You will find `@POST` and `@DELETE` and also the paths they adhere too. This is how we can construct a simple Endpoint for our application.
-
-Run the following command in CodeReady Workspaces `Terminal`:
-
-`mvn compile quarkus:dev`
-
-And hit the preview URL and add `/swagger-ui` to the end. You should see the following output in your browser.
-
-![cart]({% image_path cart-swagger-ui.png %})
-
-Notice that the documentation after the methods, this is an excellent way for other service developers to know what you intend to do with each service method. You can try to invoke the methods and see the output from the service. Hence an excellent way to test quickly as well.
 
 ##### Adding a distributed cache to our cart-service
 
@@ -405,7 +360,7 @@ Lets create a simple version of the cache service in our cluster. Open the Termi
 
 `oc new-app jboss/infinispan-server:10.0.0.Beta3 --name=datagrid-service`
 
->NOTE: This will create a single instance of infinispan server the community version of the DataGrid. At the time of writing this guide, the infinspan client for Quarkus does not work with DataGrid, and Quarkus itself is also a community project.
+>`NOTE`: This will create a single instance of infinispan server the community version of the DataGrid. At the time of writing this guide, the infinspan client for Quarkus does not work with DataGrid, and Quarkus itself is also a community project.
 
 Once deployed you should see the newly created `datagrid-service` in your project dashboard as follows:
 
@@ -459,7 +414,7 @@ message Promotion {
 
 * ShoppingCartItem has Product
 
-But we havent defined the Product yet. Lets go ahead and do that.
+But we havent defined the `Product` yet. Lets go ahead and do that.
 
 ~~~java
 message Product {
@@ -489,6 +444,12 @@ Lets go ahead and create a `Marshaller `for our Product class which will do exac
 Create a new Java class called `ProductMarshaller.java` in `com.redhat.cloudnative.model`
 
 ~~~java
+
+import com.redhat.cloudnative.model.Product;
+import org.infinispan.protostream.MessageMarshaller;
+
+import java.io.IOException;
+
 public class ProductMarshaller implements MessageMarshaller<Product> {
 
     /**
@@ -529,7 +490,6 @@ public class ProductMarshaller implements MessageMarshaller<Product> {
         return "coolstore.Product";
     }
 
-
 }
 ~~~
 
@@ -562,8 +522,6 @@ We use the producer to ensure our RemoteCache gets instantiated. We create metho
         return manager.getCache();
     }
 
-
-
     protected ConfigurationBuilder getConfigBuilder() {
         ConfigurationBuilder cfg = null;
         cfg = new ConfigurationBuilder().addServer()
@@ -586,6 +544,51 @@ First we need to make sure we will inject our cache in our service like this in 
     @Remote("default")
     RemoteCache<String, ShoppingCart> carts;
 ~~~
+
+##### Building REST API with Quarkus
+
+The cart is quite simple; All the information from the browser i.e., via our `Angular App` is via `JSON`. What is the endpoint is `/api/cart`: GET request `/{cartId}` gets the items in the cart, or creates a new unique ID if one is not present `POST` to `/{cartId}/{itemId}/{quantity}` will add items to the cart DELETE `/{cartId}/{itemId}/{quantity}` will remove items from the cart. And finally `/checkout/{cartId}` will remove the items and invoke the checkout procedure
+
+Let's take a look at how we do this with Quarkus. In our project and in our main package i.e., com.redhat.cloudnative is the `CartResource`. Let's take a look at the getCart method.
+
+~~~java
+// TODO
+    public ShoppingCart getCart(@PathParam("cartId") String cartId) {	 
+        return shoppingCartService.getShoppingCart(cartId);	 
+    }
+~~~
+
+The code above is using the `ShoppingCartService`, which is injected into the CartResource via the Dependency Injection. The ShoppingCartService take a cartId as a parameter and returns the associated ShoppingCart. So that's perfect, however, for our Endpoint i.e., `CartResource` to respond, we need to define a couple of things:
+
+ * The type of HTTPRequest
+
+ * The type of data it can receive
+
+ * The path it resolves too
+
+ Add the following code on top of the `getCart` method
+
+~~~java
+    @GET     
+    @Produces(MediaType.TEXT_PLAIN)     
+    @Path("/{cartId}")     
+    @Operation(summary = "get the contents of cart by cartId")     
+~~~
+
+We have now successfully stated that the method adheres to a GET request and accepts data in `plain text`. The path would be `/api/cart/{cartId}`
+finally, we add the @Operation for some documentation, which is important for other developers using our service.
+
+Take this opportunity to look at some of the other methods. You will find `@POST` and `@DELETE` and also the paths they adhere too. This is how we can construct a simple Endpoint for our application.
+
+Run the following command in CodeReady Workspaces `Terminal`:
+
+`mvn compile quarkus:dev`
+
+And hit the preview URL and add `/swagger-ui` to the end. You should see the following output in your browser.
+
+![cart]({% image_path cart-swagger-ui.png %})
+
+Notice that the documentation after the methods, this is an excellent way for other service developers to know what you intend to do with each service method. You can try to invoke the methods and see the output from the service. Hence an excellent way to test quickly as well.
 
 ##### Package and Deploy the cart-service
 
@@ -846,7 +849,7 @@ public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
 }
 ~~~
 
-`Quarkus` will  register the `CodecProvider` for you.
+`Quarkus` will register the `CodecProvider` for you.
 
 Finally, when getting the `MongoCollection` from the database you can use directly the `Order` class instead of the `Document` one, 
 the codec will automatically map the `Document` to/from your `Order` class.
@@ -863,7 +866,7 @@ private MongoCollection<Order> getCollection(){
 
 ##### Building and Deploying Application to OpenShift
 
-ackage the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
+Package the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
 
 ![codeready-workspace-maven]({% image_path quarkus-dev-run-packageforOcp.png %})
 

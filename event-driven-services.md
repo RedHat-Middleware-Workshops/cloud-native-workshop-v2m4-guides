@@ -306,20 +306,16 @@ Go to `Workloads > Pods` on the left menu then search `kafka-cluster` pods. Clic
 
 Click on `Terminal` tab then execute the following `kafka-console-consumer.sh`:
 
-~~~shell
-bin/kafka-console-consumer.sh --topic payments --bootstrap-server localhost:9092
-~~~
+`bin/kafka-console-consumer.sh --topic payments --bootstrap-server localhost:9092`
 
 ![payment]({% image_path kafka-console-consumer.png %})
 
 Let's produce a new topic message using `curl` command in CodeReady Workspaces `Terminal`:
 
-~~~shell
-export URL="http://$(oc get route | grep payment | awk '{print $2}')"
+`export URL="http://$(oc get route | grep payment | awk '{print $2}')"`
 
-curl -i -H 'Content-Type: application/json' -X POST \
-  -d'{"key": "12321","total": 232.23, "creditCard": {"number": "4232454678667866","expiration": "04/22","nameOnCard": "Jane G Doe"}, "billingAddress": "123 Anystreet, Pueblo, CO 32213", "name": "Jane Doe"}'  \
-  $URL
+~~~shell
+curl -i -H 'Content-Type: application/json' -X POST -d'{"key": "12321","total": 232.23, "creditCard": {"number": "4232454678667866","expiration": "04/22","nameOnCard": "Jane G Doe"}, "billingAddress": "123 Anystreet, Pueblo, CO 32213", "name": "Jane Doe"}' $URL
 ~~~
 
 You will see the following result in `Pod Terminal`:
@@ -330,6 +326,10 @@ You will see the following result in `Pod Terminal`:
 
 ![payment]({% image_path payment_curl_result.png %})
 
+Before moving to the next step, stop the Kafka consumer console via `CTRL + C` in Terminal:
+
+![payment]({% image_path kafka-console-consumer-stop.png %})
+
 ####3. Adding Kafka Client to Cart Service
 
 ---
@@ -337,6 +337,26 @@ You will see the following result in `Pod Terminal`:
 By now we have added our `REST API`, `Cache` for our `Cart`. Quite often, other services or functions would need the data we are working with. And same in this case, once a user checks out, there are other services like the `Order Service` and the `Payment Service` that will need this information, and would most likely want to process further. So we need to make sure we can send a `Kafka` message to topic `orders`.
 
 To do that add the following methods in the `CartResource`.
+
+Add `ConfigProperty` to specify the details of Kafka messaging server. 
+
+ * `// TODO: Add annotation of orders messaging configuration here` marker in `CartResource` class:
+
+~~~java
+    @ConfigProperty(name = "mp.messaging.outgoing.orders.bootstrap.servers")
+    public String bootstrapServers;
+
+    @ConfigProperty(name = "mp.messaging.outgoing.orders.topic")
+    public String ordersTopic;
+
+    @ConfigProperty(name = "mp.messaging.outgoing.orders.value.serializer")
+    public String ordersTopicValueSerializer;
+
+    @ConfigProperty(name = "mp.messaging.outgoing.orders.key.serializer")
+    public String ordersTopicKeySerializer;
+
+    private Producer<String, String> producer;
+~~~
 
 The init method as it denotes creates the Kafka configuration, we have externalized this configuration and injected the variables as properties on the class.
 
@@ -399,6 +419,10 @@ Or run the following maven plugin in CodeReady Workspaces`Terminal`:
 
 `mvn clean package -DskipTests`
 
+Create a temp directory to store only previously-built application with necessary lib directory:
+
+`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
+
 Rebuild a container image based the cart artifact that we just packaged, which will take about minutes to complete:
 
 `oc start-build cart --from-dir=target/binary --follow`
@@ -407,7 +431,183 @@ Rebuild a container image based the cart artifact that we just packaged, which w
 
 The cart service will be redeployed automatically via [OpenShift Deployment triggers](https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations) after it completes to build.
 
-Let's confirm if the cart and order services works correctly via coolstore GUI test.
+####4. Adding Kafka Client to Cart Service
+
+---
+
+##### Adding Maven Dependencies using Quarkus Extensions
+
+Execute the following command via CodeReady Workspaces `Terminal`:
+
+`mvn quarkus:add-extension -Dextensions="kafka"`
+
+This command generates a Maven project, importing the `Kafka connector` extensions for Quarkus applications
+and provides all the necessary capabilities to integrate with the Kafka clusters and subscribe `payments` topic and `orders` topic. Let's confirm your `pom.xml` as below:
+
+![order]({% image_path order-kafka-pom-dependency.png %})
+
+##### Creating Orders and Payments Consumer in Order Service
+
+Create a new Java class, `KafkaOrdersConsumer.java` in `src/main/java/com/redhat/cloudnative` to consume `orders topic`. The `onMessage` method allows you to store a new order in MongoDB based consumed `KafkaMessage`. Copy the following entire codes in `KafkaOrdersConsumer.java`.
+
+~~~java
+package com.redhat.cloudnative;
+
+import io.smallrye.reactive.messaging.kafka.KafkaMessage;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.concurrent.CompletionStage;
+
+import javax.inject.Inject;
+import io.vertx.core.json.JsonObject;
+
+public class KafkaOrdersConsumer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaOrdersConsumer.class);
+    
+    @Inject 
+    OrderService orderService;
+
+    @Incoming("orders")
+    public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
+            throws IOException {
+        
+        LOG.info("Kafka order message with value = {} arrived", message.getPayload());
+    
+        JsonObject orders = new JsonObject(message.getPayload());
+        Order order = new Order();
+        order.setId(orders.getString("orderId"));
+        order.setName(orders.getString("name"));
+        order.setTotal(orders.getString("total"));       
+        order.setCcNumber(orders.getJsonObject("creditCard").getString("number"));
+        order.setCcExp(orders.getJsonObject("creditCard").getString("expiration"));
+        order.setBillingAddress(orders.getString("billingAddress"));
+        order.setStatus("PROCESSING");
+        orderService.add(order);
+        
+        return message.ack();
+    }
+
+}
+~~~
+
+Create a new Java class, `KafkaPaymentsConsumer.java` in `src/main/java/com/redhat/cloudnative` to consume `payments topic`. The `onMessage` method allows you to update the a certain Order's Payment Status to `COMPLETED` or `FAILED` in MongoDB based consumed `KafkaMessage`. Copy the following entire codes in `KafkaOrdersConsumer.java`.
+
+~~~java
+package com.redhat.cloudnative;
+
+import io.smallrye.reactive.messaging.kafka.KafkaMessage;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.concurrent.CompletionStage;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.vertx.core.json.JsonObject;
+
+public class KafkaPaymentsConsumer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaPaymentsConsumer.class);
+
+    @Inject 
+    OrderService orderService;
+
+    @Incoming("payments")
+    public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
+            throws IOException {
+
+        LOG.info("Kafka payment message with value = {} arrived", message.getPayload());
+
+        JsonObject payments = new JsonObject(message.getPayload());
+        orderService.updateStatus(payments.getString("orderId"), payments.getString("status"));
+
+        return message.ack();
+    }
+
+}
+~~~
+
+Almost there; Next lets add the configuration to our `application.properties` file:
+
+~~~java
+mp.messaging.incoming.payments.connector=smallrye-kafka
+mp.messaging.incoming.payments.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.payments.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.payments.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+mp.messaging.incoming.payments.group.id=order-service
+mp.messaging.incoming.payments.auto.offset.reset=earliest
+mp.messaging.incoming.payments.enable.auto.commit=true
+mp.messaging.incoming.payments.request.timeout.ms=30000
+
+mp.messaging.incoming.orders.connector=smallrye-kafka
+mp.messaging.incoming.orders.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.orders.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+mp.messaging.incoming.orders.group.id=order-service
+mp.messaging.incoming.orders.auto.offset.reset=earliest
+mp.messaging.incoming.orders.enable.auto.commit=true
+mp.messaging.incoming.orders.request.timeout.ms=30000
+~~~
+
+##### Re-Deploying Order service to OpenShift
+
+Package the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
+
+![codeready-workspace-maven]({% image_path quarkus-dev-run-packageforOcp.png %})
+
+Or run the following maven plugin in CodeReady Workspaces`Terminal`:
+
+`cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
+
+`mvn clean package -DskipTests`
+
+![order]({% image_path order-mvn-package.png %})
+
+Create a temp directory to store only previously-built application with necessary lib directory:
+
+`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
+
+Rebuild a container image based the cart artifact that we just packaged, which will take about minutes to complete:
+
+`oc start-build order --from-dir=target/binary --follow`
+
+The order service will be redeployed automatically via [OpenShift Deployment triggers](https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations) after it completes to build.
+
+Let's confirm if the all services works correctly using `Kafka` messaging via coolstore GUI test.
+
+####5. End to End Functional Testing
+
+---
+
+Let's go shopping some cool items via the frontend service(`Coolstore WEB UI`) then run the following shopping scenarios:
+
+ * 1) Add a `Red Hat Fedora` to `Cart` via click on `Add to Cart` then you will see the `Success! Added!` message under the top munu.
+
+![serverless]({% image_path add-to-cart.png %})
+
+ * 2) Click on `Checkout` button in `Your Shopping Cart` and input the credit card information. The `Card Info` should be `16 `digits.
+
+![serverless]({% image_path checkout.png %})
+
+ * 3) `Input` your `Credit Card information` to pay the item you chose
+
+ ![serverless]({% image_path input-cc-info.png %})
+
+ * 4) Confirm `Payment Status` of the your shopping items in the `All Orders` tab. It should be `Processing`.
+
+ ![serverless]({% image_path payment-processing.png %})
+
+ * 5) Reload `All Orders` page to confirm after at least `5s` if the Payment Status changed to `COMPLETED` or `FAILED`.
+
+ >`Note`: If the status is still `Processing`, the order service is processing incoming Kafka messages and store thme in MongoDB. Please reload the page a few times more. 
+
+ ![serverless]({% image_path payment-completedorfailed.png %})
 
 ### Summary
 
