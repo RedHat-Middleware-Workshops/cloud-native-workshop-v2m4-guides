@@ -161,13 +161,9 @@ oc new-app -e POSTGRESQL_USER=inventory \
 
 This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
 
- * Create a temp directory to store only previously-built application with necessary lib directory:
+  * Start and watch the build, which will take about minutes to complete:
 
-`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
-
- * Start and watch the build, which will take about minutes to complete:
-
-`oc start-build inventory --from-dir=target/binary --follow`
+`oc start-build inventory --from-file target/*-runner.jar --follow`
 
 ![inventory]({% image_path inventory-build-logs.png %})
 
@@ -610,13 +606,9 @@ Build the image using on OpenShift:
 
 This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
 
- * Create a temp directory to store only previously-built application with necessary lib directory:
+  * Start and watch the build, which will take about minutes to complete:
 
-`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
-
- * Start and watch the build, which will take about minutes to complete:
-
-`oc start-build cart --from-dir=target/binary --follow`
+`oc start-build cart --from-file target/*-runner.jar --follow`
 
 ![cart]({% image_path cart-build-logs.png %})
 
@@ -898,13 +890,9 @@ Build the image using on OpenShift:
 
 This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
 
- * Create a temp directory to store only previously-built application with necessary lib directory:
-
-`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
-
  * Start and watch the build, which will take about minutes to complete:
 
-`oc start-build order --from-dir=target/binary --follow`
+`oc start-build order --from-file target/*-runner.jar --follow`
 
 ![order]({% image_path order-build-logs.png %})
 
