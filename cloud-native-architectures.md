@@ -62,7 +62,7 @@ Red Hat Runtime​s​ products and components:
 Red Hat Runtimes​​ also provide integrated and optimized products and components to deliver modern applications, whether the goal is to keep existing applications or create new ones. Applications Runtimes enable developers to containerize applications with a microservices architecture, improve data access speed via in-memory data caching, enhance application performance with messaging, or adapt cloud-native application development using modern development patterns and technologies.
 
 
-Additionally we have also chosed to use Quarkus for most of the applications in the labs. Read on to learn more about Quarkus. 
+Additionally, we have also chosen to use Quarkus for most of the applications in the labs. Read on to learn more about Quarkus. 
 
 > NOTE: At the time of writing this guide, Quarkus is still a community project and is not part of any of the Red Hat Middleware products.
 
