@@ -517,34 +517,13 @@ public class KafkaOrdersConsumer {
 }
 ~~~
 
-Create a new Java class, `KafkaPaymentsConsumer.java` in `src/main/java/com/redhat/cloudnative` to consume `payments` topic. The `onMessage()` method allows you to update the a certain Order's Payment Status to `COMPLETED` or `FAILED` in MongoDB based consumed `KafkaMessage`. Copy the following entire code into `KafkaPaymentsConsumer.java`.
+Now let's create a new method to consume `payments` topic. The `onMessagePayments()` method allows you to update the a certain Order's Payment Status to `COMPLETED` or `FAILED` in MongoDB based consumed `KafkaMessage`. Copy the following entire code into `KafkaPaymentsConsumer.java`.
 
 ~~~java
-package com.redhat.cloudnative;
 
-import io.smallrye.reactive.messaging.kafka.KafkaMessage;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
-import javax.enterprise.context.ApplicationScoped;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.concurrent.CompletionStage;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.vertx.core.json.JsonObject;
-
-@ApplicationScoped
-public class KafkaPaymentsConsumer {
-
-    private static final Logger LOG = LoggerFactory.getLogger(KafkaPaymentsConsumer.class);
-
-    @Inject
-    OrderService orderService;
 
     @Incoming("payments")
-    public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
+    public CompletionStage<Void> onMessagePayments(KafkaMessage<String, String> message)
             throws IOException {
 
         LOG.info("Kafka payment message with value = {} arrived", message.getPayload());
@@ -555,7 +534,6 @@ public class KafkaPaymentsConsumer {
         return message.ack();
     }
 
-}
 ~~~
 
 Almost there; Next lets add the configuration to our `src/main/resources/application.properties` file in the `order-service` project:
