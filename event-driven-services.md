@@ -459,7 +459,7 @@ Execute the following command via CodeReady Workspaces `Terminal`:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
 
-`mvn quarkus:add-extension -Dextensions="kafka"`
+`mvn quarkus:add-extension -Dextensions="kafka,kafka-client"`
 
 This command generates a Maven project, importing the Kafka extensions for Quarkus applications
 and provides all the necessary capabilities to integrate with the Kafka clusters and subscribe `payments` topic and `orders` topic. Let's confirm your `pom.xml` as below:
@@ -481,33 +481,36 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import io.vertx.core.json.JsonObject;
 
+@ApplicationScoped
 public class KafkaOrdersConsumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaOrdersConsumer.class);
-
-    @Inject
+    
+    @Inject 
     OrderService orderService;
 
     @Incoming("orders")
     public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
             throws IOException {
 
+        // TODO: Add to Orders       
         LOG.info("Kafka order message with value = {} arrived", message.getPayload());
-
+        
         JsonObject orders = new JsonObject(message.getPayload());
         Order order = new Order();
         order.setId(orders.getString("orderId"));
         order.setName(orders.getString("name"));
-        order.setTotal(orders.getString("total"));
+        order.setTotal(orders.getString("total"));       
         order.setCcNumber(orders.getJsonObject("creditCard").getString("number"));
         order.setCcExp(orders.getJsonObject("creditCard").getString("expiration"));
         order.setBillingAddress(orders.getString("billingAddress"));
         order.setStatus("PROCESSING");
         orderService.add(order);
-
+        
         return message.ack();
     }
 
@@ -522,6 +525,7 @@ package com.redhat.cloudnative;
 import io.smallrye.reactive.messaging.kafka.KafkaMessage;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;
@@ -531,11 +535,12 @@ import org.slf4j.LoggerFactory;
 
 import io.vertx.core.json.JsonObject;
 
+@ApplicationScoped
 public class KafkaPaymentsConsumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaPaymentsConsumer.class);
 
-    @Inject
+    @Inject 
     OrderService orderService;
 
     @Incoming("payments")
@@ -560,7 +565,7 @@ mp.messaging.incoming.payments.connector=smallrye-kafka
 mp.messaging.incoming.payments.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 mp.messaging.incoming.payments.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 mp.messaging.incoming.payments.bootstrap.servers=my-cluster-kafka-bootstrap:9092
-mp.messaging.incoming.payments.group.id=order-service
+mp.messaging.incoming.payments.group.id=payment-service
 mp.messaging.incoming.payments.auto.offset.reset=earliest
 mp.messaging.incoming.payments.enable.auto.commit=true
 mp.messaging.incoming.payments.request.timeout.ms=30000
