@@ -440,6 +440,7 @@ Lets go ahead and create a `Marshaller `for our Product class which will do exac
 Create a new Java class called `ProductMarshaller.java` in `com.redhat.cloudnative.model`
 
 ~~~java
+package com.redhat.cloudnative.model;
 
 import com.redhat.cloudnative.model.Product;
 import org.infinispan.protostream.MessageMarshaller;
@@ -533,7 +534,7 @@ We use the producer to ensure our RemoteCache gets instantiated. We create metho
 
 `Perfect`, now we have all the building blocks ready to use the cache. Lets start using our cache.
 
-First we need to make sure we will inject our cache in our service like this in `com.redhat.cloudnative.service.ShoppingCartServiceImpl`
+Next we need to make sure we will inject our cache in our service. Open `com.redhat.cloudnative.service.ShoppingCartServiceImpl` and add this at the `// TODO Inject RemoteCache` marker:
 
 ~~~java
     @Inject
@@ -541,20 +542,25 @@ First we need to make sure we will inject our cache in our service like this in 
     RemoteCache<String, ShoppingCart> carts;
 ~~~
 
-##### Building REST API with Quarkus
+##### Building `cart-service` REST API with Quarkus
 
-The cart is quite simple; All the information from the browser i.e., via our `Angular App` is via `JSON`. What is the endpoint is `/api/cart`: GET request `/{cartId}` gets the items in the cart, or creates a new unique ID if one is not present `POST` to `/{cartId}/{itemId}/{quantity}` will add items to the cart DELETE `/{cartId}/{itemId}/{quantity}` will remove items from the cart. And finally `/checkout/{cartId}` will remove the items and invoke the checkout procedure
+The cart is quite simple; All the information from the browser i.e., via our `Angular App` is via `JSON` at the `/api/cart` endpoint:
 
-Let's take a look at how we do this with Quarkus. In our project and in our main package i.e., com.redhat.cloudnative is the `CartResource`. Let's take a look at the getCart method.
+* `GET` request `/{cartId}` gets the items in the cart, or creates a new unique ID if one is not present
+* `POST` to `/{cartId}/{itemId}/{quantity}` will add items to the cart
+* `DELETE` to `/{cartId}/{itemId}/{quantity}` will remove items from the cart. * And finally a `POST` to `/checkout/{cartId}` will remove the items and invoke the checkout procedure
+
+Let's take a look at how we do this with Quarkus. In our `cart-service` project and in our main package i.e., `com.redhat.cloudnative` is the `CartResource`. Let's take a look at the getCart method.
+
+At the `// TODO ADD getCart method` marker, add this method:
 
 ~~~java
-// TODO
     public ShoppingCart getCart(@PathParam("cartId") String cartId) {
         return shoppingCartService.getShoppingCart(cartId);
     }
 ~~~
 
-The code above is using the `ShoppingCartService`, which is injected into the CartResource via the Dependency Injection. The ShoppingCartService take a cartId as a parameter and returns the associated ShoppingCart. So that's perfect, however, for our Endpoint i.e., `CartResource` to respond, we need to define a couple of things:
+The code above is using the `ShoppingCartService`, which is injected into the `CartResource` via the Dependency Injection. The `ShoppingCartService` take a `cartId` as a parameter and returns the associated ShoppingCart. So that's perfect, however, for our Endpoint i.e., `CartResource` to respond, we need to define a couple of things:
 
  * The type of HTTPRequest
 
@@ -572,21 +578,10 @@ The code above is using the `ShoppingCartService`, which is injected into the Ca
 ~~~
 
 We have now successfully stated that the method adheres to a GET request and accepts data in `plain text`. The path would be `/api/cart/{cartId}`
-finally, we add the @Operation for some documentation, which is important for other developers using our service.
+finally, we add the `@Operation` annotation for some documentation, which is important for other developers using our service.
 
 Take this opportunity to look at some of the other methods. You will find `@POST` and `@DELETE` and also the paths they adhere too. This is how we can construct a simple Endpoint for our application.
 
-Run the following command in CodeReady Workspaces `Terminal`:
-
-`cd /projects/cloud-native-workshop-v2m4-labs/cart-service/`
-
-`mvn compile quarkus:dev`
-
-And hit the preview URL and add `/swagger-ui` to the end. You should see the following output in your browser.
-
-![cart]({% image_path cart-swagger-ui.png %})
-
-Notice that the documentation after the methods, this is an excellent way for other service developers to know what you intend to do with each service method. You can try to invoke the methods and see the output from the service. Hence an excellent way to test quickly as well.
 
 ##### Package and Deploy the cart-service
 
@@ -629,7 +624,17 @@ Wait for that command to report replication controller `cart-1` successfully rol
 >`NOTE:` Even if the rollout command reports success the application may not be ready yet and the reason for
 that is that we currently don`t have any liveness check configured.
 
-Like we had done before, you can test the serice by appending `/swagger-ui` to the URL.
+With the app deployed, we can check out the API page that Quarkus generates.
+
+Run this command in the CodeReady Terminal to discover the URL to the app:
+
+`echo http://$(oc get route cart -o=go-template --template='{{ .spec.host }}')/swagger-ui`
+
+Open this URL in your browser!
+
+![cart]({% image_path cart-swagger-ui.png %})
+
+Notice that the documentation after the methods, this is an excellent way for other service developers to know what you intend to do with each service method. You can try to invoke the methods and see the output from the service. Hence an excellent way to test quickly as well.
 
 ####4. Developing and Deploying Order Service
 
