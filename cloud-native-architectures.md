@@ -61,8 +61,13 @@ Red Hat Runtime​s​ products and components:
 
 Red Hat Runtimes​​ also provide integrated and optimized products and components to deliver modern applications, whether the goal is to keep existing applications or create new ones. Applications Runtimes enable developers to containerize applications with a microservices architecture, improve data access speed via in-memory data caching, enhance application performance with messaging, or adapt cloud-native application development using modern development patterns and technologies.
 
-#### What is Quarkus? 
----
+
+Additionally we have also chosed to use Quarkus for most of the applications in the labs. Read on to learn more about Quarkus. 
+
+> NOTE: At the time of writing this guide, Quarkus is still a community project and is not part of any of the Red Hat Middleware products.
+
+
+##### What is Quarkus? 
 
 ![quarkus-logo]({% image_path quarkus-logo.png %})
 
@@ -85,8 +90,9 @@ HTTP microservices, reactive applications, message-driven microservices and serv
   Jaeger, Prometheus, Apacke Kafka, Infinispan, and more.
 
 
-##### Note! Your Connection is not secure?
+### Getting Ready for the labs
 
+#### Connnecting to Openshift
 When you access OpenShift web console or the other route URL via `HTTPS` protocol, you will see `Your Connection is not secure` warning message.
 Because, OpenShift uses self-certification to create TLS termication route as default. For example, if you're using `Firefox`, you will see the following screen.
 
@@ -98,7 +104,7 @@ Click on `Advanced > Add Exception...` then, you can access the `HTTPS` page whe
 
 ---
 
-`SKIP this setup guide if you already completed earlier in the other Modules`
+> SKIP this setup guide if you have already completed this earlier in the previous Modules
 
 
 Follow these instructions to setup the development environment on CodeReady Workspaces. 
