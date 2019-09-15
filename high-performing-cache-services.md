@@ -1,15 +1,15 @@
 ## Lab1 - Creating High-performing Cacheable Service
 
 In this lab, we'll develop 5 microservices into the cloud-native appliation architecture. These cloud-native applications
-will have transactions with multiple datasources such as `PostgreSQL` and `MongoDB`. Especially, we will learn how to configure datasources easily using 
-`Quarkus Extensions`. In the end, we will optimize `data transaction performance` of the shopping cart service thru integrating with a `Cache(Data Grid) server` 
+will have transactions with multiple datasources such as `PostgreSQL` and `MongoDB`. Especially, we will learn how to configure datasources easily using
+`Quarkus Extensions`. In the end, we will optimize `data transaction performance` of the shopping cart service thru integrating with a `Cache(Data Grid) server`
 to increase end users'(customers) satification. And there's more fun facts how easy it is to deploy applications on OpenShift 4 via `oc` command line tool.
 
 #### Goals of this lab
 
 ---
 
-The goal is to develop advanced cloud-native applications on `Red Hat Runtimes` and deploy them on `OpenShift 4` including 
+The goal is to develop advanced cloud-native applications on `Red Hat Runtimes` and deploy them on `OpenShift 4` including
 `single sign-on access management` and `distributed cache manageemnt`. After this lab, you should end up with something like:
 
 ![goal]({% image_path lab1-goal.png %})
@@ -18,7 +18,7 @@ The goal is to develop advanced cloud-native applications on `Red Hat Runtimes` 
 
 ---
 
-`Inventory Service` serves inventory and availability data for retail products. Lets's go through quickly how the inventory service works and built on 
+`Inventory Service` serves inventory and availability data for retail products. Lets's go through quickly how the inventory service works and built on
 `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `inventory-service` directory.
 
 ![inventory_service]({% image_path codeready-workspace-inventory-project.png %}){:width="500px"}
@@ -29,11 +29,11 @@ While the code is surprisingly simple, under the hood this is using:
  * `Hibernate ORM` with Panache to perform the CRUD operations on the database
  * `Maven` Java project structure
 
-`Hibernate ORM` is the de facto JPA implementation and offers you the full breadth of an Object Relational Mapper. 
-It makes complex mappings possible, but it does not make simple and common mappings trivial. Hibernate ORM with 
+`Hibernate ORM` is the de facto JPA implementation and offers you the full breadth of an Object Relational Mapper.
+It makes complex mappings possible, but it does not make simple and common mappings trivial. Hibernate ORM with
 Panache focuses on making your entities trivial and fun to write in Quarkus.
 
-When you open `Inventory.java` in `src/main/java/com/redhat/cloudnative/` as below, you will understand how easy to create a domain model 
+When you open `Inventory.java` in `src/main/java/com/redhat/cloudnative/` as below, you will understand how easy to create a domain model
 using Quarkus extension([Hibernate ORM with Panache](https://quarkus.io/guides/hibernate-orm-panache-guide)).
 
 ~~~java
@@ -55,22 +55,22 @@ public class Inventory extends PanacheEntity {
 
  * By extending `PanacheEntity` in your entities, you will get an ID field that is auto-generated. If you require a custom ID strategy, you can extend `PanacheEntityBase` instead and handle the ID yourself.
 
- * By using Use public fields, there is no need for functionless getters and setters (those that simply get or set the field). You simply refer to fields like Inventory.location without the need to write a Inventory.geLocation() implementation. Panache will 
+ * By using Use public fields, there is no need for functionless getters and setters (those that simply get or set the field). You simply refer to fields like Inventory.location without the need to write a Inventory.geLocation() implementation. Panache will
 auto-generate any getters and setters you do not write, or you can develop your own getters/setters that do more than get/set, which will be called when the field is accessed directly.
 
-The `PanacheEntity` superclass comes with lots of super useful static methods and you can add your own in your derived entity class, and much like traditional object-oriented programming it's natural and recommended to place custom queries as close to the entity as possible, ideally within the entity definition itself. 
+The `PanacheEntity` superclass comes with lots of super useful static methods and you can add your own in your derived entity class, and much like traditional object-oriented programming it's natural and recommended to place custom queries as close to the entity as possible, ideally within the entity definition itself.
 Users can just start using your entity Inventory by typing Inventory, and getting completion for all the operations in a single place.
 
 When an entity is annotated with `@Cacheable`, all its field values are cached except for collections and relations to other entities.
 This means the entity can be loaded without querying the database, but be careful as it implies the loaded entity might not reflect recent changes in the database.
 
-Next, let's find out how `inventory service` exposes `RESTful APIs` on Quarkus. Open `InventoryResource.java` in `src/main/java/com/redhat/cloudnative/` and 
+Next, let's find out how `inventory service` exposes `RESTful APIs` on Quarkus. Open `InventoryResource.java` in `src/main/java/com/redhat/cloudnative/` and
 you will see the following code sniffet.
 
 The REST services defines two endpoints:
 
 * `/api/inventory` that is accessible via `HTTP GET` which will return all known product Inventory entities as JSON
-* `/api/inventory/<itemId>` that is accessible via `HTTP GET` at for example `/inventory/329199` with the last path parameter being the location which 
+* `/api/inventory/<itemId>` that is accessible via `HTTP GET` at for example `/inventory/329199` with the last path parameter being the location which
 we want to check its inventory status.
 
 ![inventory_service]({% image_path inventoryResource.png %})
@@ -125,7 +125,7 @@ To deploy applicaitons to OpenShift via `oc` tool, we need to copy login command
 
 ![codeready-workspace-copy-login-cmd]({% image_path codeready-workspace-oc-login-copy.png %}){:width="700px"}
 
-Then you will redirect to OpenShift Login page again. 
+Then you will redirect to OpenShift Login page again.
 
 ![openshift_login]({% image_path openshift_login.png %})
 
@@ -208,14 +208,14 @@ com/?q=Paris","location":"Paris","quantity":600},{"id":8,"itemId":"444437","link
 
 ![openshift_login]({% image_path inventory_curl_result.png %})
 
-So now `Inventory` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console 
+So now `Inventory` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console
 with its single replica running in 1 pod, along with the Postgres database pod.
 
 ####2. Deploying Catalog Service
 
 ---
 
-`Catalog Service` serves products and prices for retail products. Lets's go through quickly how the catalog service works and built on 
+`Catalog Service` serves products and prices for retail products. Lets's go through quickly how the catalog service works and built on
 `Spring Boot` Java runtimes.  Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and expand `catalog-service` directory.
 
 ![catalog]({% image_path codeready-workspace-catalog-project.png %}){:width="500px"}
@@ -312,7 +312,7 @@ You will see the following result:
 
 ![openshift_login]({% image_path catalog_curl_result.png %})
 
-So now `Catalog` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console 
+So now `Catalog` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console
 with running 4 pods such as catalog, catalog-database, inventory, and inventory-database.
 
 ![catalog]({% image_path catalog-project-status.png %})
@@ -327,7 +327,7 @@ By now, you have deployed some of the essential elements for the Coolstore appli
 
 In a nutshell, the Cart service is RESTful and built with Quarkus using the Red Hat's Distributed `Data Grid` technology.
 
-##### What are the building blocks of the Shopping cart a.k.a cart-service? 
+##### What are the building blocks of the Shopping cart a.k.a cart-service?
 
 It uses a Red Hat's Distributed `Data Grid` technology to store all shopping carts and assigns a unique id to them. It uses the `Quarkus Infinispan client` to do this.
 The Shopping cart makes a call via the Quarkus Rest client to fetch all items in the Catalog. In the end, Shopping cart also throws out a `Kafka` message to the topic Orders, when checking out. For that, we use the `Quarkus Kafka client` in the next lab. Last and perhaps worth mentioning the `REST+Swagger UI` also part of the REST API support in `Quarkus`.
@@ -340,7 +340,7 @@ For this lab, we are using the code ready workspaces, make sure you have the fol
 
 ##### Adding a distributed cache to our cart-service
 
-We are going to use the Red hat Distributed `Data Grid` for caching all the users' carts. 
+We are going to use the Red hat Distributed `Data Grid` for caching all the users' carts.
 
 `Red Hat® Distributed Data Grid` is an in-memory, distributed, NoSQL datastore solution. Your applications can access, process, and analyze data at in-memory speed to deliver a superior user experience with features and benefits as below:
 
@@ -425,8 +425,8 @@ message Product {
 }
 ~~~
 
-`Great!`, now we have the Product defined in our proto model. 
-We should also ensure that this model also exists as `POJO`(Plain Old Java Object), that way our `REST Endpoint`, or `Cache` will be able to directly serialize and desrialize the data. 
+`Great!`, now we have the Product defined in our proto model.
+We should also ensure that this model also exists as `POJO`(Plain Old Java Object), that way our `REST Endpoint`, or `Cache` will be able to directly serialize and desrialize the data.
 
 Lets open up our `Product.java` in package model:
 
@@ -535,7 +535,7 @@ We use the producer to ensure our RemoteCache gets instantiated. We create metho
     }
 ~~~
 
-`Perfect`, now we have all the building blocks ready to use the cache. Lets start using our cache. 
+`Perfect`, now we have all the building blocks ready to use the cache. Lets start using our cache.
 
 First we need to make sure we will inject our cache in our service like this in `com.redhat.cloudnative.service.ShoppingCartServiceImpl`
 
@@ -553,8 +553,8 @@ Let's take a look at how we do this with Quarkus. In our project and in our main
 
 ~~~java
 // TODO
-    public ShoppingCart getCart(@PathParam("cartId") String cartId) {	 
-        return shoppingCartService.getShoppingCart(cartId);	 
+    public ShoppingCart getCart(@PathParam("cartId") String cartId) {
+        return shoppingCartService.getShoppingCart(cartId);
     }
 ~~~
 
@@ -569,10 +569,10 @@ The code above is using the `ShoppingCartService`, which is injected into the Ca
  Add the following code on top of the `getCart` method
 
 ~~~java
-    @GET     
-    @Produces(MediaType.TEXT_PLAIN)     
-    @Path("/{cartId}")     
-    @Operation(summary = "get the contents of cart by cartId")     
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/{cartId}")
+    @Operation(summary = "get the contents of cart by cartId")
 ~~~
 
 We have now successfully stated that the method adheres to a GET request and accepts data in `plain text`. The path would be `/api/cart/{cartId}`
@@ -581,6 +581,8 @@ finally, we add the @Operation for some documentation, which is important for ot
 Take this opportunity to look at some of the other methods. You will find `@POST` and `@DELETE` and also the paths they adhere too. This is how we can construct a simple Endpoint for our application.
 
 Run the following command in CodeReady Workspaces `Terminal`:
+
+`cd /projects/cloud-native-workshop-v2m4-labs/cart-service/`
 
 `mvn compile quarkus:dev`
 
@@ -641,8 +643,8 @@ Like we had done before, you can test the serice by appending `/swagger-ui` to t
 
 ---
 
-`Order Service` manages all orders when customers checkout items in the shopping cart. Lets's go through quickly how the order service get 
-`REST` services to use the `MongoDB` database with `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and 
+`Order Service` manages all orders when customers checkout items in the shopping cart. Lets's go through quickly how the order service get
+`REST` services to use the `MongoDB` database with `Quarkus` Java runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE and
 expand `order-service` directory.
 
 ![catalog]({% image_path codeready-workspace-order-project.png %}){:width="500px"}
@@ -654,9 +656,11 @@ All the information between the client and the server are formatted as `JSON`. T
 
 Execute the following command via CodeReady Workspaces `Terminal`:
 
+`cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
+
 `mvn quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client"`
 
-This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, 
+This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this,
 the quarkus-mongodb-client extension has been added to your `pom.xml`.
 
 ![catalog]({% image_path order-pom-dependency.png %})
@@ -753,12 +757,12 @@ public List<Order> updateStatus(@PathParam("orderId") String orderId, @PathParam
 }
 ~~~
 
-The implementation is pretty straightforward and you just need to define your endpoints using the `JAX-RS annotations` and 
+The implementation is pretty straightforward and you just need to define your endpoints using the `JAX-RS annotations` and
 use the `OrderService` to list/add new orders.
 
 ##### Configuring the MongoDB database
 
-The main property to configure is the URL to access to `MongoDB,` almost all configuration can be included in the connection URI 
+The main property to configure is the URL to access to `MongoDB,` almost all configuration can be included in the connection URI
 so we advise you to do so, you can find more information in the [MongoDB documentation](https://docs.mongodb.com/manual/reference/connection-string/)
 
 Open `application.properties` in `src/main/resources/` and add the following configuration:
@@ -771,8 +775,8 @@ Open `application.properties` in `src/main/resources/` and add the following con
 
 By using a Bson `Codec`, the MongoDB Client will take care of the transformation of your domain object to/from a MongoDB `Document` automatically.
 
-First you need to create a Bson `Codec` that will tell Bson how to transform your entity to/from a MongoDB `Document`. 
-Here we use a `CollectibleCodec` as our object is retrievable from the database (it has a MongoDB identifier), if not we would have used a `Codec` instead. 
+First you need to create a Bson `Codec` that will tell Bson how to transform your entity to/from a MongoDB `Document`.
+Here we use a `CollectibleCodec` as our object is retrievable from the database (it has a MongoDB identifier), if not we would have used a `Codec` instead.
 More information in the [codec documentation](https://mongodb.github.io/mongo-java-driver/3.10/bson/codecs).
 
 Edit the `com.redhat.cloudnative.codec.OrderCodec` class as follows:
@@ -851,7 +855,7 @@ public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
 
 `Quarkus` will register the `CodecProvider` for you.
 
-Finally, when getting the `MongoCollection` from the database you can use directly the `Order` class instead of the `Document` one, 
+Finally, when getting the `MongoCollection` from the database you can use directly the `Order` class instead of the `Document` one,
 the codec will automatically map the `Document` to/from your `Order` class.
 
 Edit the `com.redhat.cloudnative.CodecOrderService` class as follows:
@@ -871,6 +875,8 @@ Package the cart application via clicking on `Package for OpenShift` in `Command
 ![codeready-workspace-maven]({% image_path quarkus-dev-run-packageforOcp.png %})
 
 Or run the following maven plugin in CodeReady Workspaces`Terminal`:
+
+`cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
 
 `mvn clean package -DskipTests`
 
@@ -935,20 +941,22 @@ You will see empty result because you didn't add any shopping items yet:
 
 ---
 
-`WEB-UI Service` serves a frontend based on [AngularJS](https://angularjs.org/) and [PatternFly](http://patternfly.org/) running in a 
-[Node.js](https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i) container. 
+`WEB-UI Service` serves a frontend based on [AngularJS](https://angularjs.org/) and [PatternFly](http://patternfly.org/) running in a
+[Node.js](https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i) container.
 [Red Hat OpenShift Application Runtimes](https://developers.redhat.com/products/rhoar) includes `Node.js` support in enterprise prouction environment.
 
-Lets's go through quickly how the frontend service works and built on `Node.js` runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE 
+Lets's go through quickly how the frontend service works and built on `Node.js` runtimes. Go to `Project Explorer` in `CodeReady Workspaces` Web IDE
 and expand `coolstore-ui` directory.
 
 ![coolstore-ui]({% image_path codeready-workspace-coolstore-ui.png %}){:width="500px"}
 
 You will see javascripts for specific cloud-native services such as cart, catatlog, and order service as above.
 
-Now, we will deploy a presentation layer to OpenShift cluster using `Nodeshift` command line tool, a programmable API that you can use to deploy Node.js projects to `OpenShift`. 
+Now, we will deploy a presentation layer to OpenShift cluster using `Nodeshift` command line tool, a programmable API that you can use to deploy Node.js projects to `OpenShift`.
 
  * Install the `Nodeshift` tool via CodeReady Workspaces `Terminal`:
+
+`cd /projects/cloud-native-workshop-v2m4-labs/coolstore-ui/`
 
 `npm install --save-dev nodeshift`
 
@@ -972,11 +980,11 @@ You will see the prouct page of `Red Hat Cool Store` as below:
 
 #### Summary
 
-In this scenario we developed five microservices with `REST API` exposure to communicate with the other microservices. We also used a variety of application 
+In this scenario we developed five microservices with `REST API` exposure to communicate with the other microservices. We also used a variety of application
 runtimes such as `Quarkus`, `Spring Boot`, and `NodeJS` to compile, package, and containerize applications which is a major capability of the advanced cloud-native architecture.
 
-To deploy the cloud-native applications with multiple datasources on `OpenShift` cluster, `Quarkus` provides an easy way to connect multiple datasources and 
+To deploy the cloud-native applications with multiple datasources on `OpenShift` cluster, `Quarkus` provides an easy way to connect multiple datasources and
 obtain a reference to those datasources such as `PostgreSQL` and `MongoDB` in code.
 
-In the end, we optimized `data transaction performance` of the shopping cart service thru integrating with a `JBoss Data Grid` 
+In the end, we optimized `data transaction performance` of the shopping cart service thru integrating with a `JBoss Data Grid`
 to increase end users'(customers) satification. `Congratulations!`
