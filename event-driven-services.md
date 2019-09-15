@@ -151,7 +151,7 @@ Next, we need a method to handle incoming events, which in this lab will be comi
             log.info("received event: " + cloudEventJson);
             JsonObject event = new JsonObject(cloudEventJson);
             orderId = event.getString("key");
-            Double total = event.getDouble("total");
+            String total = event.getString("total");
             JsonObject ccDetails = event.getJsonObject("creditCard");
             String name = event.getString("name");
 
@@ -478,12 +478,15 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;
 
 import javax.inject.Inject;
 import io.vertx.core.json.JsonObject;
 
+@ApplicationScoped
 public class KafkaOrdersConsumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaOrdersConsumer.class);
@@ -521,6 +524,7 @@ package com.redhat.cloudnative;
 
 import io.smallrye.reactive.messaging.kafka.KafkaMessage;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
+import javax.enterprise.context.ApplicationScoped;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -531,6 +535,7 @@ import org.slf4j.LoggerFactory;
 
 import io.vertx.core.json.JsonObject;
 
+@ApplicationScoped
 public class KafkaPaymentsConsumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaPaymentsConsumer.class);
