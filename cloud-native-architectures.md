@@ -1,13 +1,11 @@
 ## Cloud-Native Application Architectures
 
-In today's digital world, enterprises need to build cloud-native applications that span many environments and disparate technologies.
-A unified cloud-native application environment is important to developers because it enables higher productivity and innovation witha full, cohesive 
-development platform that “just works”. Such an environment is equally important to operations becausethe rapid innovation from development is more reliable, 
-performant and scalable in production. And finally, incremental,fail-fast, agile development, integration and automation give business leaders undertaking 
-digital transformation whatthey need to innovate rapidly in fast-changing industries
+Developing applications that are reactive, imperative, event-driven, and polyglot are all requirements of modern application architecture. While cloud infrastructure and container Kubernetes solutions, such as Red Hat OpenStack Platform and Red Hat OpenShift, provide a robust infrastructure foundation for distributed environments, similar seamless application services require building applications that take full advantage of such an infrastructure.
+
+Moreover, applications require hybrid and multi-cloud architecture to thrive in the digital economy. A unified cloud-native application environment has become essential to developers because it enables higher productivity and innovation with a full, cohesive development platform. An application environment is equally critical to operations because of the rapid change and high demands for scalability, agility, and reliability.
 
 In this module, we will learn what cloud-native architecture we need to design for running containerized applications on DevOps/Cloud-Native platform in scale and speed.
-Then we will also develop cloud-natvie applications align with multiple architecture patterns such as high-performing cache, event-driven/reactive, and serverless using 
+Then we will also develop cloud-native applications based on architecture patterns such as high-performing cache, event-driven/reactive, and serverless using
 [Red Hat Runtimes](https://www.redhat.com/en/technologies/cloud-computing/openshift/application-runtimes), [Red Hat CodeReady Workspaces](https://developers.redhat.com/products/codeready-workspaces/overview) and 
 [Red Hat OpenShift Container Platform](https://www.redhat.com/en/technologies/cloud-computing/openshift).
 
