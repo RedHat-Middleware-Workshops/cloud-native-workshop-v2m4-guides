@@ -439,13 +439,9 @@ Or run the following maven plugin in CodeReady Workspaces_Terminal_:
 
 `mvn clean package -DskipTests`
 
-Create a temp directory to store only previously-built application with necessary lib directory:
-
-`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
-
 Rebuild a container image based the cart artifact that we just packaged, which will take about minutes to complete:
 
-`oc start-build cart --from-dir=target/binary --follow`
+`oc start-build cart --from-file target/*-runner.jar --follow`
 
 ![cart]({% image_path cart-build-logs.png %})
 
@@ -593,13 +589,9 @@ Or run the following maven plugin in CodeReady Workspaces_Terminal_:
 
 ![order]({% image_path order-mvn-package.png %})
 
-Create a temp directory to store only previously-built application with necessary lib directory:
-
-`rm -rf target/binary && mkdir -p target/binary && cp -r target/*runner.jar target/lib target/binary`
-
 Rebuild a container image based the cart artifact that we just packaged, which will take about minutes to complete:
 
-`oc start-build order --from-dir=target/binary --follow`
+`oc start-build order --from-file target/*-runner.jar --follow`
 
 The order service will be redeployed automatically via [OpenShift Deployment triggers](https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations) after it completes to build.
 
