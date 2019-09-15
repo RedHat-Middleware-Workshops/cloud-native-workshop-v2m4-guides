@@ -1,44 +1,37 @@
-## Cloud-Native Application Architectures
+## Cloud Native Application Architectures
 
-Developing applications that are reactive, imperative, event-driven, and polyglot are all requirements of modern application architecture. While cloud infrastructure and container Kubernetes solutions, such as Red Hat OpenStack Platform and Red Hat OpenShift, provide a robust infrastructure foundation for distributed environments, similar seamless application services require building applications that take full advantage of such an infrastructure.
+Developing applications that are reactive, imperative, event driven, and polyglot are all requirements of modern application architecture. While cloud infrastructure and container Kubernetes solutions, such as Red Hat OpenStack Platform and Red Hat OpenShift, provide a robust infrastructure foundation for distributed environments, similar seamless application services require building applications that take full advantage of such an infrastructure.
 
-Moreover, applications require hybrid and multi-cloud architecture to thrive in the digital economy. A unified cloud-native application environment has become essential to developers because it enables higher productivity and innovation with a full, cohesive development platform. An application environment is equally critical to operations because of the rapid change and high demands for scalability, agility, and reliability.
+Moreover, applications require hybrid and multi cloud architecture to thrive in the digital economy. A unified cloud native application environment has become essential to developers because it enables higher productivity and innovation with a full, cohesive development platform. An application environment is equally critical to operations because of the rapid change and high demands for scalability, agility, and reliability.
 
-In this module, we will learn what cloud-native architecture we need to design for running containerized applications on DevOps/Cloud-Native platform in scale and speed.
-Then we will also develop cloud-native applications based on architecture patterns such as high-performing cache, event-driven/reactive, and serverless using
+In this module, we will learn what cloud-native architecture we need to design for running containerized applications on DevOps/Cloud Native platform in scale and speed.
+Then we will also develop cloud native applications based on architecture patterns such as high-performing cache, event-driven/reactive, and serverless using
 [Red Hat Runtimes](https://www.redhat.com/en/technologies/cloud-computing/openshift/application-runtimes), [Red Hat CodeReady Workspaces](https://developers.redhat.com/products/codeready-workspaces/overview) and 
 [Red Hat OpenShift Container Platform](https://www.redhat.com/en/technologies/cloud-computing/openshift).
 
 
-#### What is Cloud-Native Application Architectures?
+#### Capabilities of a Cloud Native Application Architectures?
+---
+TThe benefits of cloud native application architectures enable speed of development and deployment, flexibility, quality, and reliability. More importantly, it allows developers to integrate the applications with the latest open source technologies without a steep learning curve. While there are many ways to build and architect cloud native applications following are some great ingredients for consideration:
+
+ * *Runtimes* - More likely to be written in the container first or/and Kubernetes native language, which means runtimes such as Java, Node.js, Go, Python, and Ruby, etc.
+
+ * *Security* - Deploying and maintaining applications in a multi cloud, hybrid cloud application environment, security becomes of utmost importance and should be part of the environment.
+
+ * *Observability* - The ability to observer applications and their behavior in the cloud. Tools that can give realtime metrics, and more information about the use e.g., Prometheus, Grafana, Kiali, etc.
+
+ * *Efficiency* - Focused on tiny memory footprint, small artifact size, and fast booting time to make portable applications across hybrid/multi-cloud platforms. Primarily, it will leverage an expected spice in production via rapid scaling with consuming minimal computing resources.
+
+ * *Interoperability* - Easy to integrate cloud native apps with the latest open source technologies such as Infinispan, MicroProfile, Hibernate, Apache Kafka, Jaeger, Prometheus, and more for building standard runtimes architecture.
+
+ * *DevOps/DevSecOps* - Designed for continuous deployment to production in line with the minimum viable product (MVP), with security as part of the tooling together with development, automating testing, and collaboration.
+
+
+#### How to build Cloud Native applications and architecture with Red Hat?
 
 ---
 
-Cloud-native is a new paradigm to develop application services and manage them on cloud computing infrastructure 
-which has elasticity, scalability, resiliency, and high-performance. Cloud-native application architectures enable 
-developers/architects to implement various application patterns from imperative to reactive, serverless in continuous delivery workflows.
-
-The benefits of cloud-native application architectures are to augment development productivity in terms of speed, 
-flexibility, quality, and reliability. More importantly, it allows developers to integrate the applications with the 
-latest open source technologies without a steep learning curve. For example, with the architectures, you can deal with a certain 
-microservices as serverless workloads for business seasonality. More characteristics that cloud-native application architectures should have here:
-
- * `Programming languages` - More likely to be written in the container first or/and Kubernetes native language, which means Java, Node.js, Go, Python, and Ruby.
-
- * `Efficiency` - Focused on tiny memory footprint, small artifact size, and fast booting time to make portable applications across hybrid/multi-cloud platforms. Especially, it will leverage an expected spice in production via fast scaling with consuming minimal computing resources.
-
- * `Interoperability` - Easy to integrate cloud-native apps with the latest open source technologies such as Infinispan, MicroProfile, Hibernate, Apache Kafka, Jaeger, Prometheus, and more for building standard runtimes architecture.
-
- * `DevOps` - Designed for continuous deployment to production in line with minimum viable product (MVP) development, automating testing, and collaborating ops teams in DevOps practices.
-
-
-#### How Red Hat support the Cloud-Native App Architectures?
-
----
-
-`Red Hat Applicaton Runtime​s​` is a recommended set of products, tools and components to develop and maintaincloud-native applications. It provides lightweight 
-runtimes and frameworks for highly-distributed cloud environments such asmicroservices, with in-memory caching for fast data access, and messaging for quick data 
-transfer supporting existingapplications. Features and benifits are here:
+`Red Hat Runtime​s​` is a recommended set of products, tools and components to develop and maintaincloud-native applications. It provides lightweight runtimes and frameworks for highly-distributed cloud environments such as microservices, with in-memory caching for fast data access, and messaging for quick data transfer supporting existing applications. Features and benifits are here:
 
  * `Runtimes and frameworks` - A collection of runtimes, frameworks, and languages so developers and architects can choose the right tool for the right task.
 
@@ -52,13 +45,13 @@ transfer supporting existingapplications. Features and benifits are here:
  
  * `OpenJDK` - The Red Hat build of OpenJDK is an open source implementation of the Java™ Platform, Standard Edition (Java SE) supported and maintained by the OpenJDK community.
 
-Red Hat Applicaton Runtime​s​ products and components included in this portfolio offering are:
+Red Hat Runtime​s​ products and components included in this portfolio offering are:
 
 ![rhar]({% image_path rhar.png %})
 
  * `Red Hat® JBoss® Enterprise Application Platform 7​​ (JBoss EAP)` is the market-leading open source platform formodern Java applications deployed in any environment. 
     JBoss EAP’s architecture is lightweight, modular, and cloud ready.Based on the open source WildFly app server project, the platform offers powerful management and 
-    automation for greaterdeveloper productivity.
+    automation for greater developer productivity.
 
  * `A set of cloud-native runtimes` are Spring Boot with Tomcat, Reactive Vert.x, Javascript Node.Js, MicroProfile Throntail.(`Quarkus is coming soon!!`) 
 
@@ -86,7 +79,6 @@ existing applications or create new ones. Applications Runtimes enable developer
 speedvia in-memory data caching, enhance application performance with messaging, or adapt cloud-native application development using moderndevelopment patterns and technologies.
 
 #### What is Quarkus? 
-
 ---
 
 ![quarkus-logo]({% image_path quarkus-logo.png %})
@@ -188,7 +180,7 @@ Choose `Maven` from the project configurations and then click on `Save`.
 
 Repeat the above for inventory and catalog projects.
 
-> `NOTE`: the `Terminal` window in CodeReady Workspaces. For the rest of these labs, anytime you need to run 
+> `NOTE`: the Terminal window in CodeReady Workspaces. For the rest of these labs, anytime you need to run 
 a command in a terminal, you can use the CodeReady Workspaces `Terminal` window.
 
 ![codeready-workspace-terminal]({% image_path codeready-workspace-terminal.png %})
