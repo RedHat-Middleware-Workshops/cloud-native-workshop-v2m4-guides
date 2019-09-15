@@ -188,7 +188,6 @@ private void fail(String orderId, String paymentId, String remarks) {
     payload.put("remarks", remarks);
     payload.put("status", "FAILED");
     producer.send(new ProducerRecord<String, String>(paymentsTopic, payload.toString()));
-
 }
 ~~~
 
@@ -265,6 +264,10 @@ Build the image using on OpenShift:
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=payment -l app=payment`
 
 This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
+
+ * Force update the OpenJDK image tags:
+
+`oc import-image openjdk18-openshift --all`
 
  * Create a temp directory to store only previously-built application with necessary lib directory:
 
