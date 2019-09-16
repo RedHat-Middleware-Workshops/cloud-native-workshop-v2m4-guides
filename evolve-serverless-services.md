@@ -91,7 +91,7 @@ Let's find out why Quarkus calls itself _SuperSonic Subatomic Subatomic Java_. L
 
 ~~~sh
 mkdir /tmp/hello && cd /tmp/hello && \
- mvn io.quarkus:quarkus-maven-plugin:0.21.1:create \
+ mvn io.quarkus:quarkus-maven-plugin:0.21.2:create \
     -DprojectGroupId=org.acme \
     -DprojectArtifactId=getting-started \
     -DclassName="org.acme.quickstart.GreetingResource" \
@@ -123,11 +123,11 @@ Since our environment here is Linux, you can just run it. In the CodeReady Works
 Notice the amazingly fast startup time:
 
 ~~~shell
-2019-09-11 13:32:16,261 INFO  [io.quarkus] (main) Quarkus x.xx.x started in 0.016s. Listening on: http://[::]:8080
-2019-09-11 13:32:16,261 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
+2019-09-16 08:02:29,096 INFO  [io.quarkus] (main) Quarkus 0.21.2 started in 0.014s. Listening on: http://[::]:8080
+2019-09-16 08:02:29,096 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
 ~~~
 
-That’s _16 milliseconds_ to start up.
+That’s _14 milliseconds_ to start up.
 
 ![serverless]({% image_path payment-native-runn.png %})
 
@@ -139,8 +139,8 @@ And extremely low memory usage as reported by the Linux `ps` utility. While the 
 You should see something like:
 
 ~~~shell
-  PID   RSS COMMAND
- 17509 58304 target/hello-1.0-SNAPSHOT-runner
+   PID   RSS COMMAND
+ 74810 50388 /tmp/hello/target/getting-started-1.0-SNAPSHOT-runner
 ~~~
 
 ![serverless]({% image_path payment-native-pss.png %})
@@ -294,7 +294,7 @@ spec:
 
 The service can then be deployed using the following command via CodeReady Workspaces `Terminal`:
 
-`oc create -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/knative-serving-service.yaml`
+`oc create -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/knative-serving-service.yaml`
 
 After successful creation of the service we should see a Kubernetes Deployment named similar to `payment-service-v1-deployment` available.
 
@@ -316,7 +316,7 @@ As default, Knative will automatically scale services down to zero instances whe
 
 ![serverless]({% image_path scale-to-zero-grace-period.png %})
 
-In the meantime, it probably took at least 30 seconds so select your `userNN-cloudnativeapps` project using the drop-down at the top and then go back to _Home > Status_ on the left menu and click on **payment-service-v1-deployment**. You will see 0 pods are available:
+In the meantime, it probably took at least 30 seconds so select your `userXX-cloudnativeapps` project using the drop-down at the top and then go back to _Home > Status_ on the left menu and click on **payment-service-v1-deployment**. You will see 0 pods are available:
 
 ![serverless]({% image_path payment-serving-down-to-zero.png %})
 
