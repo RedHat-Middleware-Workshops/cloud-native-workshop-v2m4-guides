@@ -151,7 +151,7 @@ Next, we need a method to handle incoming events, which in this lab will be comi
             log.info("received event: " + cloudEventJson);
             JsonObject event = new JsonObject(cloudEventJson);
             orderId = event.getString("key");
-            Double total = event.getDouble("total");
+            String total = event.getString("total");
             JsonObject ccDetails = event.getJsonObject("creditCard");
             String name = event.getString("name");
 
@@ -478,6 +478,8 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;
 
@@ -517,9 +519,10 @@ public class KafkaOrdersConsumer {
 }
 ~~~
 
-Create a new Java class, `KafkaPaymentsConsumer.java` in `src/main/java/com/redhat/cloudnative` to consume `payments` topic. The `onMessage()` method allows you to update the a certain Order's Payment Status to `COMPLETED` or `FAILED` in MongoDB based consumed `KafkaMessage`. Copy the following entire code into `KafkaPaymentsConsumer.java`.
+Now let's create a new method to consume `payments` topic. The `onMessagePayments()` method allows you to update the a certain Order's Payment Status to `COMPLETED` or `FAILED` in MongoDB based consumed `KafkaMessage`. Copy the following entire code into `KafkaPaymentsConsumer.java`.
 
 ~~~java
+<<<<<<< HEAD
 package com.redhat.cloudnative;
 
 import io.smallrye.reactive.messaging.kafka.KafkaMessage;
@@ -542,9 +545,12 @@ public class KafkaPaymentsConsumer {
 
     @Inject 
     OrderService orderService;
+=======
+
+>>>>>>> 8290c5430d0a6230c848def9271192acc086ae81
 
     @Incoming("payments")
-    public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
+    public CompletionStage<Void> onMessagePayments(KafkaMessage<String, String> message)
             throws IOException {
 
         LOG.info("Kafka payment message with value = {} arrived", message.getPayload());
@@ -555,7 +561,6 @@ public class KafkaPaymentsConsumer {
         return message.ack();
     }
 
-}
 ~~~
 
 Almost there; Next lets add the configuration to our `src/main/resources/application.properties` file in the `order-service` project:
