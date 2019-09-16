@@ -678,44 +678,45 @@ Add the following Java codes at each market.
  * `// TODO: Inject MongoClient here` marker:
 
 ~~~java
-@Inject MongoClient mongoClient;
+    @Inject MongoClient mongoClient;
 ~~~
 
  * `// TODO: Add a while loop to make an order lists using MongoCursor here` marker in `list()` method:
 
 ~~~java
-MongoCursor<Document> cursor = getCollection().find().iterator();
+            MongoCursor<Document> cursor = getCollection().find().iterator();
 
-try {
-    while (cursor.hasNext()) {
-        Document document = cursor.next();
-        Order order = new Order();
-        order.setOrderId(document.getString("orderId"));
-        order.setName(document.getString("name"));
-        order.setTotal(document.getString("total"));
-        order.setCcNumber(document.getString("ccNumber"));
-        order.setCcExp(document.getString("ccExp"));
-        order.setBillingAddress(document.getString("billingAddress"));
-        order.setStatus(document.getString("status"));
-        list.add(order);
-    }
-} finally {
-    cursor.close();
-}
+        try {
+            while (cursor.hasNext()) {
+                Document document = cursor.next();
+                Order order = new Order();
+                order.setOrderId(document.getString("orderId"));
+                order.setName(document.getString("name"));
+                order.setTotal(document.getString("total"));
+                order.setCcNumber(document.getString("ccNumber"));
+                order.setCcExp(document.getString("ccExp"));
+                order.setBillingAddress(document.getString("billingAddress"));
+                order.setStatus(document.getString("status"));
+                list.add(order);
+            }
+        } finally {
+            cursor.close();
+        }
+
 ~~~
 
  * `// TODO: Add to create a Document based order here` marker in `add(Order order)` method:
 
 ~~~java
-Document document = new Document()
-        .append("orderId", order.getOrderId())
-        .append("name", order.getName())
-        .append("total", order.getTotal())
-        .append("ccNumber", order.getCcNumber())
-        .append("ccExp", order.getCcExp())
-        .append("billingAddress", order.getBillingAddress())
-        .append("status", order.getStatus());
-getCollection().insertOne(document);
+        Document document = new Document()
+                .append("orderId", order.getOrderId())
+                .append("name", order.getName())
+                .append("total", order.getTotal())
+                .append("ccNumber", order.getCcNumber())
+                .append("ccExp", order.getCcExp())
+                .append("billingAddress", order.getBillingAddress())
+                .append("status", order.getStatus());
+        getCollection().insertOne(document);
 ~~~
 
 Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each marker:
@@ -731,29 +732,29 @@ Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each ma
  * `// TODO: Inject OrderService here` marker:
 
 ~~~java
-@Inject OrderService orderService;
+    @Inject OrderService orderService;
 ~~~
 
  * `// TODO: Add list(), add(), updateStatus() methods here` marker:
 
 ~~~java
-@GET
-public List<Order> list() {
-    return orderService.list();
-}
-
-@POST
-public List<Order> add(Order order) {
-    orderService.add(order);
-    return list();
-}
-
-@GET
-@Path("/{orderId}/{status}")
-public List<Order> updateStatus(@PathParam("orderId") String orderId, @PathParam("status") String status) {
-    orderService.updateStatus(orderId, status);
-    return list();
-}
+    @GET
+    public List<Order> list() {
+        return orderService.list();
+    }
+    
+    @POST
+    public List<Order> add(Order order) {
+        orderService.add(order);
+        return list();
+    }
+    
+    @GET
+    @Path("/{orderId}/{status}")
+    public List<Order> updateStatus(@PathParam("orderId") String orderId, @PathParam("status") String status) {
+        orderService.updateStatus(orderId, status);
+        return list();
+    }
 ~~~
 
 The implementation is pretty straightforward and you just need to define your endpoints using the `JAX-RS annotations` and
@@ -784,56 +785,56 @@ Edit the `com.redhat.cloudnative.codec.OrderCodec` class as follows:
 
 ~~~java
     @Override
-public void encode(BsonWriter writer, Order Order, EncoderContext encoderContext) {
-    Document doc = new Document();
-    doc.put("orderId", Order.getOrderId());
-    doc.put("name", Order.getName());
-    doc.put("total", Order.getTotal());
-    doc.put("ccNumber", Order.getCcNumber());
-    doc.put("ccExp", Order.getCcExp());
-    doc.put("billingAddress", Order.getBillingAddress());
-    doc.put("status", Order.getStatus());
-    documentCodec.encode(writer, doc, encoderContext);
-}
-
-@Override
-public Class<Order> getEncoderClass() {
-    return Order.class;
-}
-
-@Override
-public Order generateIdIfAbsentFromDocument(Order document) {
-    if (!documentHasId(document)) {
-        document.setOrderId(UUID.randomUUID().toString());
+    public void encode(BsonWriter writer, Order Order, EncoderContext encoderContext) {
+        Document doc = new Document();
+        doc.put("orderId", Order.getOrderId());
+        doc.put("name", Order.getName());
+        doc.put("total", Order.getTotal());
+        doc.put("ccNumber", Order.getCcNumber());
+        doc.put("ccExp", Order.getCcExp());
+        doc.put("billingAddress", Order.getBillingAddress());
+        doc.put("status", Order.getStatus());
+        documentCodec.encode(writer, doc, encoderContext);
     }
-    return document;
-}
 
-@Override
-public boolean documentHasId(Order document) {
-    return document.getOrderId() != null;
-}
-
-@Override
-public BsonValue getDocumentId(Order document) {
-    return new BsonString(document.getOrderId());
-}
-
-@Override
-public Order decode(BsonReader reader, DecoderContext decoderContext) {
-    Document document = documentCodec.decode(reader, decoderContext);
-    Order order = new Order();
-    if (document.getString("orderId") != null) {
-        order.setOrderId(document.getString("orderId"));
+    @Override
+    public Class<Order> getEncoderClass() {
+        return Order.class;
     }
-    order.setName(document.getString("name"));
-    order.setTotal(document.getString("total"));
-    order.setCcNumber(document.getString("ccNumber"));
-    order.setCcExp(document.getString("ccExp"));
-    order.setBillingAddress(document.getString("billingAddress"));
-    order.setStatus(document.getString("status"));
-    return order;
-}
+
+    @Override
+    public Order generateIdIfAbsentFromDocument(Order document) {
+        if (!documentHasId(document)) {
+            document.setOrderId(UUID.randomUUID().toString());
+        }
+        return document;
+    }
+
+    @Override
+    public boolean documentHasId(Order document) {
+        return document.getOrderId() != null;
+    }
+
+    @Override
+    public BsonValue getDocumentId(Order document) {
+        return new BsonString(document.getOrderId());
+    }
+
+    @Override
+    public Order decode(BsonReader reader, DecoderContext decoderContext) {
+        Document document = documentCodec.decode(reader, decoderContext);
+        Order order = new Order();
+        if (document.getString("orderId") != null) {
+            order.setOrderId(document.getString("orderId"));
+        }
+        order.setName(document.getString("name"));
+        order.setTotal(document.getString("total"));
+        order.setCcNumber(document.getString("ccNumber"));
+        order.setCcExp(document.getString("ccExp"));
+        order.setBillingAddress(document.getString("billingAddress"));
+        order.setStatus(document.getString("status"));
+        return order;
+    }
 ~~~
 
 Then you need to create a `CodecProvider` to link this `Codec` to the Order class.
@@ -843,13 +844,13 @@ Edit the `com.redhat.cloudnative.codec.OrderCodecProvider` class as follows:
  * `// TODO: Add Codec get method here` marker:
 
 ~~~java
-@Override
-public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
-    if (clazz == Order.class) {
-        return (Codec<T>) new OrderCodec();
+    @Override
+    public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
+        if (clazz == Order.class) {
+            return (Codec<T>) new OrderCodec();
+        }
+        return null;
     }
-    return null;
-}
 ~~~
 
 `Quarkus` will register the `CodecProvider` for you.
@@ -862,9 +863,9 @@ Edit the `com.redhat.cloudnative.CodecOrderService` class as follows:
  * `// TODO: Add MongoCollection method here` marker:
 
 ~~~java
-private MongoCollection<Order> getCollection(){
-    return mongoClient.getDatabase("order").getCollection("order", Order.class);
-}
+    private MongoCollection<Order> getCollection(){
+        return mongoClient.getDatabase("order").getCollection("order", Order.class);
+    }
 ~~~
 
 ##### Building and Deploying Application to OpenShift
