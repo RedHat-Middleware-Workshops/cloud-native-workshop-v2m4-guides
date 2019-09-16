@@ -410,7 +410,7 @@ message Promotion {
 
 * ShoppingCartItem has Product
 
-But we havent defined the `Product` yet. Lets go ahead and do that.
+But we havent defined the `Product` yet. Lets go ahead and do that. Add this code to the `//TODO ADD Product` marker:
 
 ~~~java
 message Product {
@@ -501,6 +501,8 @@ We use the producer to ensure our RemoteCache gets instantiated. We create metho
 * getCache, sets up our marshallers and proto files
 
 * other config properties are injected at runtime
+
+Add this code below the `// TODO Add getCache` and `// TODO add getConfigBuilder` marker:
 
 ~~~java
     @Produces

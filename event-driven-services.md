@@ -80,7 +80,7 @@ Change the name to `payments` then click on **Create** on the bottom.
 
 ![kafka]({% image_path kafka-topic-payments-create.png %})
 
-**Well done!** You now have a running Kafka cluster with two Kafka Topics called `payments` and `orders`. You can see the pods spinning
+**Well done!** You now have a running Kafka cluster with two Kafka Topics called `payments` and `orders`.
 
 ![kafka]({% image_path kafka-topics-created.png %})
 
@@ -373,6 +373,14 @@ This will add the Kafka extension and APIs to our Cart service app.
 
     private Producer<String, String> producer;
 ~~~
+
+Next, un-comment (or add if they are missing) the following `import` statements:
+
+```java
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+```
 
 The init method as it denotes creates the Kafka configuration, we have externalized this configuration and injected the variables as properties on the class.
 
