@@ -100,7 +100,7 @@ mkdir /tmp/hello && cd /tmp/hello && \
 
 This will create a simple Quarkus app in the `/tmp/hello` directory.
 
-Mext, create a `native executable` with this command:
+Next, create a `native executable` with this command:
 
 `mvn -f /tmp/hello clean package -Pnative -DskipTests`
 
