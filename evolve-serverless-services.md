@@ -74,7 +74,7 @@ and the application. This is accomplished using [GraalVM](https://graalvm.org/).
 Java, Scala, Groovy, Kotlin, Clojure, and LLVM-based languages such as C and C++. It includes ahead-of-time compilation, aggressive dead code elimination,
 and optimal packaging as native binaries that moves a lot of startup logic to build-time, thereby reducing startup time and memory resource requirements significantly.
 
-![serverless]({% image_path native-image-process.png %}
+![serverless]({% image_path native-image-process.png %})
 
 `GraalVM` is already installed for you. Inspect the value of the `GRAALVM_HOME` variable in the CodeReady Workspaces _Terminal_ with:
 
