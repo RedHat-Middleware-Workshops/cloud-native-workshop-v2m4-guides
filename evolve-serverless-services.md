@@ -254,6 +254,12 @@ Or you can run the commands directly:
 
 This will execute `mvn clean package -Pnative` behind the scenes. The `-Pnative` argument selects the native maven profile which invokes the Graal compiler.
 
+We've deleted our old build configuration that took a JAR file. We need a new build configuration that can take our new native compiled Quarkus app. Create a new build config with this command:
+
+`oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:19.2.0 --binary --name=payment -l app=payment`
+
+You should get a `--> Success message` at the end.
+
  * Mext, start and watch the build, which will take about 3-4 minutes to complete:
 
 `oc start-build payment --from-file target/*-runner --follow`
@@ -290,48 +296,6 @@ The service can then be deployed using the following command via CodeReady Works
 
 `oc create -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/knative-serving-service.yaml`
 
-Next, Create a new binary build within OpenShift:
-
-`oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:19.2.0 --binary --name=payment -l app=payment`
-
-You should get a `--> Success message` at the end.
-
-And then start and watch the build, which will take about a minute to complete:
-
-`oc start-build payment --from-file target/*-runner --follow`
-
-This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
-
-Once that’s done, go to _Builds > Image Streams_ on the left menu then input `payment` to show the payment imagestream. Click on `payment` imagestream:
-
-![serverless]({% image_path payment-is.png %})
-
-In the _Overview_ tab, copy the `IMAGE REPOSITORY` value shown and then open the `payment-service/knative/knative-serving-service.yaml` file and update the `image:` line with this value.
-
-![serverless]({% image_path payment-is-oveview.png %})
-
-~~~yaml
-apiVersion: serving.knative.dev/v1alpha1
-kind: Service
-metadata:
-  name: payment
-spec:
-  template:
-    metadata:
-      name: payment
-      annotations:
-        # disable istio-proxy injection
-        sidecar.istio.io/inject: "false"
-    spec:
-      containers:
-        # Replace Project name userXX-cloudnativeapps with project in which payment is deployed
-      - image: YOUR_IMAGE_SERVICE_URL:latest
-~~~
-
-The service can then be deployed using the following command via CodeReady Workspaces `Terminal`:
-
-`oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/knative-serving-service.yaml`
-
 After successful creation of the service we should see a Kubernetes Deployment named similar to `payment-service-v1-deployment` available.
 
 Go to _Home > Status_ on the left menu and click on **payment-service-v1-deployment**. You will confirm 1 pod is _available_.
@@ -344,7 +308,7 @@ Click on **config-autoscaler**.
 
 ![serverless]({% image_path knative-serving-config.png %})
 
-Once you click on **config-autoscaler**, click on the **YAML** tab to show the source code to the config map,. Here you will see the details on how Knative autoscaling feature is specified.
+Once you click on **config-autoscaler**, click on the **YAML** tab to show the source code to the config map. Here you will see the details on how Knative autoscaling feature is specified.
 
 As default, Knative will automatically scale services down to zero instances when the service(i.e. payment) has no request after 30 seconds:
 
