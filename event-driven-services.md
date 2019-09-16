@@ -114,7 +114,7 @@ and provides all the necessary capabilities to integrate with Kafka clusters. Co
 
 Let’s start by adding fields to access configuration using `@ConfigProperty` and a `Producer` field which will be used to send messages. We'll also add a `log` field so we can see debug messages later on.
 
- * Add this code to the `// TODO: Add Messaging ConfigProperty here` marker:
+ * Add this code to the `PaymentResource.java` file (in the `src/main/java/com/redhat/cloudnative` directory) at the `// TODO: Add Messaging ConfigProperty here` marker:
 
 ~~~java
     @ConfigProperty(name = "mp.messaging.outgoing.payments.bootstrap.servers")
@@ -150,11 +150,13 @@ Next, we need a method to handle incoming events, which in this lab will be comi
         try {
             log.info("received event: " + cloudEventJson);
             JsonObject event = new JsonObject(cloudEventJson);
-            orderId = event.getString("key");
+            orderId = event.getString("orderId");
             String total = event.getString("total");
             JsonObject ccDetails = event.getJsonObject("creditCard");
             String name = event.getString("name");
 
+            // fake processing time
+            Thread.sleep(5000);
             if (!ccDetails.getString("number").startsWith("4")) {
                  fail(orderId, paymentId, "Invalid Credit Card: " + ccDetails.getString("number"));
             }
@@ -164,6 +166,8 @@ Next, we need a method to handle incoming events, which in this lab will be comi
         }
     }
 ~~~
+
+> Note that the `Thread.sleep(5000);` will cause credit card "processing" to take 5 seconds, to simulate a real world processing time.
 
 Now we need to implement the `pass()` and `fail()` methods referenced above. These methods will send messages to Kafka using our `producer` field.
 
@@ -177,6 +181,7 @@ private void pass(String orderId, String paymentId, String remarks) {
     payload.put("paymentId", paymentId);
     payload.put("remarks", remarks);
     payload.put("status", "COMPLETED");
+    log.info("Sending payment success: " + payload.toString());
     producer.send(new ProducerRecord<String, String>(paymentsTopic, payload.toString()));
 }
 ~~~
@@ -190,6 +195,7 @@ private void fail(String orderId, String paymentId, String remarks) {
     payload.put("paymentId", paymentId);
     payload.put("remarks", remarks);
     payload.put("status", "FAILED");
+    log.info("Sending payment failure: " + payload.toString());
     producer.send(new ProducerRecord<String, String>(paymentsTopic, payload.toString()));
 }
 ~~~
@@ -403,7 +409,6 @@ The `sendOrder()` method is quite simple, it takes the Order POJO as a param and
 
 ~~~java
     private void sendOrder(Order order, String cartId) {
-        order.setKey(cartId);
         order.setTotal(shoppingCartService.getShoppingCart(cartId).getCartTotal() + "");
         producer.send(new ProducerRecord<String, String>(ordersTopic, Json.encode(order)));
         log.info("Sent message: " + Json.encode(order));
@@ -467,7 +472,7 @@ Execute the following command via CodeReady Workspaces `Terminal`:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
 
-`mvn quarkus:add-extension -Dextensions="kafka,kafka-client"`
+`mvn quarkus:add-extension -Dextensions="kafka"`
 
 This command generates a Maven project, importing the Kafka extensions for Quarkus applications
 and provides all the necessary capabilities to integrate with the Kafka clusters and subscribe `payments` topic and `orders` topic. Let's confirm your `pom.xml` as below:
@@ -476,7 +481,7 @@ and provides all the necessary capabilities to integrate with the Kafka clusters
 
 ##### Creating Orders and Payments Consumer in Order Service
 
-In the `order-service` project, Create a new Java class, `KafkaOrdersConsumer.java` in `src/main/java/com/redhat/cloudnative` to consume messages from the Kafka `orders` topic. The `onMessage()` method allows you to store a new order in MongoDB based consumed `KafkaMessage`. Copy the following entire code into `KafkaOrdersConsumer.java`.
+In the `order-service` project, Create a new Java class, `KafkaOrders.java` in `src/main/java/com/redhat/cloudnative` to consume messages from the Kafka `orders` and `payments` topic. Copy the following entire code into `KafkaOrders.java`.
 
 ~~~java
 package com.redhat.cloudnative;
@@ -491,45 +496,36 @@ import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import io.vertx.core.json.JsonObject;
 
 @ApplicationScoped
-public class KafkaOrdersConsumer {
+public class KafkaOrders {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KafkaOrdersConsumer.class);
-    
-    @Inject 
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaOrders.class);
+
+    @Inject
     OrderService orderService;
 
     @Incoming("orders")
     public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
             throws IOException {
 
-        // TODO: Add to Orders       
         LOG.info("Kafka order message with value = {} arrived", message.getPayload());
-        
+
         JsonObject orders = new JsonObject(message.getPayload());
         Order order = new Order();
-        order.setId(orders.getString("orderId"));
+        order.setOrderId(orders.getString("orderId"));
         order.setName(orders.getString("name"));
-        order.setTotal(orders.getString("total"));       
+        order.setTotal(orders.getString("total"));
         order.setCcNumber(orders.getJsonObject("creditCard").getString("number"));
         order.setCcExp(orders.getJsonObject("creditCard").getString("expiration"));
         order.setBillingAddress(orders.getString("billingAddress"));
         order.setStatus("PROCESSING");
         orderService.add(order);
-        
+
         return message.ack();
     }
-
-}
-~~~
-
-Now let's create a new method to consume `payments` topic. The `onMessagePayments()` method allows you to update the a certain Order's Payment Status to `COMPLETED` or `FAILED` in MongoDB based consumed `KafkaMessage`. Copy the following entire code into `KafkaPaymentsConsumer.java`.
-
-~~~java
 
     @Incoming("payments")
     public CompletionStage<Void> onMessagePayments(KafkaMessage<String, String> message)
@@ -543,20 +539,26 @@ Now let's create a new method to consume `payments` topic. The `onMessagePayment
         return message.ack();
     }
 
+}
 ~~~
 
 Almost there; Next lets add the configuration to our `src/main/resources/application.properties` file in the `order-service` project:
 
 ~~~java
+# Incoming payment topic messages
 mp.messaging.incoming.payments.connector=smallrye-kafka
 mp.messaging.incoming.payments.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 mp.messaging.incoming.payments.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 mp.messaging.incoming.payments.bootstrap.servers=my-cluster-kafka-bootstrap:9092
-mp.messaging.incoming.payments.group.id=payment-service
+mp.messaging.incoming.payments.group.id=order-service
 mp.messaging.incoming.payments.auto.offset.reset=earliest
 mp.messaging.incoming.payments.enable.auto.commit=true
 mp.messaging.incoming.payments.request.timeout.ms=30000
 
+# Enable CORS requests from browsers
+quarkus.http.cors=true
+
+# Incoming order topic messages
 mp.messaging.incoming.orders.connector=smallrye-kafka
 mp.messaging.incoming.orders.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 mp.messaging.incoming.orders.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
@@ -565,6 +567,7 @@ mp.messaging.incoming.orders.group.id=order-service
 mp.messaging.incoming.orders.auto.offset.reset=earliest
 mp.messaging.incoming.orders.enable.auto.commit=true
 mp.messaging.incoming.orders.request.timeout.ms=30000
+
 ~~~
 
 ##### Re-Deploying Order service to OpenShift
