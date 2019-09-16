@@ -174,30 +174,30 @@ Now we need to implement the `pass()` and `fail()` methods referenced above. The
  * Add the following code to the `// TODO: Add pass method here` marker:
 
 ~~~java
-private void pass(String orderId, String paymentId, String remarks) {
+    private void pass(String orderId, String paymentId, String remarks) {
 
-    JsonObject payload = new JsonObject();
-    payload.put("orderId", orderId);
-    payload.put("paymentId", paymentId);
-    payload.put("remarks", remarks);
-    payload.put("status", "COMPLETED");
-    log.info("Sending payment success: " + payload.toString());
-    producer.send(new ProducerRecord<String, String>(paymentsTopic, payload.toString()));
-}
+        JsonObject payload = new JsonObject();
+        payload.put("orderId", orderId);
+        payload.put("paymentId", paymentId);
+        payload.put("remarks", remarks);
+        payload.put("status", "COMPLETED");
+        log.info("Sending payment success: " + payload.toString());
+        producer.send(new ProducerRecord<String, String>(paymentsTopic, payload.toString()));
+    }
 ~~~
 
  * Add this code to the `// TODO: Add fail method here` marker:
 
 ~~~java
-private void fail(String orderId, String paymentId, String remarks) {
-    JsonObject payload = new JsonObject();
-    payload.put("orderId", orderId);
-    payload.put("paymentId", paymentId);
-    payload.put("remarks", remarks);
-    payload.put("status", "FAILED");
-    log.info("Sending payment failure: " + payload.toString());
-    producer.send(new ProducerRecord<String, String>(paymentsTopic, payload.toString()));
-}
+    private void fail(String orderId, String paymentId, String remarks) {
+        JsonObject payload = new JsonObject();
+        payload.put("orderId", orderId);
+        payload.put("paymentId", paymentId);
+        payload.put("remarks", remarks);
+        payload.put("status", "FAILED");
+        log.info("Sending payment failure: " + payload.toString());
+        producer.send(new ProducerRecord<String, String>(paymentsTopic, payload.toString()));
+    }
 ~~~
 
 Next, add a method that will receive events from Kafka. We will use the MicroProfile reactive messaging API `@Incoming` annotation to do this.
@@ -220,14 +220,14 @@ And finally, we need a method to initialize the Kafka producer (the consumer wil
  * Add this code to the `// TODO: Add init method here` marker:
 
 ~~~java
-public void init(@Observes StartupEvent ev) {
-    Properties props = new Properties();
+    public void init(@Observes StartupEvent ev) {
+        Properties props = new Properties();
 
-    props.put("bootstrap.servers", bootstrapServers);
-    props.put("value.serializer", paymentsTopicValueSerializer);
-    props.put("key.serializer", paymentsTopicKeySerializer);
-    producer = new KafkaProducer<String, String>(props);
-}
+        props.put("bootstrap.servers", bootstrapServers);
+        props.put("value.serializer", paymentsTopicValueSerializer);
+        props.put("key.serializer", paymentsTopicKeySerializer);
+        producer = new KafkaProducer<String, String>(props);
+    }
 ~~~
 
 This method will consume Kafka streams from the `orders` topic and call our `handleCloudEvent()` method. Later on we'll delete this method and use Knative Events to handle the incoming stream. But for now we'll use this method to listen to the topic.
@@ -302,10 +302,10 @@ This will build an executable JAR file in the `target/` directory.
 Wait for that command to report `replication controller payment-1 successfully rolled out` before continuing.
 
 > **NOTE:**
->  Even if the rollout command reports success the application may not be ready yet and the reason for
+> Even if the rollout command reports success the application may not be ready yet and the reason for
 > that is that we currently don't have any liveness check configured.
 
-* Testing the Application
+ * Testing the Application
 
 Go to _Workloads > Pods_ on the left menu then search `kafka-cluster` pods. Click on the `my-cluster-kafka-0` pod:
 
@@ -325,8 +325,7 @@ First, fetch the URL of our new payment service and store it in an environment v
 
 `export URL="http://$(oc get route | grep payment | awk '{print $2}')"`
 
-Then execute this to HTTP POST a message to our payment service with an example order
-:
+Then execute this to HTTP POST a message to our payment service with an example order:
 
 ~~~shell
 curl -i -H 'Content-Type: application/json' -X POST -d'{"orderId": "12321","total": "232.23", "creditCard": {"number": "4232454678667866","expiration": "04/22","nameOnCard": "Jane G Doe"}, "billingAddress": "123 Anystreet, Pueblo, CO 32213", "name": "Jane Doe"}' $URL
@@ -335,7 +334,8 @@ curl -i -H 'Content-Type: application/json' -X POST -d'{"orderId": "12321","tota
 The payment service will recieve this _order_ and produce a _payment_ result on the Kafka _payment_ topic. You will see the following result in `Pod Terminal`:
 
 ~~~shell
-{"orderId":"12321","paymentId":"25658","remarks":"Payment of 232.23 succeeded for Jane Doe CC details: {\"number\":\"4232454678667866\",\"expiration\":\"04/22\",\"nameOnCard\":\"Jane G Doe\"}","status":"COMPLETED"}~~~
+{"orderId":"12321","paymentId":"25658","remarks":"Payment of 232.23 succeeded for Jane Doe CC details: {\"number\":\"4232454678667866\",\"expiration\":\"04/22\",\"nameOnCard\":\"Jane G Doe\"}","status":"COMPLETED"}
+~~~
 
 ![payment]({% image_path payment_curl_result.png %})
 
@@ -426,7 +426,6 @@ Now that we have those methods, lets add a call to our `sendOrder()` method when
         sendOrder(order, cartId);
         return shoppingCartService.checkout(cartId);
     }
-
 ~~~
 
 Almost there! Next let's add the configuration to our `application.properties` file (in the `src/main/resources` of the `cart-service` project):
@@ -566,7 +565,6 @@ mp.messaging.incoming.orders.group.id=order-service
 mp.messaging.incoming.orders.auto.offset.reset=earliest
 mp.messaging.incoming.orders.enable.auto.commit=true
 mp.messaging.incoming.orders.request.timeout.ms=30000
-
 ~~~
 
 ##### Re-Deploying Order service to OpenShift
