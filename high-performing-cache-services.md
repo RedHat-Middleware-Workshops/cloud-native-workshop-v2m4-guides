@@ -194,6 +194,8 @@ And now we can access using curl once again to find all inventories:
 
 You will see the following result:
 
+> **NOTE** It may take a few tries to get the below result as the pod spins up. Keep trying until you get the below output!
+
 ~~~shell
 [{"id":1,"itemId":"329299","link":"http://maps.google.com/?q=Raleigh","location":"Raleigh","quantity":736},{"id":2,"itemId":"329199","link":"http://maps.google.com/?q=Bost
 on","location":"Boston","quantity":512},{"id":3,"itemId":"165613","link":"http://maps.google.com/?q=Seoul","location":"Seoul","quantity":256},{"id":4,"itemId":"165614","li
@@ -303,6 +305,8 @@ And now we can access using curl once again to find a certain inventory:
 `curl $URL/api/product/329299 ; echo`
 
 You will see the following result:
+
+> **NOTE** It may take a few tries to get the below result as the pod spins up. Keep trying until you get the below output! Also, you may get `quantity:0` for the first few times as the link to the inventory service is established.
 
 `{"itemId":"329299","name":"Red Fedora","desc":"Official Red Hat Fedora","price":34.99,"quantity":736}`
 
@@ -437,7 +441,7 @@ Notice that the entities match our proto file. The rest or Getters and Setters, 
 
 Lets go ahead and create a `Marshaller `for our Product class which will do exactly what we intend, read and write to our cache.
 
-Create a new Java class called `ProductMarshaller.java` in `com.redhat.cloudnative.model`
+Create a new Java class called `ProductMarshaller.java` in `com.redhat.cloudnative.model` and copy the below code into the file:
 
 ~~~java
 package com.redhat.cloudnative.model;
@@ -492,7 +496,7 @@ public class ProductMarshaller implements MessageMarshaller<Product> {
 
 So now we have the capability to read from a `ProtoStream` and `Write` to it. And this will be done directly into our cache. We have already created the other model classes and mashallers, feel free to look around.
 
-Now its time to configure our `RemoteCache`, since its not embedded into our service. Open the file `com.redhat.cloudnative.Producers`.
+Now its time to configure our `RemoteCache`, since its not embedded into our service. Open the `Producers.java` file in the `com.redhat.cloudnative` directory/package.
 
 We use the producer to ensure our RemoteCache gets instantiated. We create methods called getCache and getConfigBuilder
 
@@ -584,6 +588,8 @@ finally, we add the `@Operation` annotation for some documentation, which is imp
 
 Take this opportunity to look at some of the other methods. You will find `@POST` and `@DELETE` and also the paths they adhere too. This is how we can construct a simple Endpoint for our application.
 
+> **NOTE**
+> There are other `// TODO` markers and commented-out code we will use later. Leave them alone for now.
 
 ##### Package and Deploy the cart-service
 
@@ -630,7 +636,7 @@ With the app deployed, we can check out the API page that Quarkus generates.
 
 Run this command in the CodeReady Terminal to discover the URL to the app:
 
-`echo http://$(oc get route cart -o=go-template --template='{{ .spec.host }}')/swagger-ui`
+`echo http://$(oc get route cart -o=go-template --template={% raw %}'{{ .spec.host }}'{% endraw %})/swagger-ui`
 
 Open this URL in your browser!
 

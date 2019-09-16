@@ -329,14 +329,13 @@ Then execute this to HTTP POST a message to our payment service with an example 
 :
 
 ~~~shell
-curl -i -H 'Content-Type: application/json' -X POST -d'{"key": "12321","total": 232.23, "creditCard": {"number": "4232454678667866","expiration": "04/22","nameOnCard": "Jane G Doe"}, "billingAddress": "123 Anystreet, Pueblo, CO 32213", "name": "Jane Doe"}' $URL
+curl -i -H 'Content-Type: application/json' -X POST -d'{"orderId": "12321","total": "232.23", "creditCard": {"number": "4232454678667866","expiration": "04/22","nameOnCard": "Jane G Doe"}, "billingAddress": "123 Anystreet, Pueblo, CO 32213", "name": "Jane Doe"}' $URL
 ~~~
 
 The payment service will recieve this _order_ and produce a _payment_ result on the Kafka _payment_ topic. You will see the following result in `Pod Terminal`:
 
 ~~~shell
-{"orderId":"12321","paymentId":"40173","remarks":"Payment of 232.23 succeeded for Jane Doe CC details: {\"number\":\"4232454678667866\",\"expiration\":\"04/22\",\"nameOnCard\":\"Jane G Doe\"}","status":"COMPLETED"}
-~~~
+{"orderId":"12321","paymentId":"25658","remarks":"Payment of 232.23 succeeded for Jane Doe CC details: {\"number\":\"4232454678667866\",\"expiration\":\"04/22\",\"nameOnCard\":\"Jane G Doe\"}","status":"COMPLETED"}~~~
 
 ![payment]({% image_path payment_curl_result.png %})
 
@@ -382,11 +381,11 @@ This will add the Kafka extension and APIs to our Cart service app.
 
 Next, un-comment (or add if they are missing) the following `import` statements:
 
-```java
+~~~java
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-```
+~~~
 
 The init method as it denotes creates the Kafka configuration, we have externalized this configuration and injected the variables as properties on the class.
 
@@ -598,7 +597,7 @@ Let's confirm if the all services works correctly using `Kafka` messaging via co
 
 Let's go shopping! Open the Web UI in your browser. To get the URL to the Web UI, run this command in CodeReady _Terminal_:
 
-`echo $(oc get route coolstore-ui -o=go-template --template='{{ .spec.host }}')`
+`echo $(oc get route coolstore-ui -o=go-template --template={% raw %}'{{ .spec.host }}'{% endraw %})`
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 
