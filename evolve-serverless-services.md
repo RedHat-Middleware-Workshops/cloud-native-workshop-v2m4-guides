@@ -66,7 +66,7 @@ your code and let your code focus on the underlying business domain.
 
 ---
 
-Let’s now produce a native executable for our Quarkus application. It improves the startup time of the application, and produces a minimal disk and
+Let’s now produce a native executable for an example Quarkus application. It improves the startup time of the application, and produces a minimal disk and
 memory footprint. The executable would have everything to run the application including the `JVM`(shrunk to be just enough to run the application),
 and the application. This is accomplished using [GraalVM](https://graalvm.org/).
 
@@ -89,18 +89,30 @@ as opposed to every time the application starts, which is the case with other ap
 
 Let's find out why Quarkus calls itself _SuperSonic Subatomic Subatomic Java_. Let's build a sample app. In CodeReady Terminal, run this command:
 
-`mkdir /tmp/hello && cd /tmp/hello && \
+~~~sh
+mkdir /tmp/hello && cd /tmp/hello && \
  mvn io.quarkus:quarkus-maven-plugin:0.21.1:create \
     -DprojectGroupId=org.acme \
     -DprojectArtifactId=getting-started \
     -DclassName="org.acme.quickstart.GreetingResource" \
-    -Dpath="/hello"`{{execute}}
+    -Dpath="/hello"
+~~~
 
 This will create a simple Quarkus app in the `/tmp/hello` directory.
 
 Mext, create a `native executable` with this command:
 
-`mvn -f /tmp/hello clean package -Pnative`
+`mvn -f /tmp/hello clean package -Pnative -DskipTests`
+
+> This may take a minute or two to run. One of the benefits of Quarkus is amazingly fast startup time, at the expense of a longer build time to optimize and remove dead code, process annotations, etc. This is only incurred once, at build time rather than *every* startup!
+
+> NOTE: You can safely ignore any warnings like `Warning: RecomputeFieldValue.FieldOffset automatic substitution failed`.
+These are harmless and will be removed in future releases of Quarkus.
+
+> NOTE: Since we are on Linux in this environment, and the OS that will eventually run our application is also Linux, we can use our local OS to
+build the native Quarkus app. If you need to build native Linux binaries when on other OS’s like Windows or Mac OS X, you’ll need to have Docker
+installed and then use `mvn clean package -Pnative -Dnative-image.docker-build=true -DskipTests=true`.
+
 
 ![serverless]({% image_path payment-native-image-build.png %})
 
@@ -139,42 +151,26 @@ This shows that our process is taking around `50 MB` of memory ([Resident Set Si
 
 Make sure the app works. In a new CdeReady Workspaces Terminal run:
 
-`curl -i http://localhost:8080; echo`
+`curl -i http://localhost:8080/hello; echo`
 
-You should see the return code:
+You should see the return:
 
-`hello world!`
+~~~console
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 5
+Date: Mon, 16 Sep 2019 03:35:40 GMT
+
+hello
+~~~
 
 `Congratuations!` You’ve now built a Java application as a native executable JAR and a Linux native binary. We’ll explore the benefits of native
 binaries later in when we start deploying to Kubernetes.
 
 Before moving to the next step, go to the first Terminal tab and press `CTRL+C` to stop our native app (or close the Terminal window).
 
-##### Re-Build Native Image and Run it on OpenShift
-
-Now let's compile the payment service to native just like we did with our hello world app.
-
-Open the `payment-service/pom.xml` in the editor, then in the CodeReady command palette, Choose `Build Native Quarkus App`.
-
-This will execute `mvn clean package -Pnative` behind the scenes. The `-Pnative` argument selects the native maven profile which invokes the Graal compiler.
-
-![serverless]({% image_path native-image-build-palette.png %})
-
-`This will take about 3-4 minutes to finish. Wait for it!`
-
-![serverless]({% image_path native-image-build.png %})
-
-> NOTE: You can safely ignore any warnings like `Warning: RecomputeFieldValue.FieldOffset automatic substitution failed`.
-These are harmless and will be removed in future releases of Quarkus.
-
-> NOTE: Since we are on Linux in this environment, and the OS that will eventually run our application is also Linux, we can use our local OS to
-build the native Quarkus app. If you need to build native Linux binaries when on other OS’s like Windows or Mac OS X, you’ll need to have Docker
-installed and then use `mvn clean package -Pnative -Dnative-image.docker-build=true -DskipTests=true`.
-
-In addition to the regular files, the build will produce `target/payment-1.0-SNAPSHOT-runner`. This is the native Linux binary. Not a shell script,
-or a JAR file, but a native binary.
-
-#### 2. Deploying the serverless application in Knative Serving
+#### 2. Delete old payment service
 
 ---
 
@@ -197,7 +193,104 @@ First, we need to delete existing `BuildConfig` as it is based an excutable Jar 
 
 `oc delete bc/payment`
 
-Create a new binary build within OpenShift
+We also will delete our existing payment _deployment_ and _route_ since Knative will handle deploying the payment service and routing traffic to its managed pod when needed. Delete the existing payment deployment and its associated route and service with:
+
+`oc delete dc/payment route/payment svc/payment`
+
+#### 3. Enable Knative Eventing integration with Apache Kafka Event
+
+---
+
+Knative Eventing is a system that is designed to address a common need for cloud native development and provides composable primitives to enable `late-binding` event sources and event consumers with below goals:
+
+ * Services are loosely coupled during development and deployed independently.
+
+ * Producer can generate events before a consumer is listening, and a consumer can express an interest in an event or class of events that is not yet being produced.
+
+ * Services can be connected to create new applications without modifying producer or consumer, and with the ability to select a specific subset of events from a particular producer.
+
+The _Apache Kafka Event source_ enables Knative Eventing integration with Apache Kafka. When a message is produced to Apache Kafka, the Event Source will consume the produced message and post that message to the corresponding event sink.
+
+##### Remove direct Knative integration code
+
+Currently our Payment service directly binds to Kafka to listen for events. Now that we have Knative eventing integration, we no longer need this code. Open the `PaymentResource.java` file (in `payment-service/src/main/java/com/redhat/cloudnative` directory).
+
+Delete (or comment out) the `onMessage()` method:
+
+~~~java
+//    @Incoming("orders")
+//    public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
+//            throws IOException {
+//
+//        log.info("Kafka message with value = {} arrived", message.getPayload());
+//        handleCloudEvent(message.getPayload());
+//        return message.ack();
+//    }
+~~~
+
+And delete the configuration for the incoming stream. In `application.properties`, delete (or comment out) the following lines for the _Incoming_ stream:
+
+~~~java
+# Incoming stream (unneeded when using Knative events)
+# mp.messaging.incoming.orders.connector=smallrye-kafka
+# mp.messaging.incoming.orders.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+# mp.messaging.incoming.orders.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+# mp.messaging.incoming.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+# mp.messaging.incoming.orders.group.id=payment-order-service
+# mp.messaging.incoming.orders.auto.offset.reset=earliest
+# mp.messaging.incoming.orders.enable.auto.commit=true
+# mp.messaging.incoming.orders.request.timeout.ms=30000
+~~~
+
+##### Rebuild and re-deploy new Payment service
+
+Open the `payment-service/pom.xml` in the editor, then in the CodeReady command palette, Choose `Build Native Quarkus App`. This will re-build our native executable in the `target/` directory.
+
+Or you can run the commands directly:
+
+`cd /projects/cloud-native-workshop-v2m4-labs/payment-service/`
+
+`mvn clean package -Pnative -DskipTests`
+
+This will execute `mvn clean package -Pnative` behind the scenes. The `-Pnative` argument selects the native maven profile which invokes the Graal compiler.
+
+ * Mext, start and watch the build, which will take about 3-4 minutes to complete:
+
+`oc start-build payment --from-file target/*-runner --follow`
+
+This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
+
+Once that’s done, go to _Builds > Image Streams_ on the left menu then input `payment` to show the payment imagestream. Click on `payment` imagestream:
+
+![serverless]({% image_path payment-is.png %})
+
+In the _Overview_ tab, copy the `IMAGE REPOSITORY` value shown and then open the `payment-service/knative/knative-serving-service.yaml` file and update the `image:` line with this value.
+
+![serverless]({% image_path payment-is-oveview.png %})
+
+~~~yaml
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: payment
+spec:
+  template:
+    metadata:
+      name: payment
+      annotations:
+        # disable istio-proxy injection
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+        # Replace Project name userXX-cloudnativeapps with project in which payment is deployed
+      - image: YOUR_IMAGE_SERVICE_URL:latest
+~~~
+
+The service can then be deployed using the following command via CodeReady Workspaces `Terminal`:
+
+`oc create -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/knative-serving-service.yaml`
+
+Next, Create a new binary build within OpenShift:
 
 `oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:19.2.0 --binary --name=payment -l app=payment`
 
@@ -259,96 +352,32 @@ As default, Knative will automatically scale services down to zero instances whe
 
 ![serverless]({% image_path scale-to-zero-grace-period.png %})
 
-In the meantime, it probably took at least 30 seconds so go back to _Home > Status_ on the left menu and click on **payment-service-v1-deployment**. You will see 0 pods are available:
+In the meantime, it probably took at least 30 seconds so select your `userNN-cloudnativeapps` project using the drop-down at the top and then go back to _Home > Status_ on the left menu and click on **payment-service-v1-deployment**. You will see 0 pods are available:
 
 ![serverless]({% image_path payment-serving-down-to-zero.png %})
 
+You can't access the serverless service using traditional routing (e.g. `oc get route`). Knative maintains its own routing table for managed services. You can list the routes that knative knows of with:
+
+`oc get rt`
+
+~~~console
+
+NAME      URL                                                 READY   REASON
+payment   http://payment.userXX-cloudnativeapps.[subdomain]   True
+~~~
+
+If you send traffic to this endpoint it will trigger the autoscaler to scale the app up. Trigger the app:
+
+~~~sh
+export SVC_URL=$(oc get rt payment -o template={% raw %}'{{ .status.url }}'{% endraw %})
+curl -i -H 'Content-Type: application/json' -d '{"foo": "bar"}' $SVC_URL
+~~~
+
+This will send some dummy data to the `payment` service,  but more importantly it triggered knative
+to spin up the pod again automatically, and will shut it down 30 seconds later.
+
 `Congratulations!` You've now deployed the payment service as a Quarkus native image, served with _Knative Serving_, quicker than traditional Java applications. This is not the end of Knative capabilites so we will now see how the payment service will scale up _magically_ in the following exercises.
 
-#### 3. Enable Knative Eventing integration with Apache Kafka Event
-
----
-
-Knative Eventing is a system that is designed to address a common need for cloud native development and provides composable primitives to enable `late-binding` event sources and event consumers with below goals:
-
- * Services are loosely coupled during development and deployed independently.
-
- * Producer can generate events before a consumer is listening, and a consumer can express an interest in an event or class of events that is not yet being produced.
-
- * Services can be connected to create new applications without modifying producer or consumer, and with the ability to select a specific subset of events from a particular producer.
-
-The _Apache Kafka Event source_ enables Knative Eventing integration with Apache Kafka. When a message is produced to Apache Kafka, the Event Source will consume the produced message and post that message to the corresponding event sink.
-
-##### Remove direct Knative integration code
-
-Currently our Payment service directly binds to Kafka to listen for events. Now that we have Knative eventing integration, we no longer need this code. Open the `PaymentResource.java` file (in `payment-service/src/main/java/com/redhat/cloudnative` directory).
-
-Delete (or comment out) the `onMessage()` method:
-
-~~~java
-//    @Incoming("orders")
-//    public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
-//            throws IOException {
-//
-//        log.info("Kafka message with value = {} arrived", message.getPayload());
-//        handleCloudEvent(message.getPayload());
-//        return message.ack();
-//    }
-~~~
-
-And delete the configuration for the incoming stream. In `application.properties`, delete (or comment out) the following lines for the _Incoming_ stream:
-
-~~~java
-# Incoming stream (unneeded when using Knative events)
-# mp.messaging.incoming.orders.connector=smallrye-kafka
-# mp.messaging.incoming.orders.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
-# mp.messaging.incoming.orders.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
-# mp.messaging.incoming.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092
-# mp.messaging.incoming.orders.group.id=payment-order-service
-# mp.messaging.incoming.orders.auto.offset.reset=earliest
-# mp.messaging.incoming.orders.enable.auto.commit=true
-# mp.messaging.incoming.orders.request.timeout.ms=30000
-~~~
-
-##### Rebuild and re-deploy new Payment service
-
-Open the `payment-service/pom.xml` in the editor, then in the CodeReady command palette, Choose `Build Native Quarkus App`. This will re-build our native executable in the `target/` directory.
-
- * Mext, start and watch the build, which will take about 3-4 minutes to complete:
-
-`oc start-build payment --from-file target/*-runner --follow`
-
-This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
-
-Once that’s done, go back to _Builds > Image Streams_ on the left menu then input `payment` to show the payment imagestream. Click on `payment` imagestream:
-
-![serverless]({% image_path payment-is.png %})
-
-In the _Overview_ tab, copy the `IMAGE REPOSITORY` value shown and then open the `payment-service/knative/knative-serving-service.yaml` file and update the `image:` line with this value.
-
-![serverless]({% image_path payment-is-oveview.png %})
-
-~~~yaml
-apiVersion: serving.knative.dev/v1alpha1
-kind: Service
-metadata:
-  name: payment
-spec:
-  template:
-    metadata:
-      name: payment
-      annotations:
-        # disable istio-proxy injection
-        sidecar.istio.io/inject: "false"
-    spec:
-      containers:
-        # Replace Project name userXX-cloudnativeapps with project in which payment is deployed
-      - image: YOUR_IMAGE_SERVICE_URL:latest
-~~~
-
-The service can then be re-deployed using the following command via CodeReady Workspaces `Terminal`:
-
-`oc replace -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/knative-serving-service.yaml`
 
 ##### Create Knative event source
 
@@ -376,6 +405,15 @@ The object can then be deployed using the following command via CodeReady Worksp
 `oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/kafka-event-source.yaml`
 
 ![serverless]({% image_path kafka-event-source.png %})
+
+You can also see a new pod spun up which will manage the connection between Kafka and our `payments` service:
+
+`oc get pods -l knative-eventing-source-name=kafka-source`
+
+~~~console
+NAME                                  READY   STATUS    RESTARTS   AGE
+kafka-source-h7rz5-545fcf4bd7-2ngds   1/1     Running   0          3m19s
+~~~
 
 Great job!
 
