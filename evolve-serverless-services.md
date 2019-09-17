@@ -116,7 +116,7 @@ installed and then use `mvn clean package -Pnative -Dnative-image.docker-build=t
 
 ![serverless]({% image_path payment-native-image-build.png %})
 
-Since our environment here is Linux, you can just run it. In the CodeReady Workspaces `Terminal`, run:
+Since our environment here is Linux, you can just run it. In the CodeReady Workspaces Terminal, run:
 
 `/tmp/hello/target/*-runner`
 
@@ -191,7 +191,7 @@ you can play with [Installing the Knative Serving Operator](https://knative.dev/
 
 First, we need to delete existing `BuildConfig` as it is based an excutable Jar that we deployed it in lab 2.
 
-`oc delete bc/payment`
+`oc delete bc/payment dc/payment route/payment svc/payment`
 
 We also will delete our existing payment _deployment_ and _route_ since Knative will handle deploying the payment service and routing traffic to its managed pod when needed. Delete the existing payment deployment and its associated route and service with:
 
@@ -292,7 +292,7 @@ spec:
       - image: YOUR_IMAGE_SERVICE_URL:latest
 ~~~
 
-The service can then be deployed using the following command via CodeReady Workspaces `Terminal`:
+The service can then be deployed using the following command via CodeReady Workspaces Terminal:
 
 `oc create -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/knative-serving-service.yaml`
 
@@ -347,7 +347,7 @@ to spin up the pod again automatically, and will shut it down 30 seconds later.
 
 In this lab, Knative Eventing is already installed but if you want to install it in your own OpenShift cluster then you can install it via the _Knative Eventing Operator_ in OpenShift web console.
 
-Open `knative/kafka-event-source.yaml` (in the `payment-service` project) to define a `KafkaSource` to integrate with the Knative Eventing. Copy the following YAML code to this file:
+Open `knative/kafka-event-source.yaml` (in the _payment-service_ project) to define a _KafkaSource_ to integrate with the Knative Eventing. Copy the following YAML code to this file:
 
 ~~~yaml
 apiVersion: sources.eventing.knative.dev/v1alpha1
@@ -364,13 +364,13 @@ spec:
     name: payment
 ~~~
 
-The object can then be deployed using the following command via CodeReady Workspaces `Terminal`:
+The object can then be deployed using the following command via CodeReady Workspaces Terminal:
 
 `oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/kafka-event-source.yaml`
 
 ![serverless]({% image_path kafka-event-source.png %})
 
-You can also see a new pod spun up which will manage the connection between Kafka and our `payments` service:
+You can also see a new pod spun up which will manage the connection between Kafka and our **payments** service:
 
 `oc get pods -l knative-eventing-source-name=kafka-source`
 
@@ -538,10 +538,9 @@ Create the following Tekton tasks which will be used in the `Pipelines`:
 
 `oc create -f knative/pipeline/s2i-java-8-task.yaml`
 
-You can take a look at the list of install tasks using the [Tekton CLI](https://github.com/tektoncd/cli/releases) that already installed
-in CodeReady Workspaces `Terminal`:
+Let's confirm if the **tasks** are installed properly using [Tekton CLI](https://github.com/tektoncd/cli/releases) that already installed in CodeReady Workspaces.
 
-`tkn task ls`
+`tkn task list`
 
 ~~~shell
 openshift-client   50 seconds ago
@@ -657,7 +656,7 @@ spec:
 
 Create the above pipeline resources via the OpenShift web console via `Add → Import YAML`.
 
-You can see the list of resources created in CodeReady Workspaces `Terminal`:
+You can see the list of resources created in CodeReady Workspaces Terminal:
 
 `tkn resource ls`
 
@@ -667,7 +666,7 @@ petclinic-git     git     url: https://github.com/spring-projects/spring-petclin
 petclinic-image   image   url: image-registry.openshift-image-registry.svc:5000/userXX-cloudnative-pipeline/spring-petclinic
 ~~~
 
-A `PipelineRun` is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. You can start the pipeline in CodeReady Workspaces `Terminal`:
+A `PipelineRun` is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. You can start the pipeline in CodeReady Workspaces Terminal:
 
 ~~~shell
 tkn pipeline start petclinic-deploy-pipeline \
@@ -693,8 +692,9 @@ petclinic-deploy-pipeline   21 seconds ago   petclinic-deploy-pipeline-run-97kdv
 
 Check out the logs of the pipeline as it runs using the `tkn pipeline logs` command which interactively allows you to pick the pipelinerun of your interest and inspect the logs:
 
+`tkn pipeline logs -f`
+
 ~~~shell
-tkn pipeline logs -f
 ? Select pipeline : petclinic-deploy-pipeline
 ? Select pipelinerun : petclinic-deploy-pipeline-run-97kdv started 39 seconds ago
 
