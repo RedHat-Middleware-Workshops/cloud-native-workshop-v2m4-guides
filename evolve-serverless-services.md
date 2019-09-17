@@ -417,7 +417,7 @@ Add some cool items to your shopping cart in the following shopping scenarios:
 
 This is the same result as before, but using Knative eventing to make a more powerful event-driven system that can scale with demand.
 
-#### (Bonus Lab) Creating Cloud-Native CI/CD Pipelines using Tekton
+#### 5. Creating Cloud-Native CI/CD Pipelines using Tekton
 
 ---
 
@@ -481,7 +481,7 @@ You will use the [Spring PetClinic](https://github.com/spring-projects/spring-pe
 
 Create the Kubernetes objects for deploying the PetClinic app on OpenShift. The deployment will not complete since there are no container images built for the PetClinic application yet. That you will do in the following sections through a CI/CD pipeline.
 
-Replace `userXX-cloudnative-pipeline` with your username:
+Replace `userXX-cloudnative-pipeline` with your username in **knative/pipeline/petclinic.yaml**:
 
 ![serverless]({% image_path petclinic-namespace.png %})
 
