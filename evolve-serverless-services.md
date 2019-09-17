@@ -191,7 +191,7 @@ you can play with [Installing the Knative Serving Operator](https://knative.dev/
 
 First, we need to delete existing `BuildConfig` as it is based an excutable Jar that we deployed it in lab 2.
 
-`oc delete bc/payment dc/payment route/payment svc/payment`
+`oc delete bc/payment`
 
 We also will delete our existing payment _deployment_ and _route_ since Knative will handle deploying the payment service and routing traffic to its managed pod when needed. Delete the existing payment deployment and its associated route and service with:
 
@@ -294,7 +294,7 @@ spec:
 
 The service can then be deployed using the following command via CodeReady Workspaces Terminal:
 
-`oc create -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/knative-serving-service.yaml`
+`oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/knative-serving-service.yaml`
 
 After successful creation of the service we should see a Kubernetes Deployment named similar to `payment-service-v1-deployment` available.
 
@@ -340,10 +340,12 @@ curl -i -H 'Content-Type: application/json' -d '{"foo": "bar"}' $SVC_URL
 This will send some dummy data to the `payment` service,  but more importantly it triggered knative
 to spin up the pod again automatically, and will shut it down 30 seconds later.
 
+![serverless]({% image_path payment-serving-magic.png %})
+
 `Congratulations!` You've now deployed the payment service as a Quarkus native image, served with _Knative Serving_, quicker than traditional Java applications. This is not the end of Knative capabilites so we will now see how the payment service will scale up _magically_ in the following exercises.
 
 
-##### Create Knative event source
+##### Create KafkaSource to enable Knative Eventing
 
 In this lab, Knative Eventing is already installed but if you want to install it in your own OpenShift cluster then you can install it via the _Knative Eventing Operator_ in OpenShift web console.
 
@@ -375,8 +377,8 @@ You can also see a new pod spun up which will manage the connection between Kafk
 `oc get pods -l knative-eventing-source-name=kafka-source`
 
 ~~~console
-NAME                                  READY   STATUS    RESTARTS   AGE
-kafka-source-h7rz5-545fcf4bd7-2ngds   1/1     Running   0          3m19s
+NAME                                 READY   STATUS    RESTARTS   AGE
+kafka-source-jktp9-b6b4c6797-4rspk   2/2     Running   1          21s
 ~~~
 
 Great job!
@@ -387,33 +389,41 @@ Let's make sure if the payment service works properly with Knative features via 
 
 ---
 
+Before getting started, we need to make sure if _payment service_ is scaled down to _zero_ again in _Project Status_:
+
+![serverless]({% image_path payment-down-again.png %})
+
 Let's go shopping! Open the Web UI in your browser. To get the URL to the Web UI, run this command in CodeReady _Terminal_:
 
 `echo $(oc get route coolstore-ui -o=go-template --template='{{ .spec.host }}')`
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 
- * 1) Add a _Red Hat Fedora_ to your cart by click on **Add to Cart**. You will see the `Success! Added!` message under the top munu.
+ * 1) Add a _Froge Laptop Sticker_ to your cart by click on **Add to Cart**. You will see the `Success! Added!` message under the top munu.
 
-![serverless]({% image_path add-to-cart.png %})
+![serverless]({% image_path add-to-cart-serverless.png %})
 
  * 2) Go to the **Your Shopping Cart** tab and click on the **Checkout** button . Input the credit card information. The Card Info should be 16 digits and begin with the digit `4`. For example `4123987754646678`.
 
-![serverless]({% image_path checkout.png %})
+![serverless]({% image_path checkout-serverless.png %})
 
  * 3) Input your Credit Card information to pay for the items:
 
- ![serverless]({% image_path input-cc-info.png %})
+ ![serverless]({% image_path input-cc-info-serverless.png %})
 
- * 4) Confirm the _Payment Status_ of the your shopping items in the **All Orders** tab. It should be `Processing`.
+ * 4) Let's find out how _Kafka Event_ enables _Knative Eventing_. Go back to _Project Status_ in OpenShift Web Console then confirm if _payment service_ is up automatically. It's `MAGIC!!`
 
- ![serverless]({% image_path payment-processing.png %})
+  ![serverless]({% image_path payment-up-again.png %})
+
+ * 5) Confirm the _Payment Status_ of the your shopping items in the **All Orders** tab. It should be `Processing`.
+
+ ![serverless]({% image_path payment-processing-serverless.png %})
 
  * 5) After a few moments, reload the **All Orders** page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
 
  >`Note`: If the status is still `Processing`, the order service is processing incoming Kafka messages and store thme in MongoDB. Please reload the page a few times more.
 
- ![serverless]({% image_path payment-completedorfailed.png %})
+ ![serverless]({% image_path payment-completedorfailed-serverless.png %})
 
 This is the same result as before, but using Knative eventing to make a more powerful event-driven system that can scale with demand.
 
