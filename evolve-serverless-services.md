@@ -699,10 +699,17 @@ Check out the logs of the pipeline as it runs using the `tkn pipeline logs` comm
 ? Select pipelinerun : petclinic-deploy-pipeline-run-97kdv started 39 seconds ago
 
 ...
-[build : nop] Build successful
-[deploy : build-step-oc] deploymentconfig.apps.openshift.io/spring-petclinic rolled out
-[deploy : nop] Build successful
+[build : push] Copying config sha256:6c2be43b49deee05b0dee97bd23dab0dcfd9b1b6352fd085f833f62e7d106ae8
+[build : push] Writing manifest to image destination
+[build : push] Copying config sha256:6c2be43b49deee05b0dee97bd23dab0dcfd9b1b6352fd085f833f62e7d106ae8
+[build : push] Writing manifest to image destination
+...
+[build : image-digest-exporter-bj6dr] 2019/09/17 05:06:09 Image digest exporter output: []
+[deploy : oc] deploymentconfig.apps.openshift.io/spring-petclinic rolled out
+
 ~~~
+
+>`Note`: The build log(_ImageResource petclinic-image doesn't have an index.json file_) doesn't mean an error but it's vailation check. Even if you're failed, **Pipeline Build` will continue.
 
 After a few minutes, the pipeline should finish successfully.
 
