@@ -719,7 +719,7 @@ Check out the logs of the pipeline as it runs using the `tkn pipeline logs` comm
 
 ~~~
 
->`Note`: The build log(_ImageResource petclinic-image doesn't have an index.json file_) doesn't mean an error but it's vailation check. Even if you're failed, **Pipeline Build` will continue.
+>`Note`: The build log(_ImageResource petclinic-image doesn't have an index.json file_) doesn't mean an error but it's vailation check. Even if you're failed, **Pipeline Build** will continue.
 
 After a few minutes, the pipeline should finish successfully.
 
