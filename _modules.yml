@@ -1,6 +1,3 @@
-# config:
-#     renderer: markdown
-
 modules:
   cloud-native-architectures:
     name: Cloud-Native Application Architectures
