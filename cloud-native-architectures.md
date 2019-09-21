@@ -96,40 +96,31 @@ HTTP microservices, reactive applications, message-driven microservices and serv
 
 ---
 
-##### Connnecting to Openshift
-
-When you access OpenShift web console or the other route URL via HTTPS protocol, you will see `Your Connection is not secure` warning message.
-Because, OpenShift uses self-certification to create TLS termication route as default. For example, if you're using Firefox, you will see the following screen.
-
-Click on `Advanced > Add Exception...` then, you can access the HTTPS page when you click on `Confirm Security Exception`!!!
-
-![warning]({% image_path browser_warning.png %})
-
 ##### Access Your Development Environment
 
-You will be using Red Hat CodeReady Workspaces, an online IDE based on https://www.eclipse.org/che/[Eclipe Che,window=_blank]. **Changes to files are auto-saved every few seconds**, so you don't need to explicitly save changes.
+You will be using Red Hat CodeReady Workspaces, an online IDE based on [Eclipe Che](https://www.eclipse.org/che/){:target="_blank"}. **Changes to files are auto-saved every few seconds**, so you don't need to explicitly save changes.
 
-To get started, {{ ECLIPSE_CHE_URL }}[access the Che instance,window=_blank] and log in using the username and password you've been assigned (e.g. `{{ CHE_USER_NAME }}/{{ CHE_USER_PASSWORD }}`):
+To get started, [access the Che instance]({{ ECLIPSE_CHE_URL }}) and log in using the username and password you've been assigned (e.g. `{{ CHE_USER_NAME }}/{{ CHE_USER_PASSWORD }}`):
 
-image::che-login.png
+![cdw]({% image_path che-login.png %}){:width="400px"}
 
 Once you log in, you'll be placed on your personal dashboard. We've pre-created workspaces for you to use. Click on the name of the pre-created workspace on the left, as shown below (the name will be different depending on your assigned number). You can also click on the name of the workspace in the center, and then click on the green button that says "OPEN" on the top right hand side of the screen:
 
-image::che-precreated.png[precreated,800]
+![cdw]({% image_path che-precreated.png %}){:width="800px"}
 
 After a minute or two, you'll be placed in the workspace:
 
-image::che-workspace.png[workspace,800]
+![cdw]({% image_path che-workspace.png %}){:width="800px"}
 
 Users of Eclipse, IntelliJ IDEA or Visual Studio Code will see a familiar layout: a project/file browser on the left, a code editor on the right, and a terminal at the bottom. You'll use all of these during the course of this workshop, so keep this browser tab open throughout. **If things get weird, you can simply reload the browser tab to refresh the view.**
 
 To gain extra screen space, click on the yellow arrow to hide the left menu (you won't need it):
 
-image::che-realestate.png[screen,600]
+![cdw]({% image_path che-realestate.png %}){:width="600px"}
 
 To save screen space, you can hide the Git Repository window on the right:
 
-image::che-realestate2.png[githide,800]
+![cdw]({% image_path che-realestate2.png %}){:width="800px"}
 
 Now you can import the project skeletons into your workspace.
 
@@ -158,7 +149,15 @@ Choose `Maven` from the project configurations and then click on `Save`.
 
 Repeat the above for inventory and catalog projects.
 
-> `NOTE`: the Terminal window in CodeReady Workspaces. For the rest of these labs, anytime you need to run 
-a command in a terminal, you can use the CodeReady Workspaces `Terminal` window.
+> `NOTE`: the Terminal window in CodeReady Workspaces. For the rest of these labs, anytime you need to run a command in a terminal, you can use the CodeReady Workspaces `Terminal` window.
 
 ![codeready-workspace-terminal]({% image_path codeready-workspace-terminal.png %})
+
+##### Connnecting to Openshift
+
+When you access OpenShift web console or the other route URL via HTTPS protocol, you will see `Your Connection is not secure` warning message.
+Because, OpenShift uses self-certification to create TLS termication route as default. For example, if you're using Firefox, you will see the following screen.
+
+Click on `Advanced > Add Exception...` then, you can access the HTTPS page when you click on `Confirm Security Exception`!!!
+
+![warning]({% image_path browser_warning.png %})
