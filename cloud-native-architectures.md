@@ -149,7 +149,7 @@ Repeat the above for inventory and catalog projects.
 
 ##### Connnecting to Openshift
 
-When you access OpenShift web console or the other route URL via HTTPS protocol, you will see `Your Connection is not secure` warning message.
+When you access [OpenShift web console]({{ CONSOLE_URL}}) or the other route URL via HTTPS protocol, you will see `Your Connection is not secure` warning message.
 Because, OpenShift uses self-certification to create TLS termication route as default. For example, if you're using Firefox, you will see the following screen.
 
 Click on `Advanced > Add Exception...` then, you can access the HTTPS page when you click on `Confirm Security Exception`!!!

@@ -347,7 +347,7 @@ to spin up the pod again automatically, and will shut it down 30 seconds later.
 
 ##### Create KafkaSource to enable Knative Eventing
 
-In this lab, Knative Eventing is already installed but if you want to install it in your own OpenShift cluster then you can install it via the _Knative Eventing Operator_ in OpenShift web console.
+In this lab, Knative Eventing is already installed but if you want to install it in your own OpenShift cluster then you can install it via the _Knative Eventing Operator_ in [OpenShift web console]({{ CONSOLE_URL}}).
 
 Open `knative/kafka-event-source.yaml` (in the _payment-service_ project) to define a _KafkaSource_ to integrate with the Knative Eventing. Copy the following YAML code to this file:
 
@@ -411,7 +411,7 @@ Add some cool items to your shopping cart in the following shopping scenarios:
 
  ![serverless]({% image_path input-cc-info-serverless.png %})
 
- * 4) Let's find out how _Kafka Event_ enables _Knative Eventing_. Go back to _Project Status_ in OpenShift Web Console then confirm if _payment service_ is up automatically. It's `MAGIC!!`
+ * 4) Let's find out how _Kafka Event_ enables _Knative Eventing_. Go back to _Project Status_ in [OpenShift web console]({{ CONSOLE_URL}}) then confirm if _payment service_ is up automatically. It's `MAGIC!!`
 
   ![serverless]({% image_path payment-up-again.png %})
 
@@ -499,7 +499,7 @@ Then create the object in Kubernetes:
 
 `oc create -f knative/pipeline/petclinic.yaml`
 
-You should be able to see the deployment in the OpenShift Web Console.
+You should be able to see the deployment in the [OpenShift web console]({{ CONSOLE_URL}}).
 
 ![serverless]({% image_path petclinic-deployed-1.png %})
 
@@ -613,7 +613,7 @@ You might have noticed that there are no references to the PetClinic Git reposit
 
 The execution order of `tasks` is determined by dependencies that are defined between the tasks via `inputs` and `outputs` as well as explicit orders that are defined via `runAfter`.
 
-In the OpenShift web console, you can click on _Add > Import YAML_ at the top right of the screen while you are in the `userXX-cloudnative-pipeline` project.
+In the [OpenShift web console]({{ CONSOLE_URL}}), you can click on _Add > Import YAML_ at the top right of the screen while you are in the `userXX-cloudnative-pipeline` project.
 
 ![serverless]({% image_path console-import-yaml-1.png %})
 
@@ -632,11 +632,11 @@ petclinic-deploy-pipeline  8 seconds ago   ---        ---       ---        ---
 
 ##### Trigger Pipeline
 
-Now that the pipeline is created, you can trigger it to execute the tasks specified in the pipeline. Triggering pipelines is an area that is under development and in the next release it will be possible to be done via the OpenShift web console and Tekton CLI. In this tutorial, you will trigger the pipeline through creating the Kubernetes objects (the hard way!) in order to learn the mechanics of triggering.
+Now that the pipeline is created, you can trigger it to execute the tasks specified in the pipeline. Triggering pipelines is an area that is under development and in the next release it will be possible to be done via the [OpenShift web console]({{ CONSOLE_URL}}) and Tekton CLI. In this tutorial, you will trigger the pipeline through creating the Kubernetes objects (the hard way!) in order to learn the mechanics of triggering.
 
 First, you should create a number of `PipelineResources` that contain the specifics of the Git repository and image registry to be used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
 
-The following `PipelineResource` defines the Git repository and reference for the PetClinic application. Create the following pipeline resources via the OpenShift web console via `Add → Import YAML`:
+The following `PipelineResource` defines the Git repository and reference for the PetClinic application. Create the following pipeline resources via the [OpenShift web console]({{ CONSOLE_URL}}) via `Add → Import YAML`:
 
 ~~~yaml
 apiVersion: tekton.dev/v1alpha1
@@ -650,7 +650,7 @@ spec:
     value: https://github.com/spring-projects/spring-petclinic
 ~~~
 
-And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Create the following pipeline resources via the OpenShift web console via `Add → Import YAML`. Replace your username with `userXX`:
+And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Create the following pipeline resources via the [OpenShift web console]({{ CONSOLE_URL}}) via `Add → Import YAML`. Replace your username with `userXX`:
 
 ~~~yaml
 apiVersion: tekton.dev/v1alpha1
@@ -664,7 +664,7 @@ spec:
     value: image-registry.openshift-image-registry.svc:5000/userXX-cloudnative-pipeline/spring-petclinic
 ~~~
 
-Create the above pipeline resources via the OpenShift web console via `Add → Import YAML`.
+Create the above pipeline resources via the [OpenShift web console]({{ CONSOLE_URL}}) via `Add → Import YAML`.
 
 You can see the list of resources created in CodeReady Workspaces Terminal:
 

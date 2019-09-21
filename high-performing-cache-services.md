@@ -972,7 +972,7 @@ Now, we will deploy a presentation layer to OpenShift cluster using `Nodeshift` 
 
 `oc expose svc/coolstore-ui`
 
-Go to `Networking > Routes` in OpenShift web console and click on the route URL of `coolstore-ui`:
+Go to `Networking > Routes` in [OpenShift web console]({{ CONSOLE_URL}}) and click on the route URL of `coolstore-ui`:
 
 ![coolstore-ui]({% image_path web-ui-route.png %})
 
