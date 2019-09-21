@@ -112,15 +112,11 @@ After a minute or two, you'll be placed in the workspace:
 
 ![cdw]({% image_path che-workspace.png %})
 
-Users of Eclipse, IntelliJ IDEA or Visual Studio Code will see a familiar layout: a project/file browser on the left, a code editor on the right, and a terminal at the bottom. You'll use all of these during the course of this workshop, so keep this browser tab open throughout. **If things get weird, you can simply reload the browser tab to refresh the view.**
-
 To gain extra screen space, click on the yellow arrow to hide the left menu (you won't need it):
 
-![cdw]({% image_path che-realestate.png %}
+![cdw]({% image_path che-realestate.png %})
 
-To save screen space, you can hide the Git Repository window on the right:
-
-![cdw]({% image_path che-realestate2.png %}){:width="700px"}
+Users of Eclipse, IntelliJ IDEA or Visual Studio Code will see a familiar layout: a project/file browser on the left, a code editor on the right, and a terminal at the bottom. You'll use all of these during the course of this workshop, so keep this browser tab open throughout. **If things get weird, you can simply reload the browser tab to refresh the view.**
 
 In the project explorer pane, click on the `Import Projects...` and enter the following:
 
