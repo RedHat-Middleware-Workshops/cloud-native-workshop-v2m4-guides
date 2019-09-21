@@ -11,7 +11,9 @@ Then we will also develop cloud native applications based on architecture patter
 
 
 #### Capabilities of a Cloud Native Application Architectures?
+
 ---
+
 The benefits of cloud native application architectures enable speed of development and deployment, flexibility, quality, and reliability. More importantly, it allows developers to integrate the applications with the latest open source technologies without a steep learning curve. While there are many ways to build and architect cloud native applications following are some great ingredients for consideration:
 
  * *Runtimes* - More likely to be written in the container first or/and Kubernetes native language, which means runtimes such as Java, Node.js, Go, Python, and Ruby, etc.
@@ -90,9 +92,12 @@ HTTP microservices, reactive applications, message-driven microservices and serv
   Jaeger, Prometheus, Apacke Kafka, Infinispan, and more.
 
 
-### Getting Ready for the labs
+#### Getting Ready for the labs
 
-#### Connnecting to Openshift
+---
+
+##### Connnecting to Openshift
+
 When you access OpenShift web console or the other route URL via HTTPS protocol, you will see `Your Connection is not secure` warning message.
 Because, OpenShift uses self-certification to create TLS termication route as default. For example, if you're using Firefox, you will see the following screen.
 
@@ -100,47 +105,31 @@ Click on `Advanced > Add Exception...` then, you can access the HTTPS page when 
 
 ![warning]({% image_path browser_warning.png %})
 
-#### Setup CodeReady Workspaces for Lab Environment
+##### Access Your Development Environment
 
----
+You will be using Red Hat CodeReady Workspaces, an online IDE based on https://www.eclipse.org/che/[Eclipe Che,window=_blank]. **Changes to files are auto-saved every few seconds**, so you don't need to explicitly save changes.
 
-> SKIP this setup guide if you have already completed this earlier in the previous Modules
+To get started, {{ ECLIPSE_CHE_URL }}[access the Che instance,window=_blank] and log in using the username and password you've been assigned (e.g. `{{ CHE_USER_NAME }}/{{ CHE_USER_PASSWORD }}`):
 
+image::che-login.png
 
-Follow these instructions to setup the development environment on CodeReady Workspaces. 
+Once you log in, you'll be placed on your personal dashboard. We've pre-created workspaces for you to use. Click on the name of the pre-created workspace on the left, as shown below (the name will be different depending on your assigned number). You can also click on the name of the workspace in the center, and then click on the green button that says "OPEN" on the top right hand side of the screen:
 
-You might be familiar with the Eclipse IDE which is one of the most popular IDEs for Java and other
-programming languages. [CodeReady Workspaces](https://access.redhat.com/documentation/en-us/red_hat_codeready_workspaces) is the next-generation Eclipse IDE which is web-based and gives you a full-featured IDE running in the cloud. You have an CodeReady Workspaces instance deployed on your OpenShift cluster
-which you will use during these labs.
+image::che-precreated.png[precreated,800]
 
-Go to the [CodeReady Workspaces URL]({{ ECLIPSE_CHE_URL }}) in order to configure your development workspace.
+After a minute or two, you'll be placed in the workspace:
 
-First, you need to register as a user. Register and choose the same username and password as 
-your OpenShift credentials.
+image::che-workspace.png[workspace,800]
 
-![codeready-workspace-register]({% image_path codeready-workspace-register.png %})
+Users of Eclipse, IntelliJ IDEA or Visual Studio Code will see a familiar layout: a project/file browser on the left, a code editor on the right, and a terminal at the bottom. You'll use all of these during the course of this workshop, so keep this browser tab open throughout. **If things get weird, you can simply reload the browser tab to refresh the view.**
 
-Log into CodeReady Workspaces with your user. You can now create your workspace based on a stack. A 
-stack is a template of workspace configuration. For example, it includes the programming language and tools needed
-in your workspace. Stacks make it possible to recreate identical workspaces with all the tools and needed configuration
-on-demand. 
+To gain extra screen space, click on the yellow arrow to hide the left menu (you won't need it):
 
-For this lab, click on the `Cloud Native Roadshow` stack and then on the `Create` button. 
+image::che-realestate.png[screen,600]
 
-![codeready-workspace-create-workspace]({% image_path codeready-workspace-create-workspace.png %})
+To save screen space, you can hide the Git Repository window on the right:
 
-Click on `Open` to open the workspace and then on the `Start` button to start the workspace for use, if it hasn't started automatically.
-
-![codeready-workspace-start-workspace]({% image_path codeready-workspace-start-workspace.png %})
-
-You can click on the left arrow icon to switch to the wide view:
-
-![codeready-workspace-wide]({% image_path codeready-workspace-wide.png %})
-
-It takes a little while for the workspace to be ready. When it's ready, you will see a fully functional 
-CodeReady Workspaces IDE running in your browser.
-
-![codeready-workspace-workspace]({% image_path codeready-workspace.png %})
+image::che-realestate2.png[githide,800]
 
 Now you can import the project skeletons into your workspace.
 
