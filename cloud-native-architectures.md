@@ -102,36 +102,34 @@ You will be using Red Hat CodeReady Workspaces, an online IDE based on [Eclipe C
 
 To get started, [access the Che instance]({{ ECLIPSE_CHE_URL }}) and log in using the username and password you've been assigned (e.g. `{{ CHE_USER_NAME }}/{{ CHE_USER_PASSWORD }}`):
 
-![cdw]({% image_path che-login.png %}){:width="400px"}
+![cdw]({% image_path che-login.png %}){:width="700px"}
 
 Once you log in, you'll be placed on your personal dashboard. We've pre-created workspaces for you to use. Click on the name of the pre-created workspace on the left, as shown below (the name will be different depending on your assigned number). You can also click on the name of the workspace in the center, and then click on the green button that says "OPEN" on the top right hand side of the screen:
 
-![cdw]({% image_path che-precreated.png %}){:width="800px"}
+![cdw]({% image_path che-precreated.png %})
 
 After a minute or two, you'll be placed in the workspace:
 
-![cdw]({% image_path che-workspace.png %}){:width="800px"}
+![cdw]({% image_path che-workspace.png %})
 
 Users of Eclipse, IntelliJ IDEA or Visual Studio Code will see a familiar layout: a project/file browser on the left, a code editor on the right, and a terminal at the bottom. You'll use all of these during the course of this workshop, so keep this browser tab open throughout. **If things get weird, you can simply reload the browser tab to refresh the view.**
 
 To gain extra screen space, click on the yellow arrow to hide the left menu (you won't need it):
 
-![cdw]({% image_path che-realestate.png %}){:width="600px"}
+![cdw]({% image_path che-realestate.png %}
 
 To save screen space, you can hide the Git Repository window on the right:
 
-![cdw]({% image_path che-realestate2.png %}){:width="800px"}
-
-Now you can import the project skeletons into your workspace.
+![cdw]({% image_path che-realestate2.png %}){:width="700px"}
 
 In the project explorer pane, click on the `Import Projects...` and enter the following:
 
-> You can find `GIT URL` when you log in {{GIT_URL}} with your credential(i.e. user1 / openshift).
-
   * Version Control System: `GIT`
-  * URL: `{{GIT_URL}}/userXX/cloud-native-workshop-v2m4-labs.git`
+  * URL: `{{GIT_URL}}/userXX/cloud-native-workshop-v2m4-labs.git`(IMPORTANT: replace userXX with your lab user)
   * Check `Import recursively (for multi-module projects)`
   * Name: `cloud-native-workshop-v2m4-labs`
+
+`Tip`: You can find GIT URL when you click on {{GIT_URL}} then login with your credentials. 
 
 ![codeready-workspace-import]({% image_path codeready-workspace-import.png %}){:width="700px"}
 
