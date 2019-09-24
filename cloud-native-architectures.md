@@ -112,6 +112,10 @@ After a minute or two, you'll be placed in the workspace:
 
 ![cdw]({% image_path che-workspace.png %})
 
+You might see **Workspace agent is not running** in the popup message, click on `Restart`:
+
+![cdw]({% image_path che-workspace-restart.png %})
+
 To gain extra screen space, click on the yellow arrow to hide the left menu (you won't need it):
 
 ![cdw]({% image_path che-realestate.png %})
