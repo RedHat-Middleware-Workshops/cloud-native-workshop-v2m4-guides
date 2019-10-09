@@ -24,7 +24,7 @@ when Kafka is running within a platform like Kubernetes but is accessed from out
 [Strimzi](https://strimzi.io/) is an open source project that provides container images and operators for running
 [Apache Kafka](https://developers.redhat.com/videos/youtube/CZhOJ_ysIiI/).
 
-In this lab, we will use productized and supported versions of the Strimzi and Apache Kafka projects through [Red Hat AMQ](https://www.redhat.com/en/technologies/jboss-middleware/amq?extIdCarryOver=true&sc_cid=701f2000001OH7TAAW).
+In this lab, we will use productized and supported versions of the Strimzi and Apache Kafka projects through [Red Hat AMQ](https://www.redhat.com/en/technologies/jboss-middleware/amq?extIdCarryOver=true&sc_cid=701f2000001OH7TAAW){:target="_blank"}.
 
 #### 1. Create a Kafka Cluster and Topics
 
@@ -275,7 +275,7 @@ This will build an executable JAR file in the `target/` directory.
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=payment -l app=payment`
 
-> This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
+> This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index){:target="_blank"}, providing foundational software needed to run Java applications, while staying at a reasonable size.
 
  * Force update the OpenJDK image tags just in case they haven't been imported yet:
 
@@ -456,7 +456,7 @@ Rebuild a container image based the cart artifact that we just packaged, which w
 
 ![cart]({% image_path cart-build-logs.png %})
 
-The cart service will be redeployed automatically via [OpenShift Deployment triggers](https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations) after it completes to build.
+The cart service will be redeployed automatically via [OpenShift Deployment triggers](https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations){:target="_blank"} after it completes to build.
 
 #### 4. Adding Kafka Client to Order Service
 
@@ -585,7 +585,7 @@ Rebuild a container image based the cart artifact that we just packaged, which w
 
 `oc start-build order --from-file target/*-runner.jar --follow`
 
-The order service will be redeployed automatically via [OpenShift Deployment triggers](https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations) after it completes to build.
+The order service will be redeployed automatically via [OpenShift Deployment triggers](https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations){:target="_blank"} after it completes to build.
 
 Let's confirm if the all services works correctly using `Kafka` messaging via coolstore GUI test.
 
