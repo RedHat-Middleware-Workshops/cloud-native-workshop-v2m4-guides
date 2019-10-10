@@ -88,7 +88,7 @@ quarkus.hibernate-orm.database.generation=drop-and-create
 quarkus.hibernate-orm.log.sql=false
 ~~~
 
-Let's run the inventory application locally using `maven plugin command` via CodeReady Workspaces `Terminal`:
+Let's run the inventory application locally using `maven plugin command` via CodeReady Workspaces Terminal:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/inventory-service/`
 
@@ -98,7 +98,7 @@ You should see a bunch of log output that ends with:
 
 ![inventory_service]({% image_path inventory_mvn_compile.png %})
 
-Open a `new` CodeReady Workspaces `Terminal` and invoke the RESTful endpoint using the following CURL commands. The output looks like here:
+Open a `new` CodeReady Workspaces Terminal and invoke the RESTful endpoint using the following CURL commands. The output looks like here:
 
 `curl http://localhost:8080/api/inventory ; echo`
 
@@ -110,18 +110,44 @@ Open a `new` CodeReady Workspaces `Terminal` and invoke the RESTful endpoint usi
 
 `In production`, the inventory service will connect to `PostgeSQL` on `OpenShift` cluster.
 
-We will use `Quarkus extension` to add `PostgreSQL JDBC Driver`. Go back to CodeReady Workspaces `Terminal` and run the following maven plugin:
+We will use `Quarkus extension` to add `PostgreSQL JDBC Driver`. Go back to CodeReady Workspaces Terminal and run the following maven plugin:
 
 `mvn quarkus:add-extension -Dextensions="jdbc-postgresql"`
 
-Package the applicaiton via running the following maven plugin in CodeReady Workspaces`Terminal`:
+Package the applicaiton via running the following maven plugin in CodeReady WorkspacesTerminal:
 
 `mvn clean package -DskipTests -Dquarkus.profile=prod`
 
 > `NOTE`: You should `SKIP` the Unit test because you don't have PostgreSQL database in local environment.
 
-Let's create a cloud-native applications projects in OpenShift cluster and deploy the inventory service as a Linux container.
-To deploy applicaitons to OpenShift via `oc` tool, we need to copy login command and [Login OpenShift]({{ CONSOLE_URL}}) cluster:
+First, open a new brower with the [OpenShift web console]({{ CONSOLE_URL}}){:target="_blank"}
+
+![openshift_login]({% image_path openshift_login.png %})
+
+Login using:
+
+* Username: `userXX`
+* Password: `r3dh4t1!`
+
+> **NOTE**: Use of self-signed certificates
+>
+> When you access the OpenShift web console]({{ CONSOLE_URL}}) or other URLs via _HTTPS_ protocol, you will see browser warnings
+> like `Your > Connection is not secure` since this workshop uses self-signed certificates (which you should not do in production!).
+> For example, if you're using **Chrome**, you will see the following screen.
+>
+> Click on `Advanced` then, you can access the HTTPS page when you click on `Proceed to...`!!!
+>
+> ![warning]({% image_path browser_warning.png %})
+>
+> Other browsers have similar procedures to accept the security exception.
+
+You will see the OpenShift landing page:
+
+![openshift_landing]({% image_path openshift_landing.png %})
+
+> The project displayed in the landing page depends on which labs you will run today. If you will develop `Service Mesh and Identity` then you will see pre-created projects as the above screeenshot.
+
+We'll use `oc` tool to deploy the inventory service in OpenShift cluster. Copy _login command_ in OpenShift web console:
 
 ![codeready-workspace-copy-login-cmd]({% image_path codeready-workspace-oc-login-copy.png %}){:width="700px"}
 
@@ -137,10 +163,10 @@ Click on the link and copy the `oc login` command:
 
 ![openshift_login]({% image_path your_token.png %})
 
-Paste it on CodeReady Workspaces `Terminal` window.
+Paste it on CodeReady Workspaces Terminal window.
 
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data.
-First, deploy a new instance of PostgreSQL by executing the following commands via CodeReady Workspaces `Terminal`:
+First, deploy a new instance of PostgreSQL by executing the following commands via CodeReady Workspaces Terminal:
 
  * Create a new project in OpenShift Cluster. You need to replace `userXX` with your username:
 
@@ -245,7 +271,7 @@ Open `CatalogService.java` in `src/main/java/com/redhat/coolstore/service` direc
 
 ![catalog]({% image_path catalog-service-codes.png %})
 
-Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces `Terminal`:
+Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/catalog-service/`
 
@@ -255,7 +281,7 @@ The build and deploy may take a minute or two. Wait for it to complete. You shou
 end of the build output.
 
 Our production catalog microservice will use an external database (PostgreSQL) to house inventory data.
-First, deploy a new instance of PostgreSQL by executing via CodeReady Workspaces `Terminal`:
+First, deploy a new instance of PostgreSQL by executing via CodeReady Workspaces Terminal:
 
 Make sure if the current project is `userXX-cloudnativeapps`.
 
@@ -597,7 +623,7 @@ Package the cart application via clicking on `Package for OpenShift` in `Command
 
 ![cart]({% image_path quarkus-dev-run-packageforOcp.png %})
 
-Or run the following maven plugin in CodeReady Workspaces`Terminal`:
+Or run the following maven plugin in CodeReady WorkspacesTerminal:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/cart-service/`
 
@@ -659,7 +685,7 @@ All the information between the client and the server are formatted as `JSON`. T
 
 ##### Adding Maven Dependencies using Quarkus Extensions
 
-Execute the following command via CodeReady Workspaces `Terminal`:
+Execute the following command via CodeReady Workspaces Terminal:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
 
@@ -880,7 +906,7 @@ Package the cart application via clicking on `Package for OpenShift` in `Command
 
 ![codeready-workspace-maven]({% image_path quarkus-dev-run-packageforOcp.png %})
 
-Or run the following maven plugin in CodeReady Workspaces`Terminal`:
+Or run the following maven plugin in CodeReady WorkspacesTerminal:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
 
@@ -890,7 +916,7 @@ Or run the following maven plugin in CodeReady Workspaces`Terminal`:
 
 ##### Deploying Order service with MongoDB to OpenShift
 
-Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady Workspaces `Terminal`:
+Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady Workspaces Terminal:
 
 `oc new-app --docker-image mongo:4.0 --name=order-database`
 
@@ -956,13 +982,13 @@ You will see javascripts for specific cloud-native services such as cart, catatl
 
 Now, we will deploy a presentation layer to OpenShift cluster using `Nodeshift` command line tool, a programmable API that you can use to deploy Node.js projects to `OpenShift`.
 
- * Install the `Nodeshift` tool via CodeReady Workspaces `Terminal`:
+ * Install the `Nodeshift` tool via CodeReady Workspaces Terminal:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/coolstore-ui/`
 
 `npm install --save-dev nodeshift`
 
- * Deploy the web-ui service using `Nodeshift` via CodeReady Workspaces `Terminal` and it will take a couple of minutes to complete the web-ui application deployment:
+ * Deploy the web-ui service using `Nodeshift` via CodeReady Workspaces Terminal and it will take a couple of minutes to complete the web-ui application deployment:
 
 `npm run nodeshift`
 

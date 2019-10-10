@@ -150,12 +150,3 @@ Repeat the above for inventory and catalog projects.
 > `NOTE`: the Terminal window in CodeReady Workspaces. For the rest of these labs, anytime you need to run a command in a terminal, you can use the CodeReady Workspaces `Terminal` window.
 
 ![codeready-workspace-terminal]({% image_path codeready-workspace-terminal.png %})
-
-##### Connnecting to Openshift
-
-When you access [OpenShift web console]({{ CONSOLE_URL}}) or the other route URL via HTTPS protocol, you will see `Your Connection is not secure` warning message.
-Because, OpenShift uses self-certification to create TLS termication route as default. For example, if you're using *Chrome Browser*, you will see the following screen.
-
-Click on `Advanced` then, you can access the HTTPS page when you click on `Proceed to...`!!!
-
-![warning]({% image_path browser_warning.png %})

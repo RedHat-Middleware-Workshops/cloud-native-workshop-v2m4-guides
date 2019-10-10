@@ -466,7 +466,7 @@ Like the `payments` service, our `order` service will listen for orders being pl
 
 ##### Adding Maven Dependencies using Quarkus Extensions
 
-Execute the following command via CodeReady Workspaces `Terminal`:
+Execute the following command via CodeReady Workspaces Terminal:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
 
