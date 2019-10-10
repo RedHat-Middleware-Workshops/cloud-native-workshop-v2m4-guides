@@ -34,7 +34,7 @@ It makes complex mappings possible, but it does not make simple and common mappi
 Panache focuses on making your entities trivial and fun to write in Quarkus.
 
 When you open `Inventory.java` in `src/main/java/com/redhat/cloudnative/` as below, you will understand how easy to create a domain model
-using Quarkus extension([Hibernate ORM with Panache](https://quarkus.io/guides/hibernate-orm-panache-guide)).
+using Quarkus extension([Hibernate ORM with Panache](https://quarkus.io/guides/hibernate-orm-panache-guide){:target="_blank"}).
 
 ~~~java
 @Entity
@@ -120,6 +120,7 @@ Package the applicaiton via running the following maven plugin in CodeReady Work
 
 > `NOTE`: You should `SKIP` the Unit test because you don't have PostgreSQL database in local environment.
 
+<<<<<<< HEAD
 First, open a new brower with the [OpenShift web console]({{ CONSOLE_URL}}){:target="_blank"}
 
 ![openshift_login]({% image_path openshift_login.png %})
@@ -148,6 +149,10 @@ You will see the OpenShift landing page:
 > The project displayed in the landing page depends on which labs you will run today. If you will develop `Service Mesh and Identity` then you will see pre-created projects as the above screeenshot.
 
 We'll use `oc` tool to deploy the inventory service in OpenShift cluster. Copy _login command_ in OpenShift web console:
+=======
+Let's create a cloud-native applications projects in OpenShift cluster and deploy the inventory service as a Linux container.
+To deploy applicaitons to OpenShift via `oc` tool, we need to copy login command and [Login OpenShift]({{ CONSOLE_URL}}){:target="_blank"} cluster:
+>>>>>>> fc87266cdcf182aef334097bdc374c0399128a78
 
 ![codeready-workspace-copy-login-cmd]({% image_path codeready-workspace-oc-login-copy.png %}){:width="700px"}
 
@@ -185,7 +190,7 @@ oc new-app -e POSTGRESQL_USER=inventory \
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory -l app=inventory`
 
-This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
+This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index){:target="_blank"}, providing foundational software needed to run Java applications, while staying at a reasonable size.
 
   * Start and watch the build, which will take about minutes to complete:
 
@@ -248,7 +253,7 @@ First of all, we won't implement the catalog application to retrieve data becaus
 There're a few interesting things what we need to take a look at this Spring Boot application before we will deploy it to OpenShift cluster.
 
 This catalog service is not using the default BOM (Bill of material) that Spring Boot projects typically use. Instead, we are using
-a BOM provided by Red Hat as part of the [Snowdrop](http://snowdrop.me/) project.
+a BOM provided by Red Hat as part of the [Snowdrop](http://snowdrop.me/){:target="_blank"} project.
 
 ~~~xml
 <dependencyManagement>
@@ -633,7 +638,7 @@ Build the image using on OpenShift:
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=cart -l app=cart`
 
-This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
+This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index){:target="_blank"}, providing foundational software needed to run Java applications, while staying at a reasonable size.
 
   * Start and watch the build, which will take about minutes to complete:
 
@@ -774,13 +779,13 @@ Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each ma
     public List<Order> list() {
         return orderService.list();
     }
-    
+
     @POST
     public List<Order> add(Order order) {
         orderService.add(order);
         return list();
     }
-    
+
     @GET
     @Path("/{orderId}/{status}")
     public List<Order> updateStatus(@PathParam("orderId") String orderId, @PathParam("status") String status) {
@@ -795,7 +800,7 @@ use the `OrderService` to list/add new orders.
 ##### Configuring the MongoDB database
 
 The main property to configure is the URL to access to `MongoDB,` almost all configuration can be included in the connection URI
-so we advise you to do so, you can find more information in the [MongoDB documentation](https://docs.mongodb.com/manual/reference/connection-string/)
+so we advise you to do so, you can find more information in the [MongoDB documentation](https://docs.mongodb.com/manual/reference/connection-string/){:target="_blank"}
 
 Open `application.properties` in `src/main/resources/` and add the following configuration:
 
@@ -809,7 +814,7 @@ By using a Bson `Codec`, the MongoDB Client will take care of the transformation
 
 First you need to create a Bson `Codec` that will tell Bson how to transform your entity to/from a MongoDB `Document`.
 Here we use a `CollectibleCodec` as our object is retrievable from the database (it has a MongoDB identifier), if not we would have used a `Codec` instead.
-More information in the [codec documentation](https://mongodb.github.io/mongo-java-driver/3.10/bson/codecs).
+More information in the [codec documentation](https://mongodb.github.io/mongo-java-driver/3.10/bson/codecs){:target="_blank"}.
 
 Edit the `com.redhat.cloudnative.codec.OrderCodec` class as follows:
 
@@ -928,7 +933,7 @@ Build the image using on OpenShift:
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=order -l app=order`
 
-This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index), providing foundational software needed to run Java applications, while staying at a reasonable size.
+This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index){:target="_blank"}, providing foundational software needed to run Java applications, while staying at a reasonable size.
 
  * Start and watch the build, which will take about minutes to complete:
 
@@ -969,7 +974,7 @@ You will see empty result because you didn't add any shopping items yet:
 
 ---
 
-`WEB-UI Service` serves a frontend based on [AngularJS](https://angularjs.org/) and [PatternFly](http://patternfly.org/) running in a
+`WEB-UI Service` serves a frontend based on [AngularJS](https://angularjs.org/){:target="_blank"} and [PatternFly](http://patternfly.org/){:target="_blank"} running in a
 [Node.js](https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i) container.
 [Red Hat OpenShift Application Runtimes](https://developers.redhat.com/products/rhoar) includes `Node.js` support in enterprise prouction environment.
 
@@ -998,7 +1003,7 @@ Now, we will deploy a presentation layer to OpenShift cluster using `Nodeshift` 
 
 `oc expose svc/coolstore-ui`
 
-Go to `Networking > Routes` in [OpenShift web console]({{ CONSOLE_URL}}) and click on the route URL of `coolstore-ui`:
+Go to `Networking > Routes` in [OpenShift web console]({{ CONSOLE_URL}}){:target="_blank"} and click on the route URL of `coolstore-ui`:
 
 ![coolstore-ui]({% image_path web-ui-route.png %})
 
