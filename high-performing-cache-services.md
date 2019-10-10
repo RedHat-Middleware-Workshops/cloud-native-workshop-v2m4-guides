@@ -120,7 +120,6 @@ Package the applicaiton via running the following maven plugin in CodeReady Work
 
 > `NOTE`: You should `SKIP` the Unit test because you don't have PostgreSQL database in local environment.
 
-<<<<<<< HEAD
 First, open a new brower with the [OpenShift web console]({{ CONSOLE_URL}}){:target="_blank"}
 
 ![openshift_login]({% image_path openshift_login.png %})
@@ -149,10 +148,6 @@ You will see the OpenShift landing page:
 > The project displayed in the landing page depends on which labs you will run today. If you will develop `Service Mesh and Identity` then you will see pre-created projects as the above screeenshot.
 
 We'll use `oc` tool to deploy the inventory service in OpenShift cluster. Copy _login command_ in OpenShift web console:
-=======
-Let's create a cloud-native applications projects in OpenShift cluster and deploy the inventory service as a Linux container.
-To deploy applicaitons to OpenShift via `oc` tool, we need to copy login command and [Login OpenShift]({{ CONSOLE_URL}}){:target="_blank"} cluster:
->>>>>>> fc87266cdcf182aef334097bdc374c0399128a78
 
 ![codeready-workspace-copy-login-cmd]({% image_path codeready-workspace-oc-login-copy.png %}){:width="700px"}
 
