@@ -191,8 +191,6 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 
 `oc start-build inventory --from-file target/*-runner.jar --follow`
 
-![inventory]({% image_path inventory-build-logs.png %})
-
  * Deploy it as an OpenShift application after the build is done and override the Postgres URL to specify our production Postgres credentials:
 
 `oc new-app inventory -e QUARKUS_DATASOURCE_URL=jdbc:postgresql://inventory-database:5432/inventory`
