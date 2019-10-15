@@ -120,6 +120,34 @@ Package the applicaiton via running the following maven plugin in CodeReady Work
 
 > `NOTE`: You should `SKIP` the Unit test because you don't have PostgreSQL database in local environment.
 
+Although your Eclipse Che workspace is running on the Kubernetes cluster, it's running with a default restricted _Service Account_ that prevents you from creating most resource types. If you've completed other modules, you're probably already logged in, but let's login again: open a Terminal and issue the following command:
+
+`oc login https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT --insecure-skip-tls-verify=true`
+
+Enter your username and password assigned to you:
+
+* Username: `userXX`
+* Password: `r3dh4t1!`
+
+You should see like:
+
+~~~shell
+Login successful.
+
+You have access to the following projects and can switch between them with 'oc project <projectname>':
+
+  * default
+    istio-system
+    user0-bookinfo
+    user0-catalog
+    user0-cloudnative-pipeline
+    user0-cloudnativeapps
+    user0-inventory
+
+Using project "default".
+Welcome! See 'oc help' to get started.
+~~~
+
 First, open a new brower with the [OpenShift web console]({{ CONSOLE_URL}}){:target="_blank"}
 
 ![openshift_login]({% image_path openshift_login.png %})
@@ -146,24 +174,6 @@ You will see the OpenShift landing page:
 ![openshift_landing]({% image_path openshift_landing.png %})
 
 > The project displayed in the landing page depends on which labs you will run today. If you will develop `Service Mesh and Identity` then you will see pre-created projects as the above screeenshot.
-
-We'll use `oc` tool to deploy the inventory service in OpenShift cluster. Copy _login command_ in OpenShift web console:
-
-![codeready-workspace-copy-login-cmd]({% image_path codeready-workspace-oc-login-copy.png %}){:width="700px"}
-
-Then you will redirect to OpenShift Login page again.
-
-![openshift_login]({% image_path openshift_login.png %})
-
-When you login with your credential, you will see `Display Token` link in the redirected page.
-
-![openshift_login]({% image_path display_token_link.png %})
-
-Click on the link and copy the `oc login` command:
-
-![openshift_login]({% image_path your_token.png %})
-
-Paste it on CodeReady Workspaces Terminal window.
 
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data.
 First, deploy a new instance of PostgreSQL by executing the following commands via CodeReady Workspaces Terminal:
