@@ -265,8 +265,6 @@ Package the payment application by clicking on **Package for OpenShift** in the 
 
 Or run the following command in a CodeReady Workspaces _Terminal_:
 
-`cd /projects/cloud-native-workshop-v2m4-labs/payment-service/`
-
 `mvn clean package -DskipTests`
 
 This will build an executable JAR file in the `target/` directory.
@@ -444,9 +442,7 @@ Package the cart application via clicking on `Package for OpenShift` in `Command
 
 ![cart]({% image_path quarkus-dev-run-packageforOcp.png %})
 
-Or run the following maven plugin in CodeReady Workspaces_Terminal_:
-
-`cd /projects/cloud-native-workshop-v2m4-labs/cart-service/`
+Or run the following maven plugin in CodeReady Workspaces _Terminal_:
 
 `mvn clean package -DskipTests`
 
@@ -573,9 +569,7 @@ Package the order application via clicking on `Package for OpenShift` in `Comman
 
 ![codeready-workspace-maven]({% image_path quarkus-dev-run-packageforOcp.png %})
 
-Or run the following maven plugin in CodeReady Workspaces_Terminal_:
-
-`cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
+Or run the following maven plugin in CodeReady Workspaces _Terminal_:
 
 `mvn clean package -DskipTests`
 
@@ -595,7 +589,7 @@ Let's confirm if the all services works correctly using `Kafka` messaging via co
 
 Let's go shopping! Open the Web UI in your browser. To get the URL to the Web UI, run this command in CodeReady _Terminal_:
 
-`echo $(oc get route coolstore-ui -o=go-template --template={% raw %}'{{ .spec.host }}'{% endraw %})`
+`oc get route | grep coolstore-ui | awk '{print $2}'`
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 

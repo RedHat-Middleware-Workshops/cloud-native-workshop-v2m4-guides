@@ -91,7 +91,7 @@ Let's find out why Quarkus calls itself _SuperSonic Subatomic Subatomic Java_. L
 
 ~~~sh
 mkdir /tmp/hello && cd /tmp/hello && \
- mvn io.quarkus:quarkus-maven-plugin:0.21.2:create \
+mvn io.quarkus:quarkus-maven-plugin:0.21.2:create \
     -DprojectGroupId=org.acme \
     -DprojectArtifactId=getting-started \
     -DclassName="org.acme.quickstart.GreetingResource" \
@@ -332,10 +332,9 @@ payment   http://payment.userXX-cloudnativeapps.[subdomain]   True
 
 If you send traffic to this endpoint it will trigger the autoscaler to scale the app up. Trigger the app:
 
-~~~sh
-export SVC_URL=$(oc get rt payment -o template={% raw %}'{{ .status.url }}'{% endraw %})
-curl -i -H 'Content-Type: application/json' -d '{"foo": "bar"}' $SVC_URL
-~~~
+`export SVC_URL=$(oc get rt payment -o template={% raw %}'{{ .status.url }}'{% endraw %})`
+
+`curl -i -H 'Content-Type: application/json' -d '{"foo": "bar"}' $SVC_URL`
 
 This will send some dummy data to the `payment` service,  but more importantly it triggered knative
 to spin up the pod again automatically, and will shut it down 30 seconds later.
@@ -368,7 +367,7 @@ spec:
 
 The object can then be deployed using the following command via CodeReady Workspaces Terminal:
 
-`oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment/knative/kafka-event-source.yaml`
+`oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/kafka-event-source.yaml`
 
 ![serverless]({% image_path kafka-event-source.png %})
 
@@ -395,7 +394,7 @@ Before getting started, we need to make sure if _payment service_ is scaled down
 
 Let's go shopping! Open the Web UI in your browser. To get the URL to the Web UI, run this command in CodeReady _Terminal_:
 
-`echo $(oc get route coolstore-ui -o=go-template --template='{{ .spec.host }}')`
+`oc get route | grep coolstore-ui | awk '{print $2}'`
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 
@@ -553,8 +552,8 @@ Let's confirm if the **tasks** are installed properly using [Tekton CLI](https:/
 `tkn task list`
 
 ~~~shell
-openshift-client   50 seconds ago
-s2i-java-8         20 seconds ago
+openshift-client   7 seconds ago
+s2i-java-8         3 seconds ago
 ~~~
 
 ##### Create Pipeline

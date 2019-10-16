@@ -139,19 +139,6 @@ Click on the **Import Projects...** in **Workspace** menu and enter the followin
 
 The projects are imported now into your workspace and is visible in the project explorer.
 
-CodeReady Workspaces is a full featured IDE and provides language specific capabilities for various project types. In order to
-enable these capabilities, you need to convert the imported project skeletons to a Maven projects as below: 
-
-In the project explorer, right-click on each project and then click on `Convert to Project` continuously.
-
-![codeready-workspace-convert]({% image_path codeready-workspace-convert.png %}){:width="500px"}
-
-Choose `Maven` from the project configurations and then click on `Save`.
-
-![codeready-workspace-maven]({% image_path codeready-workspace-maven.png %}){:width="700px"}
-
-Repeat the above for inventory and catalog projects.
-
 > `NOTE`: the Terminal window in CodeReady Workspaces. For the rest of these labs, anytime you need to run a command in a terminal, you can use the CodeReady Workspaces `Terminal` window.
 
 ![codeready-workspace-terminal]({% image_path codeready-workspace-terminal.png %})

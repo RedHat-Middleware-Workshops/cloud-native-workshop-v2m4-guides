@@ -116,7 +116,7 @@ We will use `Quarkus extension` to add `PostgreSQL JDBC Driver`. Go back to Code
 
 Package the applicaiton via running the following maven plugin in CodeReady WorkspacesTerminal:
 
-`mvn clean package -DskipTests -Dquarkus.profile=prod`
+`mvn clean package -DskipTests`
 
 > `NOTE`: You should `SKIP` the Unit test because you don't have PostgreSQL database in local environment.
 
@@ -203,7 +203,7 @@ This build uses the new [Red Hat OpenJDK Container Image](https://access.redhat.
 
  * Deploy it as an OpenShift application after the build is done and override the Postgres URL to specify our production Postgres credentials:
 
-`oc new-app inventory -e QUARKUS_DATASOURCE_URL=jdbc:postgresql://inventory-database:5432/inventory`
+`oc new-app inventory -e QUARKUS_PROFILE=prod`
 
  * Create the route
 
@@ -724,7 +724,7 @@ Add the following Java codes at each market.
  * `// TODO: Add a while loop to make an order lists using MongoCursor here` marker in `list()` method:
 
 ~~~java
-            MongoCursor<Document> cursor = getCollection().find().iterator();
+        MongoCursor<Document> cursor = getCollection().find().iterator();
 
         try {
             while (cursor.hasNext()) {
@@ -915,8 +915,6 @@ Package the cart application via clicking on `Package for OpenShift` in `Command
 ![codeready-workspace-maven]({% image_path quarkus-dev-run-packageforOcp.png %})
 
 Or run the following maven plugin in CodeReady WorkspacesTerminal:
-
-`cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
 
 `mvn clean package -DskipTests`
 
