@@ -106,7 +106,7 @@ Open a `new` CodeReady Workspaces Terminal and invoke the RESTful endpoint using
 
 ![inventory_service]({% image_path inventory_local_test.png %})
 
-> `NOTE`: Make sure to stop Quarkus development mode via `Close` terminal.
+> `NOTE`: Make sure to stop Quarkus development mode via `Close` terminal. Next, you need to open a new Terminal in CodeReady Workspaces then change the directory once again via `cd` command that you executed previously.
 
 `In production`, the inventory service will connect to `PostgeSQL` on `OpenShift` cluster.
 
