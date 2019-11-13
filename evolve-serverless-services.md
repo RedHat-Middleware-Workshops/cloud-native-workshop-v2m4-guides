@@ -256,7 +256,7 @@ This will execute `mvn clean package -Pnative` behind the scenes. The `-Pnative`
 
 We've deleted our old build configuration that took a JAR file. We need a new build configuration that can take our new native compiled Quarkus app. Create a new build config with this command:
 
-`oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:19.2.0 --binary --name=payment -l app=payment`
+`oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:19.2.1 --binary --name=payment -l app=payment`
 
 You should get a `--> Success message` at the end.
 
