@@ -596,6 +596,12 @@ spec:
       name: openshift-client
     runAfter:
       - build
+    params:
+    - name: ARGS
+      value:
+        - rollout
+        - latest
+        - spring-petclinic
 ~~~
 
 This pipeline performs the following:
