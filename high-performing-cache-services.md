@@ -191,7 +191,7 @@ oc new-app -e POSTGRESQL_USER=inventory \
   --name=inventory-database
 ~~~
 
- * Build the image using on OpenShift:
+ * Build the image using the openjdk builder image on OpenShift:
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory -l app=inventory`
 
