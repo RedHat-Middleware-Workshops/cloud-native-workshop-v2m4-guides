@@ -303,7 +303,7 @@ oc new-app -e POSTGRESQL_USER=catalog \
     --name=catalog-database
 ~~~
 
- * Build the image using on OpenShift:
+ * Build the image using using the openjdk builder image on OpenShift:
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=catalog -l app=catalog`
 
@@ -637,7 +637,7 @@ Or run the following maven plugin in CodeReady WorkspacesTerminal:
 
 `mvn clean package -DskipTests`
 
-Build the image using on OpenShift:
+Build the image using using the openjdk builder image on OpenShift:
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=cart -l app=cart`
 
@@ -930,7 +930,7 @@ Once the MongoDB is deployed successfully, it will be showd in `Project Status`.
 
 ![order]({% image_path order-monogo-status.png %})
 
-Build the image using on OpenShift:
+Build the image using using the openjdk builder image on OpenShift:
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=order -l app=order`
 
