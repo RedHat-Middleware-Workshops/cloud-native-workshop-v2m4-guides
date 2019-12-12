@@ -305,7 +305,7 @@ Wait for that command to report `replication controller payment-1 successfully r
 
  * Testing the Application
 
-Go to _Workloads > Pods_ on the left menu then search `kafka-cluster` pods. Click on the `my-cluster-kafka-0` pod:
+Go to _Workloads > Pods_ on the left menu then search `cluster-kafka` pods. Click on the `my-cluster-kafka-0` pod:
 
 ![payment]({% image_path my-cluster-kafka-0.png %})
 
@@ -359,7 +359,7 @@ Execute the following command via CodeReady Workspaces _Terminal_:
 
 This will add the Kafka extension and APIs to our Cart service app.
 
-* Like our Payment service, add this code to the `// TODO: Add annotation of orders messaging configuration here` marker:
+* Like our Payment service, add this code to the `// TODO: Add annotation of orders messaging configuration here` marker inside the `CartResource` class inside the `com.redhat.cloudnative` package:
 
 ~~~java
     @ConfigProperty(name = "mp.messaging.outgoing.orders.bootstrap.servers")
@@ -611,13 +611,13 @@ Add some cool items to your shopping cart in the following shopping scenarios:
 
  * 5) After a few moments, reload the **All Orders** page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
 
- >`Note`: If the status is still `Processing`, the order service is processing incoming Kafka messages and store thme in MongoDB. Please reload the page a few times more.
+ >`Note`: If the status is still `Processing`, the order service is processing incoming Kafka messages and storing them in MongoDB. Please reload the page a few times more.
 
  ![serverless]({% image_path payment-completedorfailed.png %})
 
 ### Summary
 
-In this scenario we developed an _Event-Driven/Reactive_ cloud-native appliction to deal with data streams from the shopping cart service to the order service and payment service using _Apache Kafka).
+In this scenario we developed an _Event-Driven/Reactive_ cloud-native appliction to deal with data streams from the shopping cart service to the order service and payment service using _Apache Kafka_).
 
 We also used Quarkus and its _Kafka extension_ to integrate the app with Kafka. `AMQ Streams`, a fully supported Kafka solution from Red Hat, enables you to create Apache Kafka clusters very easily via OpenShift developer catalog.
 
