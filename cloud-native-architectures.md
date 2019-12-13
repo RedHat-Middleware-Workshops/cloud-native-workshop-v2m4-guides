@@ -129,7 +129,7 @@ Click on the **Import Projects...** in **Workspace** menu and enter the followin
 ![codeready-workspace-import]({% image_path codeready-workspace-menu.png %})
 
   * Version Control System: `GIT`
-  * URL: `{{GIT_URL}}/userXX/cloud-native-workshop-v2m4-labs.git`(IMPORTANT: replace userXX with your lab user)
+  * URL: `https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git`
   * Check `Import recursively (for multi-module projects)`
   * Name: `cloud-native-workshop-v2m4-labs`
 
