@@ -149,7 +149,7 @@ This shows that our process is taking around `50 MB` of memory ([Resident Set Si
 
 > NOTE: The RSS and memory usage of any app, including Quarkus, will vary depending your specific environment, and will rise as the application experiences load.
 
-Make sure the app works. In a new CdeReady Workspaces Terminal run:
+Make sure the app works. In a new CodeReady Workspaces Terminal run:
 
 `curl -i http://localhost:8080/hello; echo`
 
@@ -296,9 +296,9 @@ The service can then be deployed using the following command via CodeReady Works
 
 `oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/knative-serving-service.yaml`
 
-After successful creation of the service we should see a Kubernetes Deployment named similar to `payment-service-v1-deployment` available.
+After successful creation of the service we should see a Kubernetes Deployment named similar to `payment-v1-deployment` available.
 
-Go to _Home > Status_ on the left menu and click on **payment-service-v1-deployment**. You will confirm 1 pod is _available_.
+Go to _Home > Status_ on the left menu and click on **payment-v1-deployment**. You will confirm 1 pod is _available_.
 
 ![serverless]({% image_path payment-serving-deployment.png %})
 
@@ -316,7 +316,7 @@ As default, Knative will automatically scale services down to zero instances whe
 
 ![serverless]({% image_path scale-to-zero-grace-period.png %})
 
-In the meantime, it probably took at least 30 seconds so select your `userXX-cloudnativeapps` project using the drop-down at the top and then go back to _Home > Status_ on the left menu and click on **payment-service-v1-deployment**. You will see 0 pods are available:
+In the meantime, it probably took at least 30 seconds so select your `userXX-cloudnativeapps` project using the drop-down at the top and then go back to _Home > Status_ on the left menu and click on **payment-v1-deployment**. You will see 0 pods are available:
 
 ![serverless]({% image_path payment-serving-down-to-zero.png %})
 
