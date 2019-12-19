@@ -480,7 +480,6 @@ Create a new Java class called `ProductMarshaller.java` in `com.redhat.cloudnati
 ~~~java
 package com.redhat.cloudnative.model;
 
-import com.redhat.cloudnative.model.Product;
 import org.infinispan.protostream.MessageMarshaller;
 
 import java.io.IOException;
@@ -986,7 +985,7 @@ and expand `coolstore-ui` directory.
 
 You will see javascripts for specific cloud-native services such as cart, catatlog, and order service as above.
 
-Now, we will deploy a presentation layer to OpenShift cluster using `Nodeshift` command line tool, a programmable API that you can use to deploy Node.js projects to `OpenShift`.
+Now, we will deploy a presentation layer to OpenShift cluster using [`Nodeshift`](https://nodeshift.dev) command line tool, a programmable API that you can use to deploy Node.js projects to `OpenShift`.
 
  * Install the `Nodeshift` tool via CodeReady Workspaces Terminal:
 
@@ -1021,4 +1020,4 @@ To deploy the cloud-native applications with multiple datasources on `OpenShift`
 obtain a reference to those datasources such as `PostgreSQL` and `MongoDB` in code.
 
 In the end, we optimized `data transaction performance` of the shopping cart service thru integrating with a `JBoss Data Grid`
-to increase end users'(customers) satification. `Congratulations!`
+to increase end users' (customers) satification. `Congratulations!`
