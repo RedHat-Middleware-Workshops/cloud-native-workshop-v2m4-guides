@@ -373,7 +373,7 @@ The object can then be deployed using the following command via CodeReady Worksp
 
 You can also see a new pod spun up which will manage the connection between Kafka and our **payments** service:
 
-`oc get pods -l knative-eventing-source-name=kafka-source`
+`oc get pods -l eventing.knative.dev/SourceName=kafka-source`
 
 ~~~console
 NAME                                 READY   STATUS    RESTARTS   AGE
