@@ -260,7 +260,7 @@ We've deleted our old build configuration that took a JAR file. We need a new bu
 
 You should get a `--> Success message` at the end.
 
- * Mext, start and watch the build, which will take about 3-4 minutes to complete:
+ * Next, start and watch the build, which will take about 3-4 minutes to complete:
 
 `oc start-build payment --from-file target/*-runner --follow`
 
@@ -298,7 +298,7 @@ The service can then be deployed using the following command via CodeReady Works
 
 After successful creation of the service we should see a Kubernetes Deployment named similar to `payment-v1-deployment` available.
 
-Go to _Home > Status_ on the left menu and click on **payment-service-v1-deployment**. You will confirm 1 pod is _available_.
+Go to _Home > Status_ on the left menu and click on **payment-v1-deployment**. You will confirm 1 pod is _available_.
 
 ![serverless]({% image_path payment-serving-deployment.png %})
 
@@ -373,7 +373,7 @@ The object can then be deployed using the following command via CodeReady Worksp
 
 You can also see a new pod spun up which will manage the connection between Kafka and our **payments** service:
 
-`oc get pods -l knative-eventing-source-name=kafka-source`
+`oc get pods -l eventing.knative.dev/SourceName=kafka-source`
 
 ~~~console
 NAME                                 READY   STATUS    RESTARTS   AGE
@@ -398,7 +398,7 @@ Let's go shopping! Open the Web UI in your browser. To get the URL to the Web UI
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 
- * 1) Add a _Froge Laptop Sticker_ to your cart by click on **Add to Cart**. You will see the `Success! Added!` message under the top menu.
+ * 1) Add a _Forge Laptop Sticker_ to your cart by click on **Add to Cart**. You will see the `Success! Added!` message under the top menu.
 
 ![serverless]({% image_path add-to-cart-serverless.png %})
 
@@ -420,7 +420,7 @@ Add some cool items to your shopping cart in the following shopping scenarios:
 
  * 5) After a few moments, reload the **All Orders** page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
 
- >`Note`: If the status is still `Processing`, the order service is processing incoming Kafka messages and store thme in MongoDB. Please reload the page a few times more.
+ >`Note`: If the status is still `Processing`, the order service is processing incoming Kafka messages and store them in MongoDB. Please reload the page a few times more.
 
  ![serverless]({% image_path payment-completedorfailed-serverless.png %})
 
