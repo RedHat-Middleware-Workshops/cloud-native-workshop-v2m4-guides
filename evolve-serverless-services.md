@@ -400,7 +400,7 @@ Let's go shopping! Open the Web UI in your browser. To get the URL to the Web UI
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 
- * 1) Add a _Froge Laptop Sticker_ to your cart by click on **Add to Cart**. You will see the `Success! Added!` message under the top munu.
+ * 1) Add a _Forge Laptop Sticker_ to your cart by click on **Add to Cart**. You will see the `Success! Added!` message under the top munu.
 
 ![serverless]({% image_path add-to-cart-serverless.png %})
 
@@ -422,7 +422,7 @@ Add some cool items to your shopping cart in the following shopping scenarios:
 
  * 5) After a few moments, reload the **All Orders** page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
 
- >`Note`: If the status is still `Processing`, the order service is processing incoming Kafka messages and store thme in MongoDB. Please reload the page a few times more.
+ >`Note`: If the status is still `Processing`, the order service is processing incoming Kafka messages and store them in MongoDB. Please reload the page a few times more.
 
  ![serverless]({% image_path payment-completedorfailed-serverless.png %})
 
