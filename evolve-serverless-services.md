@@ -254,13 +254,15 @@ Or you can run the commands directly:
 
 This will execute `mvn clean package -Pnative` behind the scenes. The `-Pnative` argument selects the native maven profile which invokes the Graal compiler.
 
+> The native compilation could take several minutes, so please be patient!
+
 We've deleted our old build configuration that took a JAR file. We need a new build configuration that can take our new native compiled Quarkus app. Create a new build config with this command:
 
 `oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:19.2.0 --binary --name=payment -l app=payment`
 
 You should get a `--> Success message` at the end.
 
- * Mext, start and watch the build, which will take about 3-4 minutes to complete:
+ * Next, start and watch the build, which will take about 3-4 minutes to complete:
 
 `oc start-build payment --from-file target/*-runner --follow`
 
