@@ -376,8 +376,8 @@ You can also see a new pod spun up which will manage the connection between Kafk
 `oc get pods -l eventing.knative.dev/SourceName=kafka-source`
 
 ~~~console
-NAME                                 READY   STATUS    RESTARTS   AGE
-kafka-source-jktp9-b6b4c6797-4rspk   2/2     Running   1          21s
+NAME                                                              READY   STATUS    RESTARTS   AGE
+kafkasource-kafka-source-268a71ea-2335-11ea-abea-120eed0aat5998   2/2     Running   1          21s
 ~~~
 
 Great job!
@@ -490,13 +490,13 @@ You will use the [Spring PetClinic](https://github.com/spring-projects/spring-pe
 
 Create the Kubernetes objects for deploying the PetClinic app on OpenShift. The deployment will not complete since there are no container images built for the PetClinic application yet. That you will do in the following sections through a CI/CD pipeline.
 
-Replace `userXX-cloudnative-pipeline` with your username in **knative/pipeline/petclinic.yaml**:
+Replace `In CodeReady Workspaces in the `payment-service` project, open the **knative/pipeline/petclinic.yaml** file. Inside it, replace `userXX` with your username:
 
 ![serverless]({% image_path petclinic-namespace.png %})
 
 Then create the object in Kubernetes:
 
-`oc create -f knative/pipeline/petclinic.yaml`
+`oc create -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/petclinic.yaml`
 
 You should be able to see the deployment in the [OpenShift web console]({{ CONSOLE_URL}}){:target="_blank"}.
 
@@ -543,9 +543,9 @@ creating a pipeline in the next section:
 
 Create the following Tekton tasks which will be used in the `Pipelines`:
 
-`oc create -f knative/pipeline/openshift-client-task.yaml`
+`oc create -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/openshift-client-task.yaml`
 
-`oc create -f knative/pipeline/s2i-java-8-task.yaml`
+`oc create -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/s2i-java-8-task.yaml`
 
 Let's confirm if the **tasks** are installed properly using [Tekton CLI](https://github.com/tektoncd/cli/releases){:target="_blank"} that already installed in CodeReady Workspaces.
 
