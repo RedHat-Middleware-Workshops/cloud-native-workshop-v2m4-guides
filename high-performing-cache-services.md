@@ -178,7 +178,7 @@ You will see the OpenShift landing page:
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data.
 First, deploy a new instance of PostgreSQL by executing the following commands via CodeReady Workspaces Terminal:
 
- * Create a new project in OpenShift Cluster. You need to replace `userXX` with your username:
+ * Switch to the cloudnativeapps project in the terminal. You need to replace `userXX` with your username:
 
 `oc project userXX-cloudnativeapps`
 
