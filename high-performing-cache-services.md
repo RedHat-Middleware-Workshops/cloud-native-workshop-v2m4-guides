@@ -106,7 +106,7 @@ Open a `new` CodeReady Workspaces Terminal and invoke the RESTful endpoint using
 
 ![inventory_service]({% image_path inventory_local_test.png %})
 
-> `NOTE`: Make sure to stop Quarkus development mode via `Close` terminal. Next, you need to open a new Terminal in CodeReady Workspaces then change the directory once again via `cd` command that you executed previously.
+> `NOTE`: Make sure to stop Quarkus development mode via `Close` terminal. Next, you need to open a new Terminal in CodeReady Workspaces then change the directory once again via `cd` command that you executed previously. To change directory to the inventory service whenever starting a new Terminal run `echo 'cd cloud-native-workshop-v2m4-labs/inventory-service/' >> ~/.bashrc`
 
 `In production`, the inventory service will connect to `PostgeSQL` on `OpenShift` cluster.
 
@@ -282,6 +282,8 @@ Open `CatalogService.java` in `src/main/java/com/redhat/coolstore/service` direc
 Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/catalog-service/`
+
+To change directory to the catalog service whenever starting a new Terminal run `echo 'cd cloud-native-workshop-v2m4-labs/catalog-service/' >> ~/.bashrc`
 
 `mvn clean package spring-boot:repackage -DskipTests`
 
@@ -633,6 +635,8 @@ Package the cart application via clicking on `Package for OpenShift` in `Command
 Or run the following maven plugin in CodeReady WorkspacesTerminal:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/cart-service/`
+
+To change directory to the cart service whenever starting a new Terminal run `echo 'cd cloud-native-workshop-v2m4-labs/cart-service/' >> ~/.bashrc`
 
 `mvn clean package -DskipTests`
 
@@ -990,6 +994,8 @@ Now, we will deploy a presentation layer to OpenShift cluster using [`Nodeshift`
  * Install the `Nodeshift` tool via CodeReady Workspaces Terminal:
 
 `cd /projects/cloud-native-workshop-v2m4-labs/coolstore-ui/`
+
+To change directory to the coolstore ui whenever starting a new Terminal run `echo 'cd cloud-native-workshop-v2m4-labs/coolstore-ui/' >> ~/.bashrc`
 
 `npm install --save-dev nodeshift`
 
