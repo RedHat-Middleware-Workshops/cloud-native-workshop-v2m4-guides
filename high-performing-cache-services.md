@@ -178,7 +178,7 @@ You will see the OpenShift landing page:
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data.
 First, deploy a new instance of PostgreSQL by executing the following commands via CodeReady Workspaces Terminal:
 
- * Create a new project in OpenShift Cluster. You need to replace `userXX` with your username:
+ * Switch to the cloudnativeapps project in the terminal. You need to replace `userXX` with your username:
 
 `oc project userXX-cloudnativeapps`
 
@@ -191,7 +191,7 @@ oc new-app -e POSTGRESQL_USER=inventory \
   --name=inventory-database
 ~~~
 
- * Build the image using on OpenShift:
+ * Create a build configuration for your application using OpenJDK base container image in OpenShift:
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory -l app=inventory`
 
@@ -303,7 +303,7 @@ oc new-app -e POSTGRESQL_USER=catalog \
     --name=catalog-database
 ~~~
 
- * Build the image using on OpenShift:
+ * Create a build configuration for your application using OpenJDK base container image in OpenShift:
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=catalog -l app=catalog`
 
@@ -636,7 +636,7 @@ Or run the following maven plugin in CodeReady WorkspacesTerminal:
 
 `mvn clean package -DskipTests`
 
-Build the image using on OpenShift:
+Create a build configuration for your application using OpenJDK base container image in OpenShift:
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=cart -l app=cart`
 
@@ -929,7 +929,7 @@ Once the MongoDB is deployed successfully, it will be showd in `Project Status`.
 
 ![order]({% image_path order-monogo-status.png %})
 
-Build the image using on OpenShift:
+Create a build configuration for your application using OpenJDK base container image in OpenShift:
 
 `oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=order -l app=order`
 
