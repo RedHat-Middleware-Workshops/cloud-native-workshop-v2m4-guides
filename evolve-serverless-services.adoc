@@ -10,7 +10,7 @@ application.
 * *Serverless computing* is an emerging category that represents a shift in the way developers build and deliver software systems.
 Abstracting application infrastructure away from the code can greatly simplify the development process while introducing new cost
 and efficiency benefits. Serverless computing and FaaS will play an important role in helping to define the next era of enterprise
-IT, along with cloud-native services and the https://enterprisersproject.com/hybrid-cloud[hybrid cloud]\{:target="_blank"}.
+IT, along with cloud-native services and the https://enterprisersproject.com/hybrid-cloud[hybrid cloud,window=_blank].
 * *Serverless platforms* provide APIs that allow users to run code snippets (functions, also called _actions_) and return the
 results of each function. Serverless platforms also provide endpoints to allow the developer to retrieve function results. These
 endpoints can be used as inputs for other functions, thereby providing a sequence (or chain) of related functions.
@@ -26,7 +26,7 @@ The severless application enables DevOps teams to enjoy benefits like:
 
 
 The goal is to develop serverless applications on *Red Hat Runtimes* and deploy them on *OpenShift 4* using *OpenShift Serverless*
-(Based on the https://www.openshift.com/learn/topics/knative[Knative]\{:target="_blank"} project) with a cloud-native, continuous
+(Based on the https://www.openshift.com/learn/topics/knative[Knative,window=_blank] project) with a cloud-native, continuous
 integration and delivery (CI/CD) Pipelines using `Tekton`. After this lab, you should end up with something like:
 
 image::lab3-goal.png[goal]
@@ -51,7 +51,7 @@ Knative components leverage best practices from real-world Kubernetes deployment
 * https://github.com/knative/serving[Serving]\{:target="_blank``}uses Kubernetes and
 https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Istio]\{:target=''_blank"} to rapidly deploy, network, and
 automatically scale serverless workloads.
-* https://github.com/knative/eventing[Eventing]\{:target="_blank"} is common infrastructure for consuming and producing events to
+* https://github.com/knative/eventing[Eventing,window=_blank] is common infrastructure for consuming and producing events to
 stimulate applications.
 
 ==== What is a Service Mesh?
@@ -74,7 +74,7 @@ Take that out of your code and let your code focus on the underlying business do
 Let’s now produce a native executable for an example Quarkus application. It improves the startup time of the application, and
 produces a minimal disk and memory footprint. The executable would have everything to run the application including the
 `JVM`(shrunk to be just enough to run the application), and the application. This is accomplished using
-https://graalvm.org/[GraalVM]\{:target="_blank"}.
+https://graalvm.org/[GraalVM,window=_blank].
 
 `GraalVM` is a universal virtual machine for compiling and running applications written in JavaScript, Python, Ruby, R, JVM-based
 languages like Java, Scala, Groovy, Kotlin, Clojure, and LLVM-based languages such as C and C++. It includes ahead-of-time
@@ -166,7 +166,7 @@ You should see something like:
 image::payment-native-pss.png[serverless]
 
 This shows that our process is taking around `50 MB` of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
-Size]\{:target="_blank"}, or RSS). Pretty compact!
+Size,window=_blank], or RSS). Pretty compact!
 
 ____
 [NOTE] The RSS and memory usage of any app, including Quarkus, will vary depending your specific environment, and will rise as the
@@ -212,7 +212,7 @@ The Knative Serving project provides middleware primitives that enable:
 
 In the lab, _Knative Serving_ is already installed on your OpenShift cluster but if you want to install Knative Serving on your
 own OpenShift cluster, you can play with https://knative.dev/docs/install/knative-with-openshift/[Installing the Knative Serving
-Operator]\{:target="_blank"} as below:
+Operator,window=_blank] as below:
 
 image::knative_serving_tile_highlighted.png[serverless]
 
@@ -394,7 +394,7 @@ _magically_ in the following exercises.
 ==== Create KafkaSource to enable Knative Eventing
 
 In this lab, Knative Eventing is already installed but if you want to install it in your own OpenShift cluster then you can
-install it via the _Knative Eventing Operator_ in {{ CONSOLE_URL%7D%7D[OpenShift web console]\{:target="_blank"}.
+install it via the _Knative Eventing Operator_ in {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank].
 
 Open `knative/kafka-event-source.yaml` (in the _payment-service_ project) to define a _KafkaSource_ to integrate with the Knative
 Eventing. Copy the following YAML code to this file:
@@ -472,7 +472,7 @@ image::input-cc-info-serverless.png[serverless]
 * {blank}
 [arabic, start=4]
 . Let’s find out how _Kafka Event_ enables _Knative Eventing_. Go back to _Project Status_ in
-{{ CONSOLE_URL%7D%7D[OpenShift web console]\{:target="_blank"} then confirm if _payment service_ is up automatically.
+{{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] then confirm if _payment service_ is up automatically.
 It’s `MAGIC!!`
 
 image::payment-up-again.png[serverless]
@@ -510,7 +510,7 @@ them on Kubernetes clusters. The _cloud-native CI/CD pipeline_ should be defined
 example, the pipeline can be specified as Kubernetes resources using YAML format.
 
 _OpenShift Pipelines_ provides a cloud-native, continuous integration and delivery (CI/CD) solution for building pipelines using
-https://tekton.dev/[Tekton]\{:target="_blank"}.
+https://tekton.dev/[Tekton,window=_blank].
 
 Tekton is a flexible, Kubernetes-native, open-source CI/CD framework that enables automating deployments across multiple platforms
 (Kubernetes, serverless, VMs, etc) by abstracting away the underlying details.
@@ -535,7 +535,7 @@ ____
 ==== What is Tekton?
 
 Tekton defines a number of https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/[Kubernetes custom
-resources]\{:target="_blank"} as building blocks in order to standardize pipeline concepts and provide a terminology that is
+resources,window=_blank] as building blocks in order to standardize pipeline concepts and provide a terminology that is
 consistent across CI/CD solutions. These custom resources are an extension of the Kubernetes API that let users create and
 interact with these objects using the OpenShift CLI (`oc`), `kubectl`, and other Kubernetes tools.
 
@@ -550,7 +550,7 @@ The custom resources needed to define a pipeline are listed below:
 image::tekton-arch.png[severless]
 
 For further details on pipeline concepts, refer to the https://github.com/tektoncd/pipeline/tree/master/docs#learn-more[Tekton
-documentation]\{:target="_blank"} that provides an excellent guide for understanding various parameters and attributes available
+documentation,window=_blank] that provides an excellent guide for understanding various parameters and attributes available
 for defining pipelines.
 
 In this lab, we will walk you through pipeline concepts and how to create and run a CI/CD pipeline for building and deploying
@@ -563,7 +563,7 @@ Change to your developer project for the sample application that you will be usi
 
 `oc project userXX-cloudnative-pipeline`
 
-You will use the https://github.com/spring-projects/spring-petclinic[Spring PetClinic]\{:target="_blank"} sample application
+You will use the https://github.com/spring-projects/spring-petclinic[Spring PetClinic,window=_blank] sample application
 during this tutorial, which is a simple Spring Boot application.
 
 Create the Kubernetes objects for deploying the PetClinic app on OpenShift. The deployment will not complete since there are no
@@ -579,7 +579,7 @@ Then create the object in Kubernetes:
 
 `oc create -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/petclinic.yaml`
 
-You should be able to see the deployment in the {{ CONSOLE_URL%7D%7D[OpenShift web console]\{:target="_blank"}.
+You should be able to see the deployment in the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank].
 
 image::petclinic-deployed-1.png[serverless]
 
@@ -630,7 +630,7 @@ Create the following Tekton tasks which will be used in the `Pipelines`:
 
 `oc create -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/s2i-java-8-task.yaml`
 
-Let’s confirm if the *tasks* are installed properly using https://github.com/tektoncd/cli/releases[Tekton CLI]\{:target="_blank"}
+Let’s confirm if the *tasks* are installed properly using https://github.com/tektoncd/cli/releases[Tekton CLI,window=_blank]
 that already installed in CodeReady Workspaces.
 
 `tkn task list`
@@ -648,7 +648,7 @@ A pipeline defines a number of tasks that should be executed and how they intera
 In this lab, we will create a pipeline that takes the source code of PetClinic application from GitHub and then builds and deploys
 it on OpenShift using
 https://docs.openshift.com/container-platform/4.1/builds/understanding-image-builds.html#build-strategy-s2i_understanding-image-builds[Source-to-Image
-(S2I)]\{:target="_blank"}.
+(S2I),window=_blank].
 
 image::pipeline-diagram.png[serverless]
 
@@ -697,7 +697,7 @@ This pipeline performs the following:
 
 * Clones the source code of the application from a Git repository (`app-git` resource)
 * Builds the container image using the `s2i-java-8` task that generates a `Dockerfile` for the application and uses
-https://buildah.io/[Buildah]\{:target="_blank"} to build the image
+https://buildah.io/[Buildah,window=_blank] to build the image
 * The application image is pushed to an image registry (`app-image` resource)
 * The new application image is deployed on OpenShift using the `openshift-cli`
 
@@ -710,7 +710,7 @@ will do that in a little bit in the next section.
 The execution order of `tasks` is determined by dependencies that are defined between the tasks via `inputs` and `outputs` as well
 as explicit orders that are defined via `runAfter`.
 
-In the {{ CONSOLE_URL%7D%7D[OpenShift web console]\{:target="_blank"}, you can click on _Add > Import YAML_ at the top
+In the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank], you can click on _Add > Import YAML_ at the top
 right of the screen while you are in the `userXX-cloudnative-pipeline` project.
 
 image::console-import-yaml-1.png[serverless]
@@ -733,14 +733,14 @@ petclinic-deploy-pipeline  8 seconds ago   ---        ---       ---        ---
 
 Now that the pipeline is created, you can trigger it to execute the tasks specified in the pipeline. Triggering pipelines is an
 area that is under development and in the next release it will be possible to be done via the
-{{ CONSOLE_URL%7D%7D[OpenShift web console]\{:target="_blank"} and Tekton CLI. In this tutorial, you will trigger the
+{{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] and Tekton CLI. In this tutorial, you will trigger the
 pipeline through creating the Kubernetes objects (the hard way!) in order to learn the mechanics of triggering.
 
 First, you should create a number of `PipelineResources` that contain the specifics of the Git repository and image registry to be
 used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
 
 The following `PipelineResource` defines the Git repository and reference for the PetClinic application. Create the following
-pipeline resources via the {{ CONSOLE_URL%7D%7D[OpenShift web console]\{:target="_blank"} via `Add → Import YAML`:
+pipeline resources via the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] via `Add → Import YAML`:
 
 [source,yaml]
 ----
@@ -756,7 +756,7 @@ spec:
 ----
 
 And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Create the following pipeline
-resources via the {{ CONSOLE_URL%7D%7D[OpenShift web console]\{:target="_blank"} via `Add → Import YAML`. Replace your
+resources via the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] via `Add → Import YAML`. Replace your
 username with `userXX`:
 
 [source,yaml]
@@ -772,7 +772,7 @@ spec:
     value: image-registry.openshift-image-registry.svc:5000/userXX-cloudnative-pipeline/spring-petclinic
 ----
 
-Create the above pipeline resources via the {{ CONSOLE_URL%7D%7D[OpenShift web console]\{:target="_blank"} via
+Create the above pipeline resources via the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] via
 `Add → Import YAML`.
 
 You can see the list of resources created in CodeReady Workspaces Terminal:
@@ -867,13 +867,13 @@ cloud-native application on hybrid cloud on the *Red Hat OpenShift Container Pla
 
 ==== Additional Resources:
 
-* https://www.openshift.com/learn/topics/knative[Knative on OpenShift]\{:target="_blank"}
-* https://knative.dev/docs/install/knative-with-openshift/[Knative Install on OpenShift]\{:target="_blank"}
-* https://redhat-developer-demos.github.io/knative-tutorial[Knative Tutorial]\{:target="_blank"}
-* https://developers.redhat.com/topics/knative/[Knative, Serverless Kubernetes Blogs]\{:target="_blank"}
+* https://www.openshift.com/learn/topics/knative[Knative on OpenShift,window=_blank]
+* https://knative.dev/docs/install/knative-with-openshift/[Knative Install on OpenShift,window=_blank]
+* https://redhat-developer-demos.github.io/knative-tutorial[Knative Tutorial,window=_blank]
+* https://developers.redhat.com/topics/knative/[Knative, Serverless Kubernetes Blogs,window=_blank]
 * https://opensource.com/article/18/11/open-source-serverless-platforms[7 open source platforms to get started with serverless
-computing]\{:target="_blank"}
+computing,window=_blank]
 * https://opensource.com/article/18/11/developing-functions-service-apache-openwhisk[How to develop functions-as-a-service with
-Apache OpenWhisk]\{:target="_blank"}
+Apache OpenWhisk,window=_blank]
 * https://opensource.com/article/19/4/enabling-serverless-kubernetes[How to enable serverless computing in
-Kubernetes]\{:target="_blank"}
+Kubernetes,window=_blank]

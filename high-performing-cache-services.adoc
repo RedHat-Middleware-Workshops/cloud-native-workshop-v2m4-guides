@@ -34,7 +34,7 @@ your entities trivial and fun to write in Quarkus.
 
 When you open `Inventory.java` in `src/main/java/com/redhat/cloudnative/` as below, you will understand how easy to create a
 domain model using Quarkus extension(https://quarkus.io/guides/hibernate-orm-panache-guide[Hibernate ORM with
-Panache]\{:target="_blank"}).
+Panache,window=_blank]).
 
 [source,none,role="copypaste"]
 ----
@@ -103,15 +103,57 @@ Let’s run the inventory application locally using `maven plugin command` via C
 mvn clean compile quarkus:dev -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
 ----
 
+You should see a bunch of log output that ends with:
+
+[source,console,role="copypaste"]
+----
+2020-02-13 19:09:01,346 INFO  [io.quarkus] (main) inventory 1.0-SNAPSHOT (running on Quarkus 1.2.0.Final) started in 2.979s. Listening on: http://0.0.0.0:8080
+2020-02-13 19:09:01,348 INFO  [io.quarkus] (main) Profile dev activated. Live Coding activated.
+2020-02-13 19:09:01,348 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, narayana-jta, resteasy, resteasy-jsonb, smallrye-health]
+----
+
+CodeReady will also detect that the Quarkus app opens port `5005` (for debugging) and `8080` (for web requests). Do not open port 5005, but when prompted, open the port `8080`, which opens a small web browser in CodeReady:
+
 You should see a bunch of log output and Theia popup shows the endpoint for your local application. Click on `Open Link` then you
 will see *Coolstore Inventory* page on you left side. `Close` the popup window.
 
-image::inventory_mvn_compile.png[inventory_service, 700]
+image::open-port.png[Inventory RESTful Service, 700]
 
-[NOTE]
-====
-Make sure to stop Quarkus development mode via kbd:[CTRL+C] (or kbd:[Command+C] on Mac OS) in terminal. Close the Priview window via clicking on *Preview toggle* on the right.
-====
+You should see the inventory web frontend directly in CodeReady (you may need to click the _reload_ icon):
+
+image::inventory-codeready.png[Inventory RESTful Service, 700]
+
+Open a *new* CodeReady Workspaces Terminal:
+
+image::codeready-workspace-terminal.png[Inventory RESTful Service, 700]
+
+and invoke the RESTful endpoint using the following CURL commands.
+
+[source,sh,role="copypaste"]
+----
+curl http://localhost:8080/api/inventory | jq
+----
+
+The output looks like:
+
+[source,json]
+----
+  ...
+  {
+    "id": 7,
+    "itemId": "444435",
+    "link": "http://maps.google.com/?q=Paris",
+    "location": "Paris",
+    "quantity": 600
+  },
+  {
+    "id": 8,
+    "itemId": "444437",
+    "link": "http://maps.google.com/?q=Tokyo",
+    "location": "Tokyo",
+    "quantity": 230
+  }
+----
 
 `In production`, the inventory service will connect to *PostgeSQL* on _OpenShift_ cluster.
 
@@ -122,17 +164,24 @@ maven plugin:
 
 Package the applicaiton via running the following maven plugin in CodeReady WorkspacesTerminal:
 
-`mvn clean package -DskipTests`
+[source,sh,role="copypaste"]
+----
+mvn clean compile package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
+----
 
-____
-`NOTE`: You should `SKIP` the Unit test because you don’t have PostgreSQL database in local environment.
-____
+[NOTE]
+====
+You should `SKIP` the Unit test because you don’t have PostgreSQL database in local environment.
+====
 
 Although your Eclipse Che workspace is running on the Kubernetes cluster, it’s running with a default restricted _Service Account_
 that prevents you from creating most resource types. If you’ve completed other modules, you’re probably already logged in, but
 let’s login again: open a Terminal and issue the following command:
 
-`oc login https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT --insecure-skip-tls-verify=true`
+[source,sh,role="copypaste"]
+----
+oc login https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT --insecure-skip-tls-verify=true
+----
 
 Enter your username and password assigned to you:
 
@@ -141,7 +190,7 @@ Enter your username and password assigned to you:
 
 You should see something like this (the project names may be different):
 
-[source,shell]
+[source,none]
 ----
 Login successful.
 
@@ -159,7 +208,7 @@ Using project "istio-system".
 Welcome! See 'oc help' to get started.
 ----
 
-First, open a new brower with the {{ CONSOLE_URL%7D%7D[OpenShift web console]\{:target="_blank"}
+First, open a new brower with the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank]
 
 image::openshift_login.png[openshift_login]
 
@@ -182,17 +231,44 @@ image::browser_warning.png[warning]
 Other browsers have similar procedures to accept the security exception.
 ____
 
-You will see the OpenShift landing page:
+You will see a list of projects to which you have access:
 
-image::openshift_landing.png[openshift_landing]
+image::openshift_landing.png[openshift_landing, 700]
+
+[NOTE]
+====
+The project displayed in the landing page depends on which labs you will run today.
+====
 
 ____
 The project displayed in the landing page depends on which labs you will run today. If you will develop
 `Service Mesh and Identity` then you will see pre-created projects as the above screeenshot.
 ____
 
+==== Switch to Developer Perspective
+
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new
-instance of PostgreSQL by executing the following commands via CodeReady Workspaces Terminal:
+instance of PostgreSQL. Click **+Add** on the left, on the _Database_ box on the project overview:
+
+image::db.png[db, 700]
+
+Type in `postgres` in the search box, and click on the *PostgreSQL (ephemeral)*:
+
+image::db-postgres.png[db, 700]
+
+Click on *Instantiate Template* and fill in the following fields, leaving the others as their default values:
+
+* **Namespace**: _choose `{{ USER_ID }}-inventory` for the first Namespace. Leave the second one as `openshift`_
+* **Database Service Name**: `inventory-database`
+* **PostgreSQL Connection Username**: `inventory`
+* **PostgreSQL Connection Password**: `mysecretpassword`
+* **PostgreSQL Database Name**: `inventory`
+
+image::db-postgres-inventory-values.png[db, 700]
+
+This will deploy the database to our new project. Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-inventory[Topology View, window=_blank] to see it:
+
+image::inventory-database-deployment.png[inventory_db_deployments, 700]
 
 * Switch to the cloudnativeapps project in the terminal. You need to replace `{{ USER_ID }}` with your username:
 
@@ -214,7 +290,7 @@ oc new-app -e POSTGRESQL_USER=inventory \
 
 This build uses the new
 https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index[Red
-Hat OpenJDK Container Image]\{:target="_blank"}, providing foundational software needed to run Java applications, while staying at
+Hat OpenJDK Container Image,window=_blank], providing foundational software needed to run Java applications, while staying at
 a reasonable size.
 
 * Start and watch the build, which will take about minutes to complete:
@@ -268,7 +344,7 @@ imported this project from Git server. There’re a few interesting things what 
 application before we will deploy it to OpenShift cluster.
 
 This catalog service is not using the default BOM (Bill of material) that Spring Boot projects typically use. Instead, we are
-using a BOM provided by Red Hat as part of the http://snowdrop.me/[Snowdrop]\{:target="_blank"} project.
+using a BOM provided by Red Hat as part of the http://snowdrop.me/[Snowdrop,window=_blank] project.
 
 [source,xml]
 ----
@@ -303,9 +379,10 @@ image::catalog-service-codes.png[catalog]
 Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces
 Terminal:
 
-`cd /projects/cloud-native-workshop-v2m4-labs/catalog-service/`
-
-`mvn clean package spring-boot:repackage -DskipTests`
+[source,sh,role="copypaste"]
+----
+mvn clean package spring-boot:repackage -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m1-labs/catalog-service
+----
 
 The build and deploy may take a minute or two. Wait for it to complete. You should see a `BUILD SUCCESS` at the end of the build
 output.
@@ -694,7 +771,7 @@ Create a build configuration for your application using OpenJDK base container i
 
 This build uses the new
 https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index[Red
-Hat OpenJDK Container Image]\{:target="_blank"}, providing foundational software needed to run Java applications, while staying at
+Hat OpenJDK Container Image,window=_blank], providing foundational software needed to run Java applications, while staying at
 a reasonable size.
 
 * Start and watch the build, which will take about minutes to complete:
@@ -867,7 +944,7 @@ The implementation is pretty straightforward and you just need to define your en
 
 The main property to configure is the URL to access to `MongoDB,` almost all configuration can be included in the connection URI
 so we advise you to do so, you can find more information in the
-https://docs.mongodb.com/manual/reference/connection-string/[MongoDB documentation]\{:target="_blank"}
+https://docs.mongodb.com/manual/reference/connection-string/[MongoDB documentation,window=_blank]
 
 Open `application.properties` in `src/main/resources/` and add the following configuration:
 
@@ -883,7 +960,7 @@ By using a Bson `Codec`, the MongoDB Client will take care of the transformation
 First you need to create a Bson `Codec` that will tell Bson how to transform your entity to/from a MongoDB `Document`. Here we use
 a `CollectibleCodec` as our object is retrievable from the database (it has a MongoDB identifier), if not we would have used a
 `Codec` instead. More information in the https://mongodb.github.io/mongo-java-driver/3.10/bson/codecs[codec
-documentation]\{:target="_blank"}.
+documentation,window=_blank].
 
 Edit the `com.redhat.cloudnative.codec.OrderCodec` class as follows:
 
@@ -1005,7 +1082,7 @@ Create a build configuration for your application using OpenJDK base container i
 
 This build uses the new
 https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index[Red
-Hat OpenJDK Container Image]\{:target="_blank"}, providing foundational software needed to run Java applications, while staying at
+Hat OpenJDK Container Image,window=_blank], providing foundational software needed to run Java applications, while staying at
 a reasonable size.
 
 * Start and watch the build, which will take about minutes to complete:
@@ -1082,7 +1159,7 @@ image::coolstore-ui-deploy.png[coolstore-ui]
 
 `oc expose svc/coolstore-ui`
 
-Go to `Networking > Routes` in {{ CONSOLE_URL%7D%7D[OpenShift web console]\{:target="_blank"} and click on the route
+Go to `Networking > Routes` in {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] and click on the route
 URL of `coolstore-ui`:
 
 image::web-ui-route.png[coolstore-ui]

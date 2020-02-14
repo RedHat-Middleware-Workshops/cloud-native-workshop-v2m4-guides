@@ -33,7 +33,7 @@ https://developers.redhat.com/videos/youtube/CZhOJ_ysIiI/[Apache Kafka].
 
 In this lab, we will use productized and supported versions of the Strimzi and Apache Kafka projects through
 https://www.redhat.com/en/technologies/jboss-middleware/amq?extIdCarryOver=true&sc_cid=701f2000001OH7TAAW[Red Hat
-AMQ]\{:target="_blank"}.
+AMQ,window=_blank].
 
 === 1. Create a Kafka Cluster and Topics
 
@@ -308,7 +308,7 @@ This will build an executable JAR file in the `target/` directory.
 ____
 This build uses the new
 https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index[Red
-Hat OpenJDK Container Image]\{:target="_blank"}, providing foundational software needed to run Java applications, while staying at
+Hat OpenJDK Container Image,window=_blank], providing foundational software needed to run Java applications, while staying at
 a reasonable size.
 ____
 
@@ -510,7 +510,7 @@ image::cart-build-logs.png[cart]
 
 The cart service will be redeployed automatically via
 https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift
-Deployment triggers]\{:target="_blank"} after it completes to build.
+Deployment triggers,window=_blank] after it completes to build.
 
 === 4. Adding Kafka Client to Order Service
 
@@ -646,7 +646,7 @@ Rebuild a container image based the cart artifact that we just packaged, which w
 
 The order service will be redeployed automatically via
 https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift
-Deployment triggers]\{:target="_blank"} after it completes to build.
+Deployment triggers,window=_blank] after it completes to build.
 
 Let’s confirm if the all services works correctly using `Kafka` messaging via coolstore GUI test.
 

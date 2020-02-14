@@ -14,7 +14,7 @@ In this module, we will learn what cloud-native architecture we need to design f
 DevOps/Cloud Native platform in scale and speed. Then we will also develop cloud native applications based on architecture
 patterns such as high-performing cache, event-driven/reactive, and serverless using
 https://www.redhat.com/en/technologies/cloud-computing/openshift/application-runtimes[Red Hat Runtimes],
-https://developers.redhat.com/products/codeready-workspaces/overview[Red Hat CodeReady Workspaces]\{:target="_blank"} and
+https://developers.redhat.com/products/codeready-workspaces/overview[Red Hat CodeReady Workspaces,window=_blank] and
 https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift Container Platform].
 
 === Capabilities of a Cloud Native Application Architectures?
@@ -171,6 +171,6 @@ image::crw-clone-explorer.png[crw,900]
 ====
 The Terminal window in CodeReady Workspaces. You can open a terminal window for any of the containers running in your Developer workspace. For the rest of these labs, anytime you need to run a command in a
 terminal, you can use the **>_ New Terminal** command on the right:
+====
 
 image::codeready-workspace-terminal.png[codeready-workspace-terminal, 700]
-====
