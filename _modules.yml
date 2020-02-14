@@ -1,5 +1,5 @@
 config:
-    renderer: markdown
+    renderer: asciidoc
 
 modules:
   workshop-environment:
