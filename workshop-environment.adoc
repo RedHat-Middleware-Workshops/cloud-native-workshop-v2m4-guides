@@ -46,16 +46,16 @@ that are your own and are isolated from other workshop students
 own personal workspace for use with this workshop. You’ll write, test, and deploy code from here.
 * https://developers.redhat.com/products/rhamt[Red Hat Application Migration Toolkit,window=_blank] - You’ll use this to
 migrate an existing application
-* https://www.redhat.com/en/products/runtimes[Red Hat Runtimes]\{:target="_blank``} - a collection of cloud-native runtimes like
+* https://www.redhat.com/en/products/runtimes[Red Hat Runtimes, window=_blank] - a collection of cloud-native runtimes like
 Spring Boot, Node.js, and https://quarkus.io[Quarkus]\{:target=''_blank"}
 * https://www.redhat.com/en/technologies/jboss-middleware/amq[Red Hat AMQ Streams,window=_blank] - streaming data platform
 based on *Apache Kafka*
 * https://access.redhat.com/products/red-hat-single-sign-on[Red Hat SSO,window=_blank] - For authentication / authorization -
 based on *Keycloak*
-* Other open source projects like https://gogs.io/[Gogs]\{:target="_blank``} (Git server that holds application source code),
-https://knative.dev[Knative]\{:target=''_blank``} (for serverless apps), https://jenkins.io/[Jenkins]\{:target=''_blank``} and
-https://cloud.google.com/tekton/[Tekton]\{:target=''_blank``} (CI/CD pipelines),
-https://prometheus.io[Prometheus]\{:target=''_blank``} and https://grafana.com[Grafana]\{:target=''_blank"} (monitoring apps), and
+* Other open source projects like https://gogs.io/[Gogs, window=_blank] (Git server that holds application source code),
+https://knative.dev[Knative, window=_blank] (for serverless apps), https://jenkins.io/[Jenkins, window=_blank] and
+https://cloud.google.com/tekton/[Tekton, window=_blank] (CI/CD pipelines),
+https://prometheus.io[Prometheus, window=_blank] and https://grafana.com[Grafana]\{:target=''_blank"} (monitoring apps), and
 more.
 
 You’ll be provided clickable URLs throughout the workshop to access the services that have been installed for you.

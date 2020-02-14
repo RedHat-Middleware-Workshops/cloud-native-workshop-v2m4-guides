@@ -208,7 +208,7 @@ Using project "istio-system".
 Welcome! See 'oc help' to get started.
 ----
 
-First, open a new brower with the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank]
+First, open a new brower with the {{ CONSOLE_URL }}[OpenShift web console,window=_blank]
 
 image::openshift_login.png[openshift_login]
 
@@ -1159,7 +1159,7 @@ image::coolstore-ui-deploy.png[coolstore-ui]
 
 `oc expose svc/coolstore-ui`
 
-Go to `Networking > Routes` in {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] and click on the route
+Go to `Networking > Routes` in {{ CONSOLE_URL }}[OpenShift web console,window=_blank] and click on the route
 URL of `coolstore-ui`:
 
 image::web-ui-route.png[coolstore-ui]

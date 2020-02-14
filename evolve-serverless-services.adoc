@@ -394,7 +394,7 @@ _magically_ in the following exercises.
 ==== Create KafkaSource to enable Knative Eventing
 
 In this lab, Knative Eventing is already installed but if you want to install it in your own OpenShift cluster then you can
-install it via the _Knative Eventing Operator_ in {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank].
+install it via the _Knative Eventing Operator_ in {{ CONSOLE_URL }}[OpenShift web console,window=_blank].
 
 Open `knative/kafka-event-source.yaml` (in the _payment-service_ project) to define a _KafkaSource_ to integrate with the Knative
 Eventing. Copy the following YAML code to this file:
@@ -472,7 +472,7 @@ image::input-cc-info-serverless.png[serverless]
 * {blank}
 [arabic, start=4]
 . Let’s find out how _Kafka Event_ enables _Knative Eventing_. Go back to _Project Status_ in
-{{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] then confirm if _payment service_ is up automatically.
+{{ CONSOLE_URL }}[OpenShift web console,window=_blank] then confirm if _payment service_ is up automatically.
 It’s `MAGIC!!`
 
 image::payment-up-again.png[serverless]
@@ -579,7 +579,7 @@ Then create the object in Kubernetes:
 
 `oc create -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/petclinic.yaml`
 
-You should be able to see the deployment in the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank].
+You should be able to see the deployment in the {{ CONSOLE_URL }}[OpenShift web console,window=_blank].
 
 image::petclinic-deployed-1.png[serverless]
 
@@ -710,7 +710,7 @@ will do that in a little bit in the next section.
 The execution order of `tasks` is determined by dependencies that are defined between the tasks via `inputs` and `outputs` as well
 as explicit orders that are defined via `runAfter`.
 
-In the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank], you can click on _Add > Import YAML_ at the top
+In the {{ CONSOLE_URL }}[OpenShift web console,window=_blank], you can click on _Add > Import YAML_ at the top
 right of the screen while you are in the `userXX-cloudnative-pipeline` project.
 
 image::console-import-yaml-1.png[serverless]
@@ -733,14 +733,14 @@ petclinic-deploy-pipeline  8 seconds ago   ---        ---       ---        ---
 
 Now that the pipeline is created, you can trigger it to execute the tasks specified in the pipeline. Triggering pipelines is an
 area that is under development and in the next release it will be possible to be done via the
-{{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] and Tekton CLI. In this tutorial, you will trigger the
+{{ CONSOLE_URL }}[OpenShift web console,window=_blank] and Tekton CLI. In this tutorial, you will trigger the
 pipeline through creating the Kubernetes objects (the hard way!) in order to learn the mechanics of triggering.
 
 First, you should create a number of `PipelineResources` that contain the specifics of the Git repository and image registry to be
 used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
 
 The following `PipelineResource` defines the Git repository and reference for the PetClinic application. Create the following
-pipeline resources via the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] via `Add → Import YAML`:
+pipeline resources via the {{ CONSOLE_URL }}[OpenShift web console,window=_blank] via `Add → Import YAML`:
 
 [source,yaml]
 ----
@@ -756,7 +756,7 @@ spec:
 ----
 
 And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Create the following pipeline
-resources via the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] via `Add → Import YAML`. Replace your
+resources via the {{ CONSOLE_URL }}[OpenShift web console,window=_blank] via `Add → Import YAML`. Replace your
 username with `userXX`:
 
 [source,yaml]
@@ -772,7 +772,7 @@ spec:
     value: image-registry.openshift-image-registry.svc:5000/userXX-cloudnative-pipeline/spring-petclinic
 ----
 
-Create the above pipeline resources via the {{ CONSOLE_URL%7D%7D[OpenShift web console,window=_blank] via
+Create the above pipeline resources via the {{ CONSOLE_URL }}[OpenShift web console,window=_blank] via
 `Add → Import YAML`.
 
 You can see the list of resources created in CodeReady Workspaces Terminal:
