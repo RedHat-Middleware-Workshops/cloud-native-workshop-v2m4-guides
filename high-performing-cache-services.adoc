@@ -20,7 +20,7 @@ _Inventory Service_ serves inventory and availability data for retail products. 
 service works and built on *Quarkus* Java runtimes. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand
 _inventory-service_ directory.
 
-image::codeready-workspace-inventory-project.png[inventory_service, 500]
+image::codeready-workspace-inventory-project.png[inventory_service, 700]
 
 While the code is surprisingly simple, under the hood this is using:
 
@@ -36,7 +36,7 @@ When you open `Inventory.java` in `src/main/java/com/redhat/cloudnative/` as bel
 domain model using Quarkus extension(https://quarkus.io/guides/hibernate-orm-panache-guide[Hibernate ORM with
 Panache,window=_blank]).
 
-[source,none,role="copypaste"]
+[source,none]
 ----
 @Entity
 @Cacheable
@@ -84,7 +84,7 @@ image::inventoryResource.png[inventory_service, 700]
 `In Development`, we will configure to use local *in-memory H2 database* for local testing, as defined in
 _src/main/resources/application.properties_:
 
-[source,none,role="copypaste"]
+[source,none]
 ----
 quarkus.datasource.url=jdbc:h2:file://projects/database.db
 quarkus.datasource.driver=org.h2.Driver
@@ -105,7 +105,7 @@ mvn clean compile quarkus:dev -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-l
 
 You should see a bunch of log output that ends with:
 
-[source,console,role="copypaste"]
+[source,console]
 ----
 2020-02-13 19:09:01,346 INFO  [io.quarkus] (main) inventory 1.0-SNAPSHOT (running on Quarkus 1.2.0.Final) started in 2.979s. Listening on: http://0.0.0.0:8080
 2020-02-13 19:09:01,348 INFO  [io.quarkus] (main) Profile dev activated. Live Coding activated.
@@ -160,7 +160,10 @@ The output looks like:
 We will use _Quarkus extension_ to add *PostgreSQL JDBC Driver*. Go back to CodeReady Workspaces Terminal and run the following
 maven plugin:
 
-`mvn quarkus:add-extension -Dextensions="jdbc-postgresql"`
+[source,sh,role="copypaste"]
+----
+mvn quarkus:add-extension -Dextensions="jdbc-postgresql" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
+----
 
 Package the applicaiton via running the following maven plugin in CodeReady WorkspacesTerminal:
 
@@ -196,19 +199,18 @@ Login successful.
 
 You have access to the following projects and can switch between them with 'oc project <projectname>':
 
-  * istio-system
-    knative-serving
-    user1-bookinfo
+  * user1-bookinfo
     user1-catalog
     user1-cloudnative-pipeline
     user1-cloudnativeapps
     user1-inventory
+    user1-istio-system
 
-Using project "istio-system".
+Using project "user1-bookinfo".
 Welcome! See 'oc help' to get started.
 ----
 
-First, open a new brower with the {{ CONSOLE_URL }}[OpenShift web console,window=_blank]
+First, open a new brower with the {{ CONSOLE_URL }}[OpenShift web console window=_blank]
 
 image::openshift_login.png[openshift_login]
 
@@ -217,19 +219,20 @@ Login using:
 * Username: `{{ USER_ID }}`
 * Password: `r3dh4t1!`
 
-____
-*NOTE*: Use of self-signed certificates
+[NOTE]
+====
+Use of self-signed certificates
 
 When you access the OpenShift web console](\{\{ CONSOLE_URL}}) or other URLs via _HTTPS_ protocol, you will see browser warnings
 like `Your > Connection is not secure` since this workshop uses self-signed certificates (which you should not do in production!).
 For example, if you’re using *Chrome*, you will see the following screen.
 
 Click on `Advanced` then, you can access the HTTPS page when you click on `Proceed to...`!!!
+====
 
 image::browser_warning.png[warning]
 
 Other browsers have similar procedures to accept the security exception.
-____
 
 You will see a list of projects to which you have access:
 
@@ -237,18 +240,14 @@ image::openshift_landing.png[openshift_landing, 700]
 
 [NOTE]
 ====
-The project displayed in the landing page depends on which labs you will run today.
-====
-
-____
 The project displayed in the landing page depends on which labs you will run today. If you will develop
 `Service Mesh and Identity` then you will see pre-created projects as the above screeenshot.
-____
+====
 
-==== Switch to Developer Perspective
+ * Switch to Developer Perspective
 
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new
-instance of PostgreSQL. Click **+Add** on the left, on the _Database_ box on the project overview:
+instance of PostgreSQL. Click **+Add** on the left, on the _Database_ box on the ** {{ USER_ID }}-cloudnativeapps project overview:
 
 image::db.png[db, 700]
 
@@ -258,7 +257,7 @@ image::db-postgres.png[db, 700]
 
 Click on *Instantiate Template* and fill in the following fields, leaving the others as their default values:
 
-* **Namespace**: _choose `{{ USER_ID }}-inventory` for the first Namespace. Leave the second one as `openshift`_
+* **Namespace**: _choose `{{ USER_ID }}-cloudnativeapps` for the first Namespace. Leave the second one as `openshift`_
 * **Database Service Name**: `inventory-database`
 * **PostgreSQL Connection Username**: `inventory`
 * **PostgreSQL Connection Password**: `mysecretpassword`
@@ -266,59 +265,41 @@ Click on *Instantiate Template* and fill in the following fields, leaving the ot
 
 image::db-postgres-inventory-values.png[db, 700]
 
-This will deploy the database to our new project. Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-inventory[Topology View, window=_blank] to see it:
+This will deploy the database to our new project. Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] to see it:
 
 image::inventory-database-deployment.png[inventory_db_deployments, 700]
 
-* Switch to the cloudnativeapps project in the terminal. You need to replace `{{ USER_ID }}` with your username:
-
-`oc project {{ USER_ID }}-cloudnativeapps`
-
-* Deploy PostgreSQL to the project:
-
-[source,shell]
-----
-oc new-app -e POSTGRESQL_USER=inventory \
-  -e POSTGRESQL_PASSWORD=mysecretpassword \
-  -e POSTGRESQL_DATABASE=inventory openshift/postgresql:10 \
-  --name=inventory-database
-----
-
 * Create a build configuration for your application using OpenJDK base container image in OpenShift:
 
-`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory -l app=inventory`
+[source,sh,role="copypaste"]
+----
+oc project {{ USER_ID }}-cloudnativeapps
+oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory -l app=inventory
+----
 
+[INFO]
+====
 This build uses the new
-https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index[Red
-Hat OpenJDK Container Image,window=_blank], providing foundational software needed to run Java applications, while staying at
+https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index[Red Hat OpenJDK Container Image, window=_blank], providing foundational software needed to run Java applications, while staying at
 a reasonable size.
+====
 
 * Start and watch the build, which will take about minutes to complete:
 
-`oc start-build inventory --from-file target/*-runner.jar --follow`
+[source,sh,role="copypaste"]
+----
+oc start-build inventory --from-file $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service/target/*-runner.jar --follow
+----
 
-* Deploy it as an OpenShift application after the build is done and override the Postgres URL to specify our production Postgres
-credentials:
+* Once the build is done, we’ll deploy it as an OpenShift application and override the Postgres URL to specify our production
+Postgres credentials:
 
-`oc new-app inventory -e QUARKUS_PROFILE=prod`
+[source,sh,role="copypaste"]
+----
+oc new-app inventory -e QUARKUS_PROFILE=prod; oc expose svc/inventory
+----
 
-* Create the route
-
-`oc expose svc/inventory`
-
-* Finally, make sure it’s actually done rolling out:
-
-`oc rollout status -w dc/inventory`
-
-Wait for that command to report replication controller `inventory-1` successfully rolled out before continuing.
-
-____
-`[NOTE]` Even if the rollout command reports success the application may not be ready yet and the reason for that is that we
-currently don’t have any liveness check configured, but we will add that in the next steps.
-____
-
-Let’s go to `Developer Console` in OpenShift to find all inventories. Click on `Topology` in \{\{ USER_ID }}-cloudnativeapps
-project:
+Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], make sure it's done deploying (dark blue circle):
 
 image::inventory_topology.png[inventory]
 
@@ -326,8 +307,7 @@ image::inventory_topology.png[inventory]
 
 image::inventory_topology_openurl.png[inventory]
 
-So now `Inventory` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console with its
-single replica running in 1 pod, along with the Postgres database pod.
+So now `Inventory` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console with its single replica running in 1 pod, along with the Postgres database pod.
 
 === 2. Deploying Catalog Service
 
