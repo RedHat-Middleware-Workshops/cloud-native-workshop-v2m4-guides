@@ -249,11 +249,11 @@ The project displayed in the landing page depends on which labs you will run tod
  * Switch to Developer Perspective
 
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new
-instance of PostgreSQL. Click **+Add** on the left, on the _Database_ box on the ** {{ USER_ID }}-cloudnativeapps project overview:
+instance of PostgreSQL. Click **+Add** on the left, on the _Database_ box on the ** {{ USER_ID }}-cloudnativeapps** project overview:
 
 image::db.png[db, 700]
 
-Type in `postgres` in the search box, and click on the *PostgreSQL (ephemeral)*:
+Type in `postgres` in the search box, and click on the **PostgreSQL (ephemeral)**:
 
 image::db-postgres.png[db, 700]
 
