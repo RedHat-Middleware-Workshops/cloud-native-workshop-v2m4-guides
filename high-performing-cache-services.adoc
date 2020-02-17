@@ -155,6 +155,8 @@ The output looks like:
   }
 ----
 
+Be sure to terminate the running Quarkus development via kbd:[CTRL+C] (or kbd:[Command+C] on Mac OS).
+
 `In production`, the inventory service will connect to *PostgeSQL* on _OpenShift_ cluster.
 
 We will use _Quarkus extension_ to add *PostgreSQL JDBC Driver*. Go back to CodeReady Workspaces Terminal and run the following
@@ -210,9 +212,9 @@ Using project "user1-bookinfo".
 Welcome! See 'oc help' to get started.
 ----
 
-First, open a new brower with the {{ CONSOLE_URL }}[OpenShift web console window=_blank]
+First, open a new brower with the {{ CONSOLE_URL }}[OpenShift web console, window=_blank]:
 
-image::openshift_login.png[openshift_login]
+image::openshift_login.png[openshift_login, 700]
 
 Login using:
 
@@ -274,7 +276,7 @@ image::inventory-database-deployment.png[inventory_db_deployments, 700]
 [source,sh,role="copypaste"]
 ----
 oc project {{ USER_ID }}-cloudnativeapps
-oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory -l app=inventory
+oc new-build -n {{ USER_ID }}-cloudnativeapps registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory -l app=inventory
 ----
 
 [INFO]
@@ -296,39 +298,33 @@ Postgres credentials:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app inventory -e QUARKUS_PROFILE=prod; oc expose svc/inventory
+oc new-app inventory; oc expose svc/inventory
 ----
 
 Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], make sure it's done deploying (dark blue circle):
 
-image::inventory_topology.png[inventory]
+image::inventory_topology.png[inventory, 700]
 
 * Click on Open URL then you will see inventories:
 
-image::inventory_topology_openurl.png[inventory]
+image::inventory_topology_openurl.png[inventory, 700]
 
 So now `Inventory` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console with its single replica running in 1 pod, along with the Postgres database pod.
 
 === 2. Deploying Catalog Service
 
+_Catalog Service_ serves products and prices for retail products. Lets’s go through quickly how the catalog service works and built on *Spring Boot* Java runtimes. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand *catalog-service* directory.
 
+image::codeready-workspace-catalog-project.png[catalog, 700]
 
-_Catalog Service_ serves products and prices for retail products. Lets’s go through quickly how the catalog service works and
-built on *Spring Boot* Java runtimes. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand *catalog-service*
-directory.
-
-image::codeready-workspace-catalog-project.png[catalog]\{:width=``500px''}
-
-First of all, we won’t implement the catalog application to retrieve data because of all funtions are already built when we
-imported this project from Git server. There’re a few interesting things what we need to take a look at this Spring Boot
+First of all, we won’t implement the catalog application to retrieve data because of all funtions are already built when we imported this project from Git server. There’re a few interesting things what we need to take a look at this Spring Boot
 application before we will deploy it to OpenShift cluster.
 
-This catalog service is not using the default BOM (Bill of material) that Spring Boot projects typically use. Instead, we are
-using a BOM provided by Red Hat as part of the http://snowdrop.me/[Snowdrop,window=_blank] project.
+This catalog service is not using the default BOM (Bill of material) that Spring Boot projects typically use. Instead, we are using a BOM provided by Red Hat as part of the http://snowdrop.me/[Snowdrop, window=_blank] project.
 
 [source,xml]
 ----
-<dependencyManagement>
+    <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>me.snowdrop</groupId>
@@ -361,81 +357,77 @@ Terminal:
 
 [source,sh,role="copypaste"]
 ----
-mvn clean package spring-boot:repackage -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m1-labs/catalog-service
+mvn clean package spring-boot:repackage -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/catalog-service
 ----
 
-The build and deploy may take a minute or two. Wait for it to complete. You should see a `BUILD SUCCESS` at the end of the build
-output.
+The build and deploy may take a minute or two. Wait for it to complete. You should see a `BUILD SUCCESS` at the end of the build output.
 
-Our production catalog microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new
-instance of PostgreSQL by executing via CodeReady Workspaces Terminal:
+Our `production` catalog microservice will use an external database (PostgreSQL) to house inventory data. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank].
 
-Make sure if the current project is `{{ USER_ID }}-cloudnativeapps`.
+* Click **+Add** on the left, on the _Database_ box on the project overview:
 
-* Deploy PostgreSQL to the project:
+image::db.png[db, 700]
 
-[source,shell]
-----
-oc new-app -e POSTGRESQL_USER=catalog \
-    -e POSTGRESQL_PASSWORD=mysecretpassword \
-    -e POSTGRESQL_DATABASE=catalog \
-    openshift/postgresql:10 \
-    --name=catalog-database
-----
+Type in `postgres` in the search box, and click on the *PostgreSQL (ephemeral)*:
+
+image::db-postgres.png[db, 700]
+
+Click on *Instantiate Template* and fill in the following fields, leaving the others as their default values:
+
+* **Namespace**: _choose `{{ USER_ID }}-catalog` for the first Namespace. Leave the second one as `openshift`_
+* **Database Service Name**: `catalog-database`
+* **PostgreSQL Connection Username**: `catalog`
+* **PostgreSQL Connection Password**: `mysecretpassword`
+* **PostgreSQL Database Name**: `catalog`
+
+image::db-catalog-postgres-fields.png[db, 700]
+
+This will deploy the database to our catalog project. Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] to see it:
 
 * Create a build configuration for your application using OpenJDK base container image in OpenShift:
 
-`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=catalog -l app=catalog`
+[source, properties, role="copypaste"]
+----
+oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=catalog -l app=catalog
+----
 
 * Start and watch the build, which will take about minutes to complete:
 
-`oc start-build catalog --from-file=target/catalog-1.0.0-SNAPSHOT.jar --follow`
+[source,sh,role="copypaste"]
+----
+oc start-build catalog --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/catalog-service/target/catalog-1.0.0-SNAPSHOT.jar --follow
+----
 
 image::catalog-build-logs.png[catalog]
 
-* Deploy it as an OpenShift application after the build is done and override the Postgres URL to specify our production Postgres
-credentials:
+* Once the build is done, we’ll deploy it as an OpenShift application and override the spring profile to use our _production_ values.:
 
-`oc new-app catalog`
+[source,sh,role="copypaste"]
+----
+oc new-app catalog -e JAVA_OPTS_APPEND='-Dspring.profiles.active=openshift'
+----
 
 * Create the route
 
-`oc expose service catalog`
+[source,sh,role="copypaste"]
+----
+oc expose service catalog
+----
 
-* Finally, make sure it’s actually done rolling out:
+* Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] for the catalog, and ensure you get the blue circles!
 
-`oc rollout status -w dc/catalog`
+And then access the http://catalog-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Catalog Web frontend, window=_blank] and ensure you get the expected inventory quantity (and not `-1`):
 
-Wait for that command to report replication controller `catalog-1` successfully rolled out before continuing.
+[NOTE]
+====
+Even if the rollout command reports success the application may not be ready yet and the reason for that is that we currently don’t have any liveness check configured, but we will add that in the next steps.
+====
 
-____
-`[NOTE]` Even if the rollout command reports success the application may not be ready yet and the reason for that is that we
-currently don’t have any liveness check configured, but we will add that in the next steps.
-____
+image::catalog.png[catalog, 700]
 
-And now we can access using curl once again to find a certain inventory:
+So now `Catalog` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console with running 4 pods such as catalog, catalog-database, inventory, and inventory-database.
 
-* Get the route URL
-
-`export URL="http://$(oc get route | grep catalog | awk '{print $2}')"`
-
-`curl $URL/api/product/329299 ; echo`
-
-You will see the following result:
-
-____
-*NOTE* It may take a few tries to get the below result as the pod spins up. Keep trying until you get the below output! Also, you
-may get `quantity:0` for the first few times as the link to the inventory service is established.
-____
-
-`{"itemId":"329299","name":"Red Fedora","desc":"Official Red Hat Fedora","price":34.99,"quantity":736}`
-
-image::catalog_curl_result.png[openshift_login]
-
-So now `Catalog` service is deployed to OpenShift. You can also see it in the Project Status in the OpenShift Console with running
-4 pods such as catalog, catalog-database, inventory, and inventory-database.
-
-image::catalog-project-status.png[catalog]
+image::inventory-catalog-topology.png[catalog]
 
 === 3. Developing and Deploying Shopping Cart Service
 
