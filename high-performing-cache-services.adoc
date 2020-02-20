@@ -24,17 +24,13 @@ image::codeready-workspace-inventory-project.png[inventory_service, 700]
 
 While the code is surprisingly simple, under the hood this is using:
 
-* `RESTEasy` to expose the REST endpoints
-* `Hibernate ORM` with Panache to perform the CRUD operations on the database
-* `Maven` Java project structure
+* **RESTEasy** to expose the REST endpoints
+* **Hibernate ORM** with Panache to perform the CRUD operations on the database
+* **Maven** Java project structure
 
-`Hibernate ORM` is the de facto JPA implementation and offers you the full breadth of an Object Relational Mapper. It makes
-complex mappings possible, but it does not make simple and common mappings trivial. Hibernate ORM with Panache focuses on making
-your entities trivial and fun to write in Quarkus.
+_Hibernate ORM_ is the de facto JPA implementation and offers you the full breadth of an Object Relational Mapper. It makes complex mappings possible, but it does not make simple and common mappings trivial. Hibernate ORM with Panache focuses on making your entities trivial and fun to write in Quarkus.
 
-When you open `Inventory.java` in `src/main/java/com/redhat/cloudnative/` as below, you will understand how easy to create a
-domain model using Quarkus extension(https://quarkus.io/guides/hibernate-orm-panache-guide[Hibernate ORM with
-Panache,window=_blank]).
+When you open `Inventory.java` in `src/main/java/com/redhat/cloudnative/` as below, you will understand how easy to create a domain model using Quarkus extension(https://quarkus.io/guides/hibernate-orm-panache-guide[Hibernate ORM with Panache,window=_blank]).
 
 [source,none]
 ----
@@ -54,24 +50,16 @@ public class Inventory extends PanacheEntity {
 }
 ----
 
-* By extending `PanacheEntity` in your entities, you will get an ID field that is auto-generated. If you require a custom ID
-strategy, you can extend `PanacheEntityBase` instead and handle the ID yourself.
-* By using Use public fields, there is no need for functionless getters and setters (those that simply get or set the field). You
-simply refer to fields like Inventory.location without the need to write a Inventory.geLocation() implementation. Panache will
-auto-generate any getters and setters you do not write, or you can develop your own getters/setters that do more than get/set,
+* By extending _PanacheEntity_ in your entities, you will get an ID field that is auto-generated. If you require a custom ID strategy, you can extend _PanacheEntityBase_ instead and handle the ID yourself.
+* By using Use public fields, there is no need for functionless getters and setters (those that simply get or set the field). You simply refer to fields like Inventory.location without the need to write a Inventory.geLocation() implementation. Panache will auto-generate any getters and setters you do not write, or you can develop your own getters/setters that do more than get/set,
 which will be called when the field is accessed directly.
 
-The `PanacheEntity` superclass comes with lots of super useful static methods and you can add your own in your derived entity
-class, and much like traditional object-oriented programming it’s natural and recommended to place custom queries as close to the
-entity as possible, ideally within the entity definition itself. Users can just start using your entity Inventory by typing
+The PanacheEntity superclass comes with lots of super useful static methods and you can add your own in your derived entity class, and much like traditional object-oriented programming it’s natural and recommended to place custom queries as close to the entity as possible, ideally within the entity definition itself. Users can just start using your entity Inventory by typing
 Inventory, and getting completion for all the operations in a single place.
 
-When an entity is annotated with `@Cacheable`, all its field values are cached except for collections and relations to other
-entities. This means the entity can be loaded without querying the database, but be careful as it implies the loaded entity might
-not reflect recent changes in the database.
+When an entity is annotated with _@Cacheable_, all its field values are cached except for collections and relations to other entities. This means the entity can be loaded without querying the database, but be careful as it implies the loaded entity might not reflect recent changes in the database.
 
-Next, let’s find out how `inventory service` exposes `RESTful APIs` on Quarkus. Open `InventoryResource.java` in
-`src/main/java/com/redhat/cloudnative/` and you will see the following code sniffet.
+Next, let’s find out how _inventory service_ exposes _RESTful APIs_ on Quarkus. Open `InventoryResource.java` in `src/main/java/com/redhat/cloudnative/` and you will see the following code sniffet.
 
 The REST services defines two endpoints:
 
@@ -81,8 +69,7 @@ being the location which we want to check its inventory status.
 
 image::inventoryResource.png[inventory_service, 700]
 
-`In Development`, we will configure to use local *in-memory H2 database* for local testing, as defined in
-_src/main/resources/application.properties_:
+**In Development**, we will configure to use local _in-memory H2 database_ for local testing, as defined in `src/main/resources/application.properties`:
 
 [source,none]
 ----
@@ -157,7 +144,7 @@ The output looks like:
 
 Be sure to terminate the running Quarkus development via kbd:[CTRL+C] (or kbd:[Command+C] on Mac OS).
 
-`In production`, the inventory service will connect to *PostgeSQL* on _OpenShift_ cluster.
+**In production**, the inventory service will connect to _PostgeSQL_ on OpenShift cluster.
 
 We will use _Quarkus extension_ to add *PostgreSQL JDBC Driver*. Go back to CodeReady Workspaces Terminal and run the following
 maven plugin:
@@ -179,9 +166,7 @@ mvn clean compile package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-worksho
 You should `SKIP` the Unit test because you don’t have PostgreSQL database in local environment.
 ====
 
-Although your Eclipse Che workspace is running on the Kubernetes cluster, it’s running with a default restricted _Service Account_
-that prevents you from creating most resource types. If you’ve completed other modules, you’re probably already logged in, but
-let’s login again: open a Terminal and issue the following command:
+Although your Eclipse Che workspace is running on the Kubernetes cluster, it’s running with a default restricted _Service Account_ that prevents you from creating most resource types. If you’ve completed other modules, you’re probably already logged in, but let’s login again: open a Terminal and issue the following command:
 
 [source,sh,role="copypaste"]
 ----
@@ -225,7 +210,7 @@ Login using:
 ====
 Use of self-signed certificates
 
-When you access the OpenShift web console]({{ CONSOLE_URL}}) or other URLs via _HTTPS_ protocol, you will see browser warnings
+When you access the [OpenShift web console]({{ CONSOLE_URL}}) or other URLs via _HTTPS_ protocol, you will see browser warnings
 like `Your > Connection is not secure` since this workshop uses self-signed certificates (which you should not do in production!).
 For example, if you’re using *Chrome*, you will see the following screen.
 
@@ -424,11 +409,7 @@ By now, you have deployed some of the essential elements for the Coolstore appli
 
 ==== Let’s get started!
 
-In a nutshell, the Cart service is RESTful and built with Quarkus using the Red Hat’s Distributed `Data Grid` technology.
-
-==== What are the building blocks of the Shopping cart a.k.a cart-service?
-
-It uses a Red Hat’s Distributed **Data Grid** technology to store all shopping carts and assigns a unique id to them. It uses the **Quarkus Infinispan client** to do this. The Shopping cart makes a call via the Quarkus Rest client to fetch all items in the Catalog. In the end, Shopping cart also throws out a _Kafka_ message to the topic Orders, when checking out. For that, we use the **Quarkus Kafka client** in the next lab. Last and perhaps worth mentioning the _REST+Swagger UI_ also part of the REST API support in _Quarkus_.
+In a nutshell, the Cart service is RESTful and built with Quarkus using the Red Hat’s Distributed `Data Grid` technology. It uses a Red Hat’s Distributed **Data Grid** technology to store all shopping carts and assigns a unique id to them. It uses the **Quarkus Infinispan client** to do this. The Shopping cart makes a call via the Quarkus Rest client to fetch all items in the Catalog. In the end, Shopping cart also throws out a _Kafka_ message to the topic Orders, when checking out. For that, we use the **Quarkus Kafka client** in the next lab. Last and perhaps worth mentioning the _REST+Swagger UI_ also part of the REST API support in _Quarkus_.
 
 What is a _Shopping Cart_ in our context? A Shopping cart has a list of Shopping Items. Quantity of a product in the Items list _Discount_ and promotional details. We will see these in more details when we look at our model.
 
@@ -684,7 +665,7 @@ We have now successfully stated that the method adheres to a GET request and acc
 Take this opportunity to look at some of the other methods. You will find **@POST** and **@DELETE** and also the paths they adhere too. This is how we can construct a simple Endpoint for our application.
 
 [NOTE]
-=====
+====
 There are other **// TODO** markers and commented-out code we will use later. Leave them alone for now.
 ====
 
