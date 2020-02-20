@@ -464,7 +464,7 @@ topic.
     }
 ----
 
-Now that we have those methods, lets add a call to our `sendOrder()` method when we are checking out. Replace the code for
+Now that we have those methods, Let'sadd a call to our `sendOrder()` method when we are checking out. Replace the code for
 `checkout()` with this code:
 
 [source,none,role="copypaste"]
@@ -599,7 +599,7 @@ public class KafkaOrders {
 }
 ----
 
-Almost there; Next lets add the configuration to our `src/main/resources/application.properties` file in the `order-service`
+Almost there; Next Let'sadd the configuration to our `src/main/resources/application.properties` file in the `order-service`
 project:
 
 [source,none,role="copypaste"]
