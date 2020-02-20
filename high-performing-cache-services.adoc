@@ -210,8 +210,7 @@ Login using:
 ====
 Use of self-signed certificates
 
-When you access the [OpenShift web console]({{ CONSOLE_URL}}) or other URLs via _HTTPS_ protocol, you will see browser warnings
-like `Your > Connection is not secure` since this workshop uses self-signed certificates (which you should not do in production!).
+When you access the [=OpenShift web console or other URLs via _HTTPS_ protocol, you will see browser warnings like `Your > Connection is not secure` since this workshop uses self-signed certificates (which you should not do in production!).
 For example, if you’re using *Chrome*, you will see the following screen.
 
 Click on `Advanced` then, you can access the HTTPS page when you click on `Proceed to...`!!!
@@ -328,13 +327,13 @@ This catalog service is not using the default BOM (Bill of material) that Spring
     </dependencyManagement>
 ----
 
-image::catalog-pom.png[catalog]
+image::catalog-pom.png[catalog, 700]
 
 Also, catalog service calls the inventory service that we deployed earlier using REST to retrieve the inventory status and include
 that in the response. Open `CatalogService.java` in `src/main/java/com/redhat/coolstore/service` directory via Project Explorer
 and how `read()` and `readAll()` method work:
 
-image::catalog-service-codes.png[catalog]
+image::catalog-service-codes.png[catalog, 700]
 
 Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
 
@@ -407,8 +406,6 @@ So now `Catalog` service is deployed to OpenShift. You can also see it in the Pr
 
 By now, you have deployed some of the essential elements for the Coolstore application. However, an online shop without a cart means no checkout experience. In this section, we are going to implement the Shopping Cart; in our Microservice world, we are going to call it the **cart service** and our java artifact/repo is called the **cart-service**.
 
-==== Let’s get started!
-
 In a nutshell, the Cart service is RESTful and built with Quarkus using the Red Hat’s Distributed `Data Grid` technology. It uses a Red Hat’s Distributed **Data Grid** technology to store all shopping carts and assigns a unique id to them. It uses the **Quarkus Infinispan client** to do this. The Shopping cart makes a call via the Quarkus Rest client to fetch all items in the Catalog. In the end, Shopping cart also throws out a _Kafka_ message to the topic Orders, when checking out. For that, we use the **Quarkus Kafka client** in the next lab. Last and perhaps worth mentioning the _REST+Swagger UI_ also part of the REST API support in _Quarkus_.
 
 What is a _Shopping Cart_ in our context? A Shopping cart has a list of Shopping Items. Quantity of a product in the Items list _Discount_ and promotional details. We will see these in more details when we look at our model.
@@ -416,8 +413,6 @@ What is a _Shopping Cart_ in our context? A Shopping cart has a list of Shopping
 For this lab, we are using the code ready workspaces, make sure you have the following project open in your workspace. Lets’s go through quickly how the cart service works and built on _Quarkus*_ Java runtimes. Go to _Explorer: /projects_ in CodeReady Workspaces Web IDE and expand `cart-service` directory.
 
 image::codeready-workspace-cart-project.png[cart, 700]
-
-==== Adding a distributed cache to our cart-service
 
 We are going to use the Red hat Distributed `Data Grid` for caching all the users’ carts.
 
@@ -624,8 +619,6 @@ Next we need to make sure we will inject our cache in our service. Open `com.red
     RemoteCache<String, ShoppingCart> carts;
 ----
 
-==== Building cart-service REST API with Quarkus
-
 The cart is quite simple; All the information from the browser i.e., via our **Angular App** is via _JSON_ at the _/api/cart_ endpoint:
 
 * **GET** request _/{cartId}_ gets the items in the cart, or creates a new unique ID if one is not present.
@@ -669,8 +662,6 @@ Take this opportunity to look at some of the other methods. You will find **@POS
 There are other **// TODO** markers and commented-out code we will use later. Leave them alone for now.
 ====
 
-==== Package and Deploy the cart-service
-
 Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
@@ -706,8 +697,6 @@ Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}
 
 image::cart-topology.png[catalog, 700]
 
-http://cart-user1-cloudnativeapps.apps.cluster-boston-9f85.boston-9f85.example.opentlc.com/swagger-ui/
-
 And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Cart Swagger UI, window=_blank]:
 
 image::cart-swagger-ui.png[cart, 700]
@@ -715,50 +704,43 @@ image::cart-swagger-ui.png[cart, 700]
 Notice that the documentation after the methods, this is an excellent way for other service developers to know what you intend to
 do with each service method. You can try to invoke the methods and see the output from the service. Hence an excellent way to test
 quickly as well.
-
+T
 === 4. Developing and Deploying Order Service
 
 _Order Service_ manages all orders when customers checkout items in the shopping cart. Lets’s go through quickly how the order
-service get `REST` services to use the `MongoDB` database with `Quarkus` Java runtimes. Go to _Explorer: /projects_ in
-CodeReady Workspaces Web IDE and expand `order-service` directory.
+service get REST services to use the **MongoDB** database with **Quarkus** Java runtimes. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand **order-service** directory.
 
-image::codeready-workspace-order-project.png[catalog]\{:width=``500px''}
+image::codeready-workspace-order-project.png[order, 700]
 
-The application built in `Quarkus` is quite simple: the user can add elements in a list using `RESTful APIs` and the list is
-updated. All the information between the client and the server are formatted as `JSON`. The elements are stored in `MongoDB`.
+The application built in _Quarkus_ is quite simple: the user can add elements in a list using _RESTful APIs_ and the list is updated. All the information between the client and the server are formatted as **JSON**. The elements are stored in _MongoDB_.
 
-==== Adding Maven Dependencies using Quarkus Extensions
+Execute the following command for adding Maven Dependencies using Quarkus Extensions via CodeReady Workspaces Terminal:
 
-Execute the following command via CodeReady Workspaces Terminal:
+[source,sh,role="copypaste"]
+----
+mvn quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
+----
 
-`cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
+This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, the quarkus-mongodb-client extension has been added to your **pom.xml**.
 
-`mvn quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client"`
+image::order-pom-dependency.png[order, 700]
 
-This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, the
-quarkus-mongodb-client extension has been added to your `pom.xml`.
+Before we create the order service using JSON REST service, let's have a look at the `Order` bean in `src/main/java/com/redhat/cloudnative/`as follows:
 
-image::order-pom-dependency.png[catalog]
+image::order_bean.png[order, 700]
 
-==== Creating Order Service using JSON REST service
+Nothing fancy. One important thing to note is that having a default constructor is required by the **JSON serialization layer**.
 
-First, let’s have a look at the `Order` bean in `src/main/java/com/redhat/cloudnative/`as follows:
+Now, open a `com.redhat.cloudnative.OrderService` that will be the business layer of our application and _store/load_ the orders from the mongoDB database. Add the following Java codes at each market.
 
-image::order_bean.png[openshift_login]\{:width=``700px''}
-
-Nothing fancy. One important thing to note is that having a default constructor is required by the `JSON serialization layer`.
-
-Now, open a `com.redhat.cloudnative.OrderService` that will be the business layer of our application and `store/load` the orders
-from the mongoDB database. Add the following Java codes at each market.
-
-* `// TODO: Inject MongoClient here` marker:
+`// TODO: Inject MongoClient here` marker:
 
 [source,none,role="copypaste"]
 ----
     @Inject MongoClient mongoClient;
 ----
 
-* `// TODO: Add a while loop to make an order lists using MongoCursor here` marker in `list()` method:
+`// TODO: Add a while loop to make an order lists using MongoCursor here` marker in `list()` method:
 
 [source,none,role="copypaste"]
 ----
@@ -799,7 +781,7 @@ from the mongoDB database. Add the following Java codes at each market.
 
 Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each marker:
 
-* `// TODO: Add JAX-RS annotations here` marker:
+`// TODO: Add JAX-RS annotations here` marker:
 
 [source,none,role="copypaste"]
 ----
@@ -808,14 +790,14 @@ Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each ma
 @Consumes(MediaType.APPLICATION_JSON)
 ----
 
-* `// TODO: Inject OrderService here` marker:
+`// TODO: Inject OrderService here` marker:
 
 [source,none,role="copypaste"]
 ----
     @Inject OrderService orderService;
 ----
 
-* `// TODO: Add list(), add(), updateStatus() methods here` marker:
+`// TODO: Add list(), add(), updateStatus() methods here` marker:
 
 [source,none,role="copypaste"]
 ----
@@ -838,34 +820,27 @@ Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each ma
     }
 ----
 
-The implementation is pretty straightforward and you just need to define your endpoints using the `JAX-RS annotations` and use the
-`OrderService` to list/add new orders.
+The implementation is pretty straightforward and you just need to define your endpoints using the **JAX-RS annotations** and use the _OrderService_ to list/add new orders.
 
-==== Configuring the MongoDB database
-
-The main property to configure is the URL to access to `MongoDB,` almost all configuration can be included in the connection URI
+The main property to configure is the URL to access to **MongoDB**, almost all configuration can be included in the connection URI
 so we advise you to do so, you can find more information in the
 https://docs.mongodb.com/manual/reference/connection-string/[MongoDB documentation,window=_blank]
 
 Open `application.properties` in `src/main/resources/` and add the following configuration:
 
-`quarkus.mongodb.connection-string = mongodb://order-database:27017`
+[source,sh,role="copypaste"]
+----
+quarkus.mongodb.connection-string = mongodb://order-database:27017
+----
 
-image::order_application_properties.png[order]
+By using a Bson **Codec**, the MongoDB Client will take care of the transformation of your domain object to/from a MongoDB **Document** automatically.
 
-==== Simplifying MongoDB Client usage using BSON codec
-
-By using a Bson `Codec`, the MongoDB Client will take care of the transformation of your domain object to/from a MongoDB
-`Document` automatically.
-
-First you need to create a Bson `Codec` that will tell Bson how to transform your entity to/from a MongoDB `Document`. Here we use
-a `CollectibleCodec` as our object is retrievable from the database (it has a MongoDB identifier), if not we would have used a
-`Codec` instead. More information in the https://mongodb.github.io/mongo-java-driver/3.10/bson/codecs[codec
+First you need to create a Bson Codec that will tell Bson how to transform your entity to/from a MongoDB Document. Here we use a _CollectibleCodec_ as our object is retrievable from the database (it has a MongoDB identifier), if not we would have used a _Codec_ instead. More information in the https://mongodb.github.io/mongo-java-driver/3.10/bson/codecs[codec
 documentation,window=_blank].
 
 Edit the `com.redhat.cloudnative.codec.OrderCodec` class as follows:
 
-* `// TODO: Add Encode & Decode contexts here` marker:
+`// TODO: Add Encode & Decode contexts here` marker:
 
 [source,none,role="copypaste"]
 ----
@@ -926,7 +901,7 @@ Then you need to create a `CodecProvider` to link this `Codec` to the Order clas
 
 Edit the `com.redhat.cloudnative.codec.OrderCodecProvider` class as follows:
 
-* `// TODO: Add Codec get method here` marker:
+`// TODO: Add Codec get method here` marker:
 
 [source,none,role="copypaste"]
 ----
@@ -939,14 +914,13 @@ Edit the `com.redhat.cloudnative.codec.OrderCodecProvider` class as follows:
     }
 ----
 
-`Quarkus` will register the `CodecProvider` for you.
+_Quarkus_ will register the _CodecProvider_ for you.
 
-Finally, when getting the `MongoCollection` from the database you can use directly the `Order` class instead of the `Document`
-one, the codec will automatically map the `Document` to/from your `Order` class.
+Finally, when getting the _MongoCollection_ from the database you can use directly the Order class instead of the Document one, the codec will automatically map the Document to/from your Order class.
 
 Edit the `com.redhat.cloudnative.CodecOrderService` class as follows:
 
-* `// TODO: Add MongoCollection method here` marker:
+`// TODO: Add MongoCollection method here` marker:
 
 [source,none,role="copypaste"]
 ----
@@ -955,128 +929,91 @@ Edit the `com.redhat.cloudnative.CodecOrderService` class as follows:
     }
 ----
 
-==== Building and Deploying Application to OpenShift
+Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
 
-Package the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
-
-image::quarkus-dev-run-packageforOcp.png[codeready-workspace-maven]
-
-Or run the following maven plugin in CodeReady Workspaces Terminal:
-
-`mvn clean package -DskipTests`
-
-image::order-mvn-package.png[order]
-
-==== Deploying Order service with MongoDB to OpenShift
+[source,sh,role="copypaste"]
+----
+mvn clean package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
+----
 
 Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady Workspaces Terminal:
 
-`oc new-app --docker-image mongo:4.0 --name=order-database`
+[source,sh,role="copypaste"]
+----
+oc new-app -n {{ USER_ID }}-cloudnativeapps --docker-image mongo:4.0 --name=order-database
+----
 
-Once the MongoDB is deployed successfully, it will be showd in `Project Status`.
+Once the MongoDB is deployed successfully, create a build configuration for your application using OpenJDK base container image in OpenShift:
 
-image::order-monogo-status.png[order]
+[source, properties, role="copypaste"]
+----
+oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=order -l app=order
+----
 
-Create a build configuration for your application using OpenJDK base container image in OpenShift:
+Start and watch the build, which will take about minutes to complete:
 
-`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=order -l app=order`
+[source,sh,role="copypaste"]
+----
+oc start-build order --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service/target/order-1.0-SNAPSHOT-runner.jar --follow
+----
 
-This build uses the new
-https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index[Red
-Hat OpenJDK Container Image,window=_blank], providing foundational software needed to run Java applications, while staying at
-a reasonable size.
+Deploy it as an OpenShift application after the build is done:
 
-* Start and watch the build, which will take about minutes to complete:
+[source,sh,role="copypaste"]
+----
+oc new-app order; oc expose svc/order
+----
 
-`oc start-build order --from-file target/*-runner.jar --follow`
+* Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] for the orders. Ensure you get the blue circles!
 
-image::order-build-logs.png[order]
+image::order-topology.png[order, 700]
 
-* Deploy it as an OpenShift application after the build is done:
+And then access the http://order-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}/api/orders[Orders, window=_blank]. You will see empty result because you didn’t add any shopping items yet:
 
-`oc new-app order`
-
-* Create the route
-
-`oc expose svc/order`
-
-* Finally, make sure it’s actually done rolling out:
-
-`oc rollout status -w dc/order`
-
-Wait for that command to report replication controller `order-1` successfully rolled out before continuing.
-
-____
-`[NOTE]` Even if the rollout command reports success the application may not be ready yet and the reason for that is that we
-currently don’t have any liveness check configured, but we will add that in the next steps.
-____
-
-And now we can access using curl once again to find all inventories:
-
-* Get the route URL
-
-`export URL="http://$(oc get route | grep order | awk '{print $2}')"`
-
-`curl $URL/api/orders ; echo`
-
-You will see empty result because you didn’t add any shopping items yet:
-
-`[]`
+[source,sh]
+----
+[]
+----
 
 === 5. Deploying WEB-UI Service
 
+_WEB-UI Service_ serves a frontend based on https://angularjs.org/[AngularJS, window=_blank] and http://patternfly.org/[PatternFly, window=_blank] running in a https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i[Node.js] container. https://developers.redhat.com/products/rhoar[Red Hat OpenShift Application Runtimes] includes **Node.js** support in enterprise prouction environment.
 
+Lets’s go through quickly how the frontend service works and built on Node.js runtimes. Go to _Explorer: /projects_ in CodeReady Workspaces Web IDE and expand _coolstore-ui_ directory.
 
-`WEB-UI Service` serves a frontend based on https://angularjs.org/[AngularJS]\{:target="_blank``} and
-http://patternfly.org/[PatternFly]\{:target=''_blank"} running in a
-https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i[Node.js]
-container. https://developers.redhat.com/products/rhoar[Red Hat OpenShift Application Runtimes] includes `Node.js` support in
-enterprise prouction environment.
-
-Lets’s go through quickly how the frontend service works and built on `Node.js` runtimes. Go to _Explorer: /projects_ in
-CodeReady Workspaces Web IDE and expand `coolstore-ui` directory.
-
-image::codeready-workspace-coolstore-ui.png[coolstore-ui]\{:width=``500px''}
+image::codeready-workspace-coolstore-ui.png[coolstore-ui, 700]
 
 You will see javascripts for specific cloud-native services such as cart, catatlog, and order service as above.
 
-Now, we will deploy a presentation layer to OpenShift cluster using https://www.npmjs.com/package/nodeshift[`Nodeshift`] command
-line tool, a programmable API that you can use to deploy Node.js projects to `OpenShift`.
+Now, we will deploy a presentation layer to OpenShift cluster using https://www.npmjs.com/package/nodeshift[Nodeshift] command line tool, a programmable API that you can use to deploy Node.js projects to OpenShift.
 
-* Install the `Nodeshift` tool via CodeReady Workspaces Terminal:
+Install the `Nodeshift` tool via CodeReady Workspaces Terminal:
 
-`cd /projects/cloud-native-workshop-v2m4-labs/coolstore-ui/`
+[source,sh,role="copypaste"]
+----
+cd $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/coolstore-ui
+npm install --save-dev nodeshift
+----
 
-`npm install --save-dev nodeshift`
+Deploy the web-ui service using `Nodeshift` via CodeReady Workspaces Terminal and it will take a couple of minutes to complete the web-ui application deployment:
 
-* Deploy the web-ui service using `Nodeshift` via CodeReady Workspaces Terminal and it will take a couple of minutes to complete
-the web-ui application deployment:
+[source,sh,role="copypaste"]
+----
+npm run nodeshift; oc expose svc/coolstore-ui
+----
 
-`npm run nodeshift`
+Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], make sure it's done deploying (dark blue circle):
 
-image::coolstore-ui-deploy.png[coolstore-ui]
+image::coolstore-ui_topology.png[coolstore-ui, 700]
 
-* Create the route
+And then access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store, window=_blank] and ensure you get the expected products and inventories:
 
-`oc expose svc/coolstore-ui`
-
-Go to `Networking > Routes` in {{ CONSOLE_URL }}[OpenShift web console,window=_blank] and click on the route
-URL of `coolstore-ui`:
-
-image::web-ui-route.png[coolstore-ui]
-
-You will see the prouct page of `Red Hat Cool Store` as below:
-
-image::web-ui-landing.png[coolstore-ui]
+image::web-ui-landing.png[coolstore-ui, 700]
 
 === Summary
 
-In this scenario we developed five microservices with `REST API` exposure to communicate with the other microservices. We also
-used a variety of application runtimes such as `Quarkus`, `Spring Boot`, and `NodeJS` to compile, package, and containerize
-applications which is a major capability of the advanced cloud-native architecture.
+In this scenario we developed five microservices with **REST API** exposure to communicate with the other microservices. We also used a variety of application runtimes such as `Quarkus`, `Spring Boot`, and `NodeJS` to compile, package, and containerize applications which is a major capability of the advanced cloud-native architecture.
 
-To deploy the cloud-native applications with multiple datasources on `OpenShift` cluster, `Quarkus` provides an easy way to
-connect multiple datasources and obtain a reference to those datasources such as `PostgreSQL` and `MongoDB` in code.
+To deploy the cloud-native applications with multiple datasources on OpenShift cluster, _Quarkus_ provides an easy way to connect multiple datasources and obtain a reference to those datasources such as **PostgreSQL** and **MongoDB** in code.
 
-In the end, we optimized `data transaction performance` of the shopping cart service thru integrating with a `JBoss Data Grid` to
-increase end users’(customers) satification. `Congratulations!`
+In the end, we optimized **data transaction performance** of the shopping cart service thru integrating with a **JBoss Data Grid** to increase end users’(customers) satification. **Congratulations!**

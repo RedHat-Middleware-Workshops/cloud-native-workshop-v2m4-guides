@@ -43,13 +43,13 @@ image::knative-audience.png[Logo]\{:width=``700px''}
 
 https://www.openshift.com/learn/topics/knative[Knative] extends
 https://www.redhat.com/en/topics/containers/what-is-kubernetes[Kubernetes]\{:target="_blank``} to provide components for building,
-deploying, and managing https://developers.redhat.com/topics/serverless-architecture/[serverless]\{:target=''_blank"}
+deploying, and managing https://developers.redhat.com/topics/serverless-architecture/[serverless, window=_blank]
 applications. Build serverless applications that run wherever you need them—on-premise or on any cloud—with Knative and OpenShift.
 
 Knative components leverage best practices from real-world Kubernetes deployments:
 
 * https://github.com/knative/serving[Serving]\{:target="_blank``}uses Kubernetes and
-https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Istio]\{:target=''_blank"} to rapidly deploy, network, and
+https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Istio, window=_blank] to rapidly deploy, network, and
 automatically scale serverless workloads.
 * https://github.com/knative/eventing[Eventing,window=_blank] is common infrastructure for consuming and producing events to
 stimulate applications.
@@ -619,7 +619,7 @@ and outputs (e.g., an image in a registry) in order to interact with each other.
 Note that only the requirement for a git repository is declared on the task and not a specific git repository to be used. That
 allows `tasks` to be reusable for multiple pipelines and purposes. You can find more examples of reusable `tasks` in the
 https://github.com/tektoncd/catalog[Tekton Catalog]\{:target="_blank``} and
-https://github.com/openshift/pipelines-catalog[OpenShift Catalog]\{:target=''_blank"} repositories.
+https://github.com/openshift/pipelines-catalog[OpenShift Catalog, window=_blank] repositories.
 
 Install the `openshift-client` and `s2i-java` tasks from the catalog repository using `oc` or `kubectl`, which you will need for
 creating a pipeline in the next section:

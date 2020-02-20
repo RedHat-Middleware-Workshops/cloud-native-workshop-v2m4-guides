@@ -106,7 +106,7 @@ a payment microservice that will ``process'' online shopping orders as they are 
 
 In CodeReady Workspaces, navigate to the `payment-service` directory.
 
-image::codeready-workspace-payment-project.png[catalog]\{:width=``500px''}
+image::codeready-workspace-payment-project.png[catalog, 700]
 
 In this step, we will learn how our Quarkus-based payment service can use Kafka to receive order events and _react_ with payment
 events.
