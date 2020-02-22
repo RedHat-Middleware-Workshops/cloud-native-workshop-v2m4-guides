@@ -1,136 +1,102 @@
 == Lab2 - Creating Event-Driven/Reactive Services
 
-Traditional microservice architecture is typically composed of many individual services with different functions. Each application
-service has many clients that need to communicate with the service for fetching data. It will become more complex to handle data
-streams because everything can be a stream of data such as end-user clicks, RESTful APIs, IoT devices generating data. And
-complexity rises when these services are running on hybrid or multi-cloud infrastructure.
+Traditional microservice architecture is typically composed of many individual services with different functions. Each application service has many clients that need to communicate with the service for fetching data. It will become more complex to handle data streams because everything can be a stream of data such as end-user clicks, RESTful APIs, IoT devices generating data. And complexity rises when these services are running on hybrid or multi-cloud infrastructure.
 
-In an event-driven architecture, we can treat data streams as _events_ using reactive programming and distributed messaging.
-_Reactive programming_ is an asynchronous programming paradigm concerned with data streams and the propagation of change. In the
-previous lab, we developed Inventory, Catalog, Shopping Cart and Order services with obvious interactions.
+In an event-driven architecture, we can treat data streams as *events* using reactive programming and distributed messaging. *Reactive programming* is an asynchronous programming paradigm concerned with data streams and the propagation of change. In the previous lab, we developed Inventory, Catalog, Shopping Cart and Order services with obvious interactions.
 
-In this lab, we’ll change our shopping cart and order implementation and add a payment service as an Event-Driven/Reactive
-application in our cloud-native appliation architecture. These cloud-native applications will use AMQ Streams (based on Apache
-Kafka) as a messaging/streaming backbome. AMQ Streams makes it easy to run Apache Kafka on OpenShift with key features:
+In this lab, we’ll change our shopping cart and order implementation and add a payment service as an Event-Driven/Reactive application in our cloud-native appliation architecture. These cloud-native applications will use AMQ Streams (based on Apache Kafka) as a messaging/streaming backbome. AMQ Streams makes it easy to run Apache Kafka on OpenShift with key features:
 
-* Designed for horizontal scalability
-* Message ordering guarantee at the partition level
-* Message rewind/replay - _Long term_ storage allows the reconstruction of an application state by replaying the messages
+* Designed for horizontal scalability * Message ordering guarantee at the partition level * Message rewind/replay - _Long term_ storage allows the reconstruction of an application state by replaying the messages
 
 === Goals of this lab
 
-The goal is to develop advanced cloud-native applications on *Red Hat Runtimes* and deploy them on *OpenShift 4* including *AMQ
-Streams* for distributed messaing capabilities. After this lab, you should end up with something like:
+The goal is to develop advanced cloud-native applications on *Red Hat Runtimes* and deploy them on *OpenShift 4* including *AMQ Streams* for distributed messaing capabilities. After this lab, you should end up with something like:
 
-image::lab2-goal.png[goal]
+image::lab2-goal.png[goal, 700]
 
-Scalability is one of the flagship features of Apache Kafka. It is achieved by partitioning the data and distributing them across
-multiple brokers. Such data sharding also has a big impact on how clients connect and use the broker. This is especially visible
-when Kafka is running within a platform like Kubernetes but is accessed from outside of that platform.
+Scalability is one of the flagship features of Apache Kafka. It is achieved by partitioning the data and distributing them across multiple brokers. Such data sharding also has a big impact on how clients connect and use the broker. This is especially visible when Kafka is running within a platform like Kubernetes but is accessed from outside of that platform.
 
-https://strimzi.io/[Strimzi] is an open source project that provides container images and operators for running
-https://developers.redhat.com/videos/youtube/CZhOJ_ysIiI/[Apache Kafka].
+https://strimzi.io/[Strimzi] is an open source project that provides container images and operators for running https://developers.redhat.com/videos/youtube/CZhOJ_ysIiI/[Apache kafka, 700].
 
-In this lab, we will use productized and supported versions of the Strimzi and Apache Kafka projects through
-https://www.redhat.com/en/technologies/jboss-middleware/amq?extIdCarryOver=true&sc_cid=701f2000001OH7TAAW[Red Hat
-AMQ,window=_blank].
+In this lab, we will use productized and supported versions of the Strimzi and Apache Kafka projects through https://www.redhat.com/en/technologies/jboss-middleware/amq?extIdCarryOver=true&sc_cid=701f2000001OH7TAAW[Red Hat AMQ,window=_blank].
 
 === 1. Create a Kafka Cluster and Topics
 
-
-
 AMQ Streams is already installed using the following _Operators_ so you don’t need to install it in this lab:
 
-* `Kafka Operator` - Responsible for deploying and managing Apache Kafka clusters within an OpenShift cluster.
-* `Topic Operator` - Responsible for managing Kafka topics within a Kafka cluster running within an OpenShift cluster.
-* `User Operator` - Responsible for managing Kafka users within a Kafka cluster running within an OpenShift cluster.
+* *Kafka Operator* - Responsible for deploying and managing Apache Kafka clusters within an OpenShift cluster.
+* *Topic Operator* - Responsible for managing Kafka topics within a Kafka cluster running within an OpenShift cluster.
+* *User Operator* - Responsible for managing Kafka users within a Kafka cluster running within an OpenShift cluster.
 
 The basic architecture of operators in AMQ is seen below:
 
-image::kafka-operators-arch.png[amqstreams]\{:width=``900px''}
+image::kafka-operators-arch.png[amqstreams, 700]
 
-* Creating a `Kafka cluster` in `userXX-cloudnativeapp` project
+Let's create a **Kafka cluster**. Click *+Add* on the left, on the _From Catalog_ box on the project overview:
 
-Navigate to _Catalog > Developer Catalog_ in the left menu. In the search box, type in `kafka' and Click on the `Kafka` box.
+image::kafka-catalog.png[kafka, 700]
 
-image::kafka-catalog.png[kafka]
+Type in `kafka` in the search box, and click on the *Kafka*:
 
-Click on *Create* to represent a Kafka cluster using AMQ Streams Operator.
+image::kafka-create.png[kafka, 700]
 
-____
-*WARNING*
+Click on *Create* and you will enter YAML editor that defines a *Kafka* Cluster. Keep the all values as-is then click on *Create* on the botton:
 
-Be sure you are in your `userXX-cloudnativeapp` project in the drop-down menu at the top. If you are in any other project, and try
-to create things, it will fail with permission denied!
-____
+image::kafka-create-detail.png[kafka, 700]
 
-image::kafka-create.png[kafka]
+Next, we will create Kafka _Topic_. Move to *Kafka Topic* tab then click on *Create Kafka Topic* on the botton:
 
-You will enter YAML editor that defines a `Kafka` Cluster. Keep the all values as-is then click on *Create* on the bottom.
+image::kafka-topic-catalog.png[kafka, 700]
 
-image::kafka-create-detail.png[kafka]
+You will enter YAML editor that defines a *KafkaTopic* object. Change the name to `orders` as shown then click on *Create* on the bottom:
 
-Next, we will create Kafka _Topic_. Return to _Catalog > Developer Catalog_ and type in `kafka` but this time click on the *Kafka
-Topic* box.
+image::kafka-topic-orders-create.png[kafka, 700]
 
-image::kafka-topic-catalog.png[kafka]
+Create another topic using the same process as above, but called `payments`:
 
-Click on *Create* to create a topic inside the Kafka cluster.
-
-image::kafka-topic-create.png[kafka]
-
-You will enter YAML editor that defines a `KafkaTopic` object. Change the name to `orders` as shown then click on *Create* on the
-bottom.
-
-image::kafka-topic-orders-create.png[kafka]
-
-Create another topic using the same process as above, but called `payments`
-
-image::kafka-another-topic-create.png[kafka]
+image::kafka-another-topic-create.png[kafka, 700]
 
 Change the name to `payments` then click on *Create* on the bottom.
 
-image::kafka-topic-payments-create.png[kafka]
+image::kafka-topic-payments-create.png[kafka, 700]
 
 *Well done!* You now have a running Kafka cluster with two Kafka Topics called `payments` and `orders`.
 
-image::kafka-topics-created.png[kafka]
+image::kafka-topics-created.png[kafka, 700]
 
 === 2. Develop and Deploy Payment Service
 
+Our _Payment Service_ will offer online services for accepting electronic payments by a variety of payment methods including credit card or bank-based payments when orders are checked out in shopping cart. It doesn’t really do anything but will represent a payment microservice that will *process* online shopping orders as they are posted to our services.
 
-
-Our *Payment Service* will offer online services for accepting electronic payments by a variety of payment methods including
-credit card or bank-based payments when orders are checked out in shopping cart. It doesn’t really do anything but will represent
-a payment microservice that will ``process'' online shopping orders as they are posted to our services.
-
-In CodeReady Workspaces, navigate to the `payment-service` directory.
+In CodeReady Workspaces, expand *payment-service* directory.
 
 image::codeready-workspace-payment-project.png[catalog, 700]
 
-In this step, we will learn how our Quarkus-based payment service can use Kafka to receive order events and _react_ with payment
-events.
+In this step, we will learn how our Quarkus-based payment service can use Kafka to receive order events and _react_ with payment events.
 
-==== Adding Maven Dependencies using Quarkus Extensions
+Let's add Maven Dependencies using Quarkus Kafka extensions in CodeReady Workspaces Terminal:
 
-Execute the following command via CodeReady Workspaces _Terminal_:
+[source,sh,role="copypaste"]
+----
+mvn quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
+----
 
-`cd /projects/cloud-native-workshop-v2m4-labs/payment-service/`
+This command imports the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with Kafka clusters. Confirm your *pom.xml* looks as below, with the new dependencies:
 
-`mvn quarkus:add-extension -Dextensions="kafka"`
+[source,sh]
+----
+...
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
+      <version>${quarkus.version}</version>
+    </dependency>
+...
+----
 
-This command imports the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with
-Kafka clusters. Confirm your `pom.xml` looks as below, with the new dependencies:
+Let’s start by adding fields to access configuration using *@ConfigProperty* and a *Producer* field which will be used to send messages. We’ll also add a `log` field so we can see debug messages later on.
 
-image::payment-pom-dependency.png[payment]
-
-==== Writing the application
-
-Let’s start by adding fields to access configuration using `@ConfigProperty` and a `Producer` field which will be used to send
-messages. We’ll also add a `log` field so we can see debug messages later on.
-
-* Add this code to the `PaymentResource.java` file (in the `src/main/java/com/redhat/cloudnative` directory) at the
-`// TODO: Add Messaging ConfigProperty here` marker:
+Add this code to the `PaymentResource.java` file (in the `src/main/java/com/redhat/cloudnative` directory) at the `// TODO: Add Messaging ConfigProperty here` marker:
 
 [source,none,role="copypaste"]
 ----
@@ -151,10 +117,9 @@ messages. We’ll also add a `log` field so we can see debug messages later on.
     public static final Logger log = LoggerFactory.getLogger(PaymentResource.class);
 ----
 
-Next, we need a method to handle incoming events, which in this lab will be coming directly from Kafka, but later will come
-through as HTTP POST events.
+Next, we need a method to handle incoming events, which in this lab will be coming directly from Kafka, but later will come through as HTTP POST events.
 
-* Add this code at the `// TODO: Add handleCloudEvent method here` marker:
+Add this code at the `// TODO: Add handleCloudEvent method here` marker:
 
 [source,none,role="copypaste"]
 ----
@@ -185,15 +150,14 @@ through as HTTP POST events.
     }
 ----
 
-____
-Note that the `Thread.sleep(5000);` will cause credit card ``processing'' to take 5 seconds, to simulate a real world processing
-time.
-____
+[Note]
+====
+*Thread.sleep(5000);* will cause credit card _processing_ to take 5 seconds, to simulate a real world processing time.
+====
 
-Now we need to implement the `pass()` and `fail()` methods referenced above. These methods will send messages to Kafka using our
-`producer` field.
+Now we need to implement the `pass()` and `fail()` methods referenced above. These methods will send messages to Kafka using our `producer` field.
 
-* Add the following code to the `// TODO: Add pass method here` marker:
+Add the following code to the `// TODO: Add pass method here` marker:
 
 [source,none,role="copypaste"]
 ----
@@ -209,7 +173,7 @@ Now we need to implement the `pass()` and `fail()` methods referenced above. The
     }
 ----
 
-* Add this code to the `// TODO: Add fail method here` marker:
+Add this code to the `// TODO: Add fail method here` marker:
 
 [source,none,role="copypaste"]
 ----
@@ -224,10 +188,9 @@ Now we need to implement the `pass()` and `fail()` methods referenced above. The
     }
 ----
 
-Next, add a method that will receive events from Kafka. We will use the MicroProfile reactive messaging API `@Incoming` annotation
-to do this.
+Next, add a method that will receive events from Kafka. We will use the MicroProfile reactive messaging API `@Incoming` annotation to do this.
 
-* Add this code to the `// TODO: Add consumer method here` marker:
+Add this code to the `// TODO: Add consumer method here` marker:
 
 [source,none,role="copypaste"]
 ----
@@ -241,11 +204,9 @@ to do this.
     }
 ----
 
-And finally, we need a method to initialize the Kafka producer (the consumer will be initialized automatically via Quarkus Kafka
-extension). We will use the Quarkus `StartupEvent` Lifecycle listener API, with the `@Observes` annotation to mark this method as
-one that should run when the app starts:
+And finally, we need a method to initialize the Kafka producer (the consumer will be initialized automatically via Quarkus Kafka extension). We will use the Quarkus `StartupEvent` Lifecycle listener API, with the `@Observes` annotation to mark this method as one that should run when the app starts:
 
-* Add this code to the `// TODO: Add init method here` marker:
+Add this code to the `// TODO: Add init method here` marker:
 
 [source,none,role="copypaste"]
 ----
@@ -259,17 +220,13 @@ one that should run when the app starts:
     }
 ----
 
-This method will consume Kafka streams from the `orders` topic and call our `handleCloudEvent()` method. Later on we’ll delete
-this method and use Knative Events to handle the incoming stream. But for now we’ll use this method to listen to the topic.
+This method will consume Kafka streams from the `orders` topic and call our `handleCloudEvent()` method. Later on we’ll delete this method and use Knative Events to handle the incoming stream. But for now we’ll use this method to listen to the topic.
 
-==== Configuring the application
+Quarkus and its extensions are configured by an `application.properties` file. Open this file (it is in the `src/main/resources` directory).
 
-Quarkus and its extensions are configured by an `application.properties` file. Open this file (it is in the `src/main/resources`
-directory).
+Add these values to the file:
 
-* Add these values to the file:
-
-[source,none,role="copypaste"]
+[source,properties,role="copypaste"]
 ----
 # Outgoing stream
 mp.messaging.outgoing.payments.bootstrap.servers=my-cluster-kafka-bootstrap:9092
@@ -289,82 +246,72 @@ mp.messaging.incoming.orders.enable.auto.commit=true
 mp.messaging.incoming.orders.request.timeout.ms=30000
 ----
 
-==== Deploying Payment service to OpenShift
+Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
 
-Package the payment application by clicking on *Package for OpenShift* in the Commands Palette`:
+[source,sh,role="copypaste"]
+----
+mvn clean package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
+----
 
-image::quarkus-dev-run-packageforOcp.png[payment]
+Create a build configuration for your application using OpenJDK base container image in OpenShift:
 
-Or run the following command in a CodeReady Workspaces _Terminal_:
+[source,sh,role="copypaste"]
+----
+oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=payment -l app=payment
+----
 
-`mvn clean package -DskipTests`
+Force update the OpenJDK image tags just in case they haven’t been imported yet:
 
-This will build an executable JAR file in the `target/` directory.
+[source,sh,role="copypaste"]
+----
+oc import-image openjdk18-openshift --all
+----
 
-* To deploy this to OpenShift, define a new build in our project:
+Start and watch the build, which will take about minutes to complete:
 
-`oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=payment -l app=payment`
+[source,sh,role="copypaste"]
+----
+oc start-build payment --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/target/payment-1.0-SNAPSHOT-runner.jar --follow
+----
 
-____
-This build uses the new
-https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index[Red
-Hat OpenJDK Container Image,window=_blank], providing foundational software needed to run Java applications, while staying at
-a reasonable size.
-____
+Deploy it as an OpenShift application after the build is done:
 
-* Force update the OpenJDK image tags just in case they haven’t been imported yet:
+[source,sh,role="copypaste"]
+----
+oc new-app payment; oc expose svc/payment
+----
 
-`oc import-image openjdk18-openshift --all`
+Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] for the orders. Ensure you get the blue circles!
 
-* Start and watch the build, which will take about minutes to complete:
+image::payment-topology.png[order, 700]
 
-`oc start-build payment --from-file target/*-runner.jar --follow`
+In order to test the payment application, click on the `my-cluster-kafka-0` pod:
 
-image::payment-build-logs.png[payment]
+image::my-cluster-kafka-0.png[payment, 700]
 
-* Deploy it as an OpenShift application after the build is done:
+We will watch the Kafka topic via a CLI to confirm the messages are being sent/received in Kafka. Click on the Terminal tab in OpenShift (not in CodeReady!) then execute the following command:
 
-`oc new-app payment`
+[source,sh,role="copypaste"]
+----
+bin/kafka-console-consumer.sh --topic payments --bootstrap-server localhost:9092
+----
 
-* Create the route
-
-`oc expose svc/payment`
-
-* Finally, make sure it’s actually done rolling out:
-
-`oc rollout status -w dc/payment`
-
-Wait for that command to report `replication controller payment-1 successfully rolled out` before continuing.
-
-____
-*[NOTE]* Even if the rollout command reports success the application may not be ready yet and the reason for that is that we
-currently don’t have any liveness check configured.
-____
-
-* Testing the Application
-
-Go to _Workloads > Pods_ on the left menu then search `cluster-kafka` pods. Click on the `my-cluster-kafka-0` pod:
-
-image::my-cluster-kafka-0.png[payment]
-
-We will watch the Kafka topic via a CLI to confirm the messages are being sent/received in Kafka. Click on the _Terminal_ tab in
-OpenShift (not in CodeReady!) then execute the following command:
-
-`bin/kafka-console-consumer.sh --topic payments --bootstrap-server localhost:9092`
-
-image::kafka-console-consumer.png[payment]
+image::kafka-console-consumer.png[payment, 700]
 
 Keep this tab open to act as a debugger for Kafka messages.
 
-Let’s produce a new topic message using `curl` command in CodeReady Workspaces _Terminal_:
+Let’s produce a new topic message using `curl` command in CodeReady Workspaces Terminal:
 
 First, fetch the URL of our new payment service and store it in an environment variable:
 
-`export URL="http://$(oc get route | grep payment | awk '{print $2}')"`
+[source,sh,role="copypaste"]
+----
+export URL="http://$(oc get route | grep payment | awk '{print $2}')"
+----
 
 Then execute this to HTTP POST a message to our payment service with an example order:
 
-[source,shell]
+[source,sh,role="copypaste"]
 ----
 curl -i -H 'Content-Type: application/json' -X POST -d'{"orderId": "12321","total": "232.23", "creditCard": {"number": "4232454678667866","expiration": "04/22","nameOnCard": "Jane G Doe"}, "billingAddress": "123 Anystreet, Pueblo, CO 32213", "name": "Jane Doe"}' $URL
 ----
@@ -377,35 +324,27 @@ following result in `Pod Terminal`:
 {"orderId":"12321","paymentId":"25658","remarks":"Payment of 232.23 succeeded for Jane Doe CC details: {\"number\":\"4232454678667866\",\"expiration\":\"04/22\",\"nameOnCard\":\"Jane G Doe\"}","status":"COMPLETED"}
 ----
 
-image::payment_curl_result.png[payment]
+image::payment_curl_result.png[payment, 700]
 
-Before moving to the next step, stop the Kafka consumer console via `CTRL + C` in Terminal:
+Before moving to the next step, stop the Kafka consumer console via kbd:[CTRL+C] (or kbd:[Command+C] on Mac OS):
 
-image::kafka-console-consumer-stop.png[payment]
+image::kafka-console-consumer-stop.png[payment, 700]
 
 === 3. Adding Kafka Client to Cart Service
 
-
-
-By now we have added several microservices to operate on our retail shopping data. Quite often, other services or functions would
-need the data we are working with. e.g. once a user checks out, there are other services like an _Order Service_ and our _Payment
-Service_ that will need this information, and would most likely want to process further. So we will integrate our Cart service
+By now we have added several microservices to operate on our retail shopping data. Quite often, other services or functions would need the data we are working with. e.g. once a user checks out, there are other services like an _Order Service_ and our _Payment Service_ that will need this information, and would most likely want to process further. So we will integrate our Cart service
 with Kafka so that it can send an order message when a shopper checks out.
 
-To do that open the `cart-service/src/main/java/com/redhat/cloudnative/CartResource.java` file in CodeReady.
+Add Maven Dependencies using Quarkus *Kafka* Extensions:
 
-==== Adding Maven Dependencies using Quarkus Extensions
-
-Execute the following command via CodeReady Workspaces _Terminal_:
-
-`cd /projects/cloud-native-workshop-v2m4-labs/cart-service/`
-
-`mvn quarkus:add-extension -Dextensions="kafka"`
+[source,sh,role="copypaste"]
+----
+mvn quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
+----
 
 This will add the Kafka extension and APIs to our Cart service app.
 
-* Like our Payment service, add this code to the `// TODO: Add annotation of orders messaging configuration here` marker inside
-the `CartResource` class inside the `com.redhat.cloudnative` package:
+Like our Payment service, add this code to the `// TODO: Add annotation of orders messaging configuration here` marker inside the `CartResource` class inside the `com.redhat.cloudnative` package:
 
 [source,none,role="copypaste"]
 ----
@@ -424,19 +363,16 @@ the `CartResource` class inside the `com.redhat.cloudnative` package:
     private Producer<String, String> producer;
 ----
 
-Next, un-comment (or add if they are missing) the following `import` statements:
+Next, `un-comment` (or add if they are missing) the following `import` statements:
 
-[source,none,role="copypaste"]
+[source,none]
 ----
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 ----
 
-The init method as it denotes creates the Kafka configuration, we have externalized this configuration and injected the variables
-as properties on the class.
-
-* Replace the empty `init()` method with this code:
+The init method as it denotes creates the Kafka configuration, we have externalized this configuration and injected the variables as properties on the class. Replace the empty `init()` method with this code:
 
 [source,none,role="copypaste"]
 ----
@@ -451,9 +387,7 @@ as properties on the class.
 ----
 
 The `sendOrder()` method is quite simple, it takes the Order POJO as a param and serializes that into JSON to send over the Kafka
-topic.
-
-* Replace the empty `sendOrder()` method with this code:
+topic. Replace the empty `sendOrder()` method with this code:
 
 [source,none,role="copypaste"]
 ----
@@ -464,8 +398,7 @@ topic.
     }
 ----
 
-Now that we have those methods, Let'sadd a call to our `sendOrder()` method when we are checking out. Replace the code for
-`checkout()` with this code:
+Now that we have those methods, Let'sadd a call to our `sendOrder()` method when we are checking out. Replace the code for `checkout()` with this code:
 
 [source,none,role="copypaste"]
 ----
@@ -480,8 +413,7 @@ Now that we have those methods, Let'sadd a call to our `sendOrder()` method when
     }
 ----
 
-Almost there! Next let’s add the configuration to our `application.properties` file (in the `src/main/resources` of the
-`cart-service` project):
+Almost there! Next let’s add the configuration to our `application.properties` file (in the `src/main/resources` of the `cart-service` project):
 
 [source,none,role="copypaste"]
 ----
@@ -494,50 +426,36 @@ mp.messaging.outgoing.orders.key.serializer=org.apache.kafka.common.serializatio
 
 ==== Re-Deploying Cart service to OpenShift
 
-Package the cart application via clicking on `Package for OpenShift` in `Commands Palette`:
+Re-package the _cart service_ using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
 
-image::quarkus-dev-run-packageforOcp.png[cart]
-
-Or run the following maven plugin in CodeReady Workspaces _Terminal_:
-
-`mvn clean package -DskipTests`
+[source,sh,role="copypaste"]
+----
+mvn clean package -DskipTests -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
+----
 
 Rebuild a container image based the cart artifact that we just packaged, which will take about minutes to complete:
 
-`oc start-build cart --from-file target/*-runner.jar --follow`
+[source,sh,role="copypaste"]
+----
+oc start-build cart --from-file $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service/target/*-runner.jar --follow
+----
 
-image::cart-build-logs.png[cart]
-
-The cart service will be redeployed automatically via
-https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift
-Deployment triggers,window=_blank] after it completes to build.
+The cart service will be redeployed automatically via https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift Deployment triggers,window=_blank] after it completes to build.
 
 === 4. Adding Kafka Client to Order Service
 
-Like the `payments` service, our `order` service will listen for orders being placed, but will not process payments - instead the
-order service will merely record the orders and their states for eventual display in the UI. Let’s add this capability to the
-order service.
+Like the *payments* service, our *order* service will listen for orders being placed, but will not process payments - instead the order service will merely record the orders and their states for eventual display in the UI. Let’s add this capability to the order service.
 
+Add Maven Dependencies using Quarkus *Kafka* Extensions:
 
+[source,sh,role="copypaste"]
+----
+mvn quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
+----
 
-==== Adding Maven Dependencies using Quarkus Extensions
+This command generates a Maven project, importing the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with the Kafka clusters and subscribe _payments_ topic and _orders_ topic. 
 
-Execute the following command via CodeReady Workspaces Terminal:
-
-`cd /projects/cloud-native-workshop-v2m4-labs/order-service/`
-
-`mvn quarkus:add-extension -Dextensions="kafka"`
-
-This command generates a Maven project, importing the Kafka extensions for Quarkus applications and provides all the necessary
-capabilities to integrate with the Kafka clusters and subscribe `payments` topic and `orders` topic. Let’s confirm your `pom.xml`
-as below:
-
-image::order-kafka-pom-dependency.png[order]
-
-==== Creating Orders and Payments Consumer in Order Service
-
-In the `order-service` project, Create a new Java class, `KafkaOrders.java` in `src/main/java/com/redhat/cloudnative` to consume
-messages from the Kafka `orders` and `payments` topic. Copy the following entire code into `KafkaOrders.java`.
+Create orders and payments consumer in _order service_ via creating a new Java class, `KafkaOrders.java` in `src/main/java/com/redhat/cloudnative` to consume messages from the Kafka _orders_ and _payments_ topic. Copy the following entire code into _KafkaOrders.java_.
 
 [source,none,role="copypaste"]
 ----
@@ -599,8 +517,7 @@ public class KafkaOrders {
 }
 ----
 
-Almost there; Next Let'sadd the configuration to our `src/main/resources/application.properties` file in the `order-service`
-project:
+Almost there; Next Let's add the configuration to our `src/main/resources/application.properties` file in the _order-service_ project:
 
 [source,none,role="copypaste"]
 ----
@@ -628,82 +545,64 @@ mp.messaging.incoming.orders.enable.auto.commit=true
 mp.messaging.incoming.orders.request.timeout.ms=30000
 ----
 
-==== Re-Deploying Order service to OpenShift
+Re-package the order service using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
 
-Package the order application via clicking on `Package for OpenShift` in `Commands Palette`:
-
-image::quarkus-dev-run-packageforOcp.png[codeready-workspace-maven]
-
-Or run the following maven plugin in CodeReady Workspaces _Terminal_:
-
-`mvn clean package -DskipTests`
-
-image::order-mvn-package.png[order]
+[source,sh,role="copypaste"]
+----
+mvn clean package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
+----
 
 Rebuild a container image based the cart artifact that we just packaged, which will take about minutes to complete:
 
-`oc start-build order --from-file target/*-runner.jar --follow`
+[source,sh,role="copypaste"]
+----
+oc start-build order --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service/target/order-1.0-SNAPSHOT-runner.jar --follow
+----
 
-The order service will be redeployed automatically via
-https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift
-Deployment triggers,window=_blank] after it completes to build.
+The order service will be redeployed automatically via https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift Deployment triggers,window=_blank] after it completes to build.
 
 Let’s confirm if the all services works correctly using `Kafka` messaging via coolstore GUI test.
 
-####5. End to End Functional Testing
+=== 5. End to End Functional Testing
 
-
-
-Let’s go shopping! Open the Web UI in your browser. To get the URL to the Web UI, run this command in CodeReady _Terminal_:
-
-`oc get route | grep coolstore-ui | awk '{print $2}'`
+Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store, window=_blank]
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 
-* {blank}
 [arabic]
 . Add a _Red Hat Fedora_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top munu.
 
 image::add-to-cart.png[serverless]
 
-* {blank}
 [arabic, start=2]
-. Go to the *Your Shopping Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should
-be 16 digits and begin with the digit `4`. For example `4123987754646678`.
+. Go to the *Your Shopping Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should be 16 digits and begin with the digit `4`. For example `4123987754646678`.
 
 image::checkout.png[serverless]
 
-* {blank}
 [arabic, start=3]
 . Input your Credit Card information to pay for the items:
 
 image::input-cc-info.png[serverless]
 
-* {blank}
 [arabic, start=4]
 . Confirm the _Payment Status_ of the your shopping items in the *All Orders* tab. It should be `Processing`.
 
 image::payment-processing.png[serverless]
 
-* {blank}
 [arabic, start=5]
 . After a few moments, reload the *All Orders* page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
 
-____
-`Note`: If the status is still `Processing`, the order service is processing incoming Kafka messages and storing them in MongoDB.
-Please reload the page a few times more.
-____
+[Info]
+====
+If the status is still `Processing`, the order service is processing incoming Kafka messages and storing them in MongoDB. Please reload the page a few times more.
+====
 
 image::payment-completedorfailed.png[serverless]
 
 === Summary
 
-In this scenario we developed an _Event-Driven/Reactive_ cloud-native appliction to deal with data streams from the shopping cart
-service to the order service and payment service using _Apache Kafka_).
+In this scenario we developed an _Event-Driven/Reactive_ cloud-native appliction to deal with data streams from the shopping cart service to the order service and payment service using _Apache Kafka_).
 
-We also used Quarkus and its _Kafka extension_ to integrate the app with Kafka. `AMQ Streams`, a fully supported Kafka solution
-from Red Hat, enables you to create Apache Kafka clusters very easily via OpenShift developer catalog.
+We also used Quarkus and its _Kafka extension_ to integrate the app with Kafka. `AMQ Streams`, a fully supported Kafka solution from Red Hat, enables you to create Apache Kafka clusters very easily via OpenShift developer catalog.
 
-In the end, we now have message-driven microservices for implementing reactive systems, where all the components interact using
-asynchronous messages passing. Most importantly, *Quarkus* is perfectly suited to implement event-driven microservices and
-reactive systems. Congratulations!
+In the end, we now have message-driven microservices for implementing reactive systems, where all the components interact using asynchronous messages passing. Most importantly, *Quarkus* is perfectly suited to implement event-driven microservices and reactive systems. Congratulations!

@@ -83,7 +83,7 @@ build-time, thereby reducing startup time and memory resource requirements signi
 
 image::native-image-process.png[serverless]
 
-`GraalVM` is already installed for you. Inspect the value of the `GRAALVM_HOME` variable in the CodeReady Workspaces _Terminal_
+`GraalVM` is already installed for you. Inspect the value of the `GRAALVM_HOME` variable in the CodeReady Workspaces Terminal
 with:
 
 `echo $GRAALVM_HOME`
@@ -443,7 +443,7 @@ Before getting started, we need to make sure if _payment service_ is scaled down
 
 image::payment-down-again.png[serverless]
 
-Let’s go shopping! Open the Web UI in your browser. To get the URL to the Web UI, run this command in CodeReady _Terminal_:
+Let’s go shopping! Open the Web UI in your browser. To get the URL to the Web UI, run this command in CodeReady Terminal:
 
 `oc get route | grep coolstore-ui | awk '{print $2}'`
 
@@ -570,7 +570,7 @@ Create the Kubernetes objects for deploying the PetClinic app on OpenShift. The 
 container images built for the PetClinic application yet. That you will do in the following sections through a CI/CD pipeline.
 
 Replace
-`In CodeReady Workspaces in the`payment-service`project, open the **knative/pipeline/petclinic.yaml** file. Inside it, replace`userXX`
+`In CodeReady Workspaces in the`payment-service`project, open the *knative/pipeline/petclinic.yaml* file. Inside it, replace`userXX`
 with your username:
 
 image::petclinic-namespace.png[serverless]
