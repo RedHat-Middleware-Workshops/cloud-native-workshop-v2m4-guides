@@ -6,7 +6,9 @@ In an event-driven architecture, we can treat data streams as *events* using rea
 
 In this lab, we’ll change our shopping cart and order implementation and add a payment service as an Event-Driven/Reactive application in our cloud-native appliation architecture. These cloud-native applications will use AMQ Streams (based on Apache Kafka) as a messaging/streaming backbome. AMQ Streams makes it easy to run Apache Kafka on OpenShift with key features:
 
-* Designed for horizontal scalability * Message ordering guarantee at the partition level * Message rewind/replay - _Long term_ storage allows the reconstruction of an application state by replaying the messages
+* Designed for horizontal scalability 
+* Message ordering guarantee at the partition level 
+* Message rewind/replay - _Long term_ storage allows the reconstruction of an application state by replaying the messages
 
 === Goals of this lab
 
@@ -16,7 +18,7 @@ image::lab2-goal.png[goal, 700]
 
 Scalability is one of the flagship features of Apache Kafka. It is achieved by partitioning the data and distributing them across multiple brokers. Such data sharding also has a big impact on how clients connect and use the broker. This is especially visible when Kafka is running within a platform like Kubernetes but is accessed from outside of that platform.
 
-https://strimzi.io/[Strimzi] is an open source project that provides container images and operators for running https://developers.redhat.com/videos/youtube/CZhOJ_ysIiI/[Apache kafka, 700].
+https://strimzi.io/[Strimzi] is an open source project that provides container images and operators for running https://developers.redhat.com/videos/youtube/CZhOJ_ysIiI/[Apache kafka].
 
 In this lab, we will use productized and supported versions of the Strimzi and Apache Kafka projects through https://www.redhat.com/en/technologies/jboss-middleware/amq?extIdCarryOver=true&sc_cid=701f2000001OH7TAAW[Red Hat AMQ,window=_blank].
 
@@ -85,13 +87,13 @@ This command imports the Kafka extensions for Quarkus applications and provides 
 
 [source,sh]
 ----
-...
+{ ... }
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
       <version>${quarkus.version}</version>
     </dependency>
-...
+{ ... }
 ----
 
 Let’s start by adding fields to access configuration using *@ConfigProperty* and a *Producer* field which will be used to send messages. We’ll also add a `log` field so we can see debug messages later on.
@@ -150,12 +152,12 @@ Add this code at the `// TODO: Add handleCloudEvent method here` marker:
     }
 ----
 
-[Note]
+[NOTE]
 ====
 *Thread.sleep(5000);* will cause credit card _processing_ to take 5 seconds, to simulate a real world processing time.
 ====
 
-Now we need to implement the `pass()` and `fail()` methods referenced above. These methods will send messages to Kafka using our `producer` field.
+Now we need to implement the *pass()* and *fail()* methods referenced above. These methods will send messages to Kafka using our _producer_ field.
 
 Add the following code to the `// TODO: Add pass method here` marker:
 
@@ -424,8 +426,6 @@ mp.messaging.outgoing.orders.value.serializer=org.apache.kafka.common.serializat
 mp.messaging.outgoing.orders.key.serializer=org.apache.kafka.common.serialization.StringSerializer
 ----
 
-==== Re-Deploying Cart service to OpenShift
-
 Re-package the _cart service_ using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
@@ -565,7 +565,7 @@ Let’s confirm if the all services works correctly using `Kafka` messaging via 
 
 === 5. End to End Functional Testing
 
-Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store, window=_blank]
+Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store, window=_blank]!
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 
@@ -601,8 +601,6 @@ image::payment-completedorfailed.png[serverless]
 
 === Summary
 
-In this scenario we developed an _Event-Driven/Reactive_ cloud-native appliction to deal with data streams from the shopping cart service to the order service and payment service using _Apache Kafka_).
-
-We also used Quarkus and its _Kafka extension_ to integrate the app with Kafka. `AMQ Streams`, a fully supported Kafka solution from Red Hat, enables you to create Apache Kafka clusters very easily via OpenShift developer catalog.
+In this scenario we developed an _Event-Driven/Reactive_ cloud-native appliction to deal with data streams from the shopping cart service to the order service and payment service using _Apache Kafka_). We also used Quarkus and its _Kafka extension_ to integrate the app with Kafka. `AMQ Streams`, a fully supported Kafka solution from Red Hat, enables you to create Apache Kafka clusters very easily via OpenShift developer catalog.
 
 In the end, we now have message-driven microservices for implementing reactive systems, where all the components interact using asynchronous messages passing. Most importantly, *Quarkus* is perfectly suited to implement event-driven microservices and reactive systems. Congratulations!
