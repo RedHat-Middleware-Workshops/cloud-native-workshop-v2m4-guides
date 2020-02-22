@@ -87,13 +87,13 @@ This command imports the Kafka extensions for Quarkus applications and provides 
 
 [source,sh]
 ----
-{ ... }
+    ...
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
       <version>${quarkus.version}</version>
     </dependency>
-{ ... }
+    ...
 ----
 
 Let’s start by adding fields to access configuration using *@ConfigProperty* and a *Producer* field which will be used to send messages. We’ll also add a `log` field so we can see debug messages later on.
