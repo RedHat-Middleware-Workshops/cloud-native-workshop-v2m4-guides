@@ -201,7 +201,7 @@ Remove direct Knative integration code. Currently our Payment service directly b
 
 Delete (or comment out) the `onMessage()` method:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
 //    @Incoming("orders")
 //    public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
@@ -278,7 +278,7 @@ Eventing. Copy the following YAML code to this file:
 
 Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], click on `+` button then copy the following YAML codes:
 
-[source,yaml role="copypaste"]
+[source,yaml,role="copypaste"]
 ----
 apiVersion: sources.eventing.knative.dev/v1alpha1
 kind: KafkaSource
@@ -401,7 +401,7 @@ Create the Kubernetes objects for deploying the _PetClinic_ app on OpenShift. Th
 
 Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View, window=_blank], click on `+` button then copy the following YAML codes:
 
-[source,yaml role="copypaste"]
+[source,yaml,role="copypaste"]
 ----
 ---
 apiVersion: image.openshift.io/v1
