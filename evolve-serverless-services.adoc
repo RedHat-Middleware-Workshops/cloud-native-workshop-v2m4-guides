@@ -27,11 +27,11 @@ The Knative Kafka Event _source_ enables _Knative Eventing_ integration with Apa
 
 OpenShift Serverless helps developers to deploy and run applications that will scale up or scale to zero on-demand. Applications are packaged as OCI compliant Linux containers that can be run anywhere.
 
-image::knative-serving-diagram.png[knative, 700]
+image::knative-serving-diagram.png[knative, 800]
 
 Applications can be triggered by a variety of event sources, such as events from your own applications, cloud services from multiple providers, Software as a Service (SaaS) systems and Red Hat Services (https://access.redhat.com/products/red-hat-amq[AMQ Streams,window=_blank]).
 
-image::knative-eventing-diagram.png[knative, 700]
+image::knative-eventing-diagram.png[knative, 800]
 
 OpenShift Serverless applications can be integrated with other OpenShift services, such as OpenShift https://www.openshift.com/learn/topics/pipelines[Pipelines,window=_blank], https://www.openshift.com/learn/topics/service-mesh[Service Mesh,window=_blank], Monitoring and https://github.com/operator-framework/operator-metering[Metering,window=_blank], delivering a complete serverless application development and deployment experience.
 
@@ -272,8 +272,6 @@ spec:
       - image: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnativeapps/payment:latest
 ----
 
-image::import-service.png[serverless, 700]
-
 After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
 
 image::kservice-up.png[serverless, 700]
@@ -312,8 +310,6 @@ spec:
     name: payment
 ----
 
-image::kafka-event-source.png[serverless, 700]
-
 You can see a new connection between Kafka and our *payments* service:
 
 image::kafka-event-source-link.png[serverless, 700]
@@ -333,27 +329,27 @@ Add some cool items to your shopping cart in the following shopping scenarios:
 [arabic]
 . Add a _Forge Laptop Sticker_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top menu.
 
-image::add-to-cart-serverless.png[serverless, 900]
+image::add-to-cart-serverless.png[serverless, 1000]
 
 [arabic, start=2]
 . Go to the *Your Shopping Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should be 16 digits and begin with the digit `4`. For example `4123987754646678`.
 
-image::checkout-serverless.png[serverless, 900]
+image::checkout-serverless.png[serverless, 1000]
 
 [arabic, start=3]
 . Input your Credit Card information to pay for the items:
 
-image::input-cc-info-serverless.png[serverless, 700]
+image::input-cc-info-serverless.png[serverless, 1000]
 
 [arabic, start=4]
-. Let’s find out how _Kafka Event_ enables _Knative Eventing_. Go back to {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] then confirm if _payment service_ is up automatically. It’s `MAGIC!!`
+. Let’s find out how _Kafka Event_ enables _Knative Eventing_. Go back to {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] then confirm if *payment service* is up automatically. It’s `MAGIC!!`
 
-image::payment-up-again.png[serverless, 900]
+image::payment-serving-magic.png[serverless, 700]
 
 [arabic, start=5]
 . Confirm the _Payment Status_ of the your shopping items in the *All Orders* tab. It should be `Processing`.
 
-image::payment-processing-serverless.png[serverless, 900]
+image::payment-processing-serverless.png[serverless, 1000]
 
 
 [arabic, start=5]
@@ -364,7 +360,7 @@ image::payment-processing-serverless.png[serverless, 900]
 If the status is still *Processing*, the order service is processing incoming Kafka messages and store them in MongoDB. Please reload the page a few times more.
 ====
 
-image::payment-completedorfailed-serverless.png[serverless, 700]
+image::payment-completedorfailed-serverless.png[serverless, 1000]
 
 This is the same result as before, but using Knative eventing to make a more powerful event-driven system that can scale with demand.
 
