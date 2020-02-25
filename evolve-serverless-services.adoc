@@ -249,7 +249,7 @@ oc start-build payment --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4
 
 This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
 
-Create a 'Knative Service' in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View] and click on '+' icon on the right top corner:
+Create a 'Knative Service' in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View] and click on `+` icon on the right top corner:
 
 image::plus-icon.png[serverless, 700]
 
@@ -288,7 +288,7 @@ image::payment-serving-magic.png[serverless, 700]
 
 Let's move on to create *KafkaSource* to enable *Knative Eventing*. In this lab, _Knative Eventing_ is already installed via the _Knative Eventing Operator_ in OpenShift 4 cluster.
 
-Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], click on '+' icon on the right top corner:
+Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], click on `+` icon on the right top corner:
 
 image::plus-icon.png[serverless, 700]
 
@@ -320,7 +320,7 @@ image::kafka-event-source-link.png[serverless, 700]
 
 Before getting started, we need to make sure if _payment service_ is scaled down to _zero_ again in {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank]:
 
-image::payment-down-again.png[serverless, 900]
+image::payment-down-again.png[serverless, 1000]
 
 Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store, window=_blank]!
 
@@ -344,7 +344,7 @@ image::input-cc-info-serverless.png[serverless, 1000]
 [arabic, start=4]
 . Let’s find out how _Kafka Event_ enables _Knative Eventing_. Go back to {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] then confirm if *payment service* is up automatically. It’s `MAGIC!!`
 
-image::payment-serving-magic.png[serverless, 700]
+image::payment-serving-magic.png[serverless, 500]
 
 [arabic, start=5]
 . Confirm the _Payment Status_ of the your shopping items in the *All Orders* tab. It should be `Processing`.
