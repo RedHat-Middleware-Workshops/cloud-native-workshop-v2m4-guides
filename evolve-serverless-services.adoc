@@ -39,7 +39,7 @@ OpenShift Serverless applications can be integrated with other OpenShift service
 
 https://www.openshift.com/learn/topics/service-mesh[OpenShift Service Mesh] provides traffic monitoring, access control, discovery, security, resiliency, and other useful things to a group of services. https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Istio,window=_blank] does all that, but it doesn’t require any changes to the code of any of those services. To make the magic happen, Istio deploys a proxy (called a _sidecar_) next to each service. All of the traffic meant for a service goes to the proxy, which uses policies to decide how, when, or if that traffic should go on to the service. _Istio_ also enables sophisticated DevOps techniques such as canary deployments, circuit breakers, fault injection, and more.
 
-image::openshift_service_mesh.png[ossm, 500]
+image::openshift_service_mesh.png[ossm, 600]
 
 _Istio_ also moves operational aspects away from code development and into the domain of operations. Why should a developer be burdened with circuit breakers and fault injections and should they respond to them? Yes, but for handling and/or creating them? Take that out of your code and let your code focus on the underlying business domain.
 
