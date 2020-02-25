@@ -237,14 +237,14 @@ compiled Quarkus app. Create a new build config with this command:
 
 [source,sh,role="copypaste"]
 ----
-oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:19.2.0 --binary --name=payment -l app=payment
+oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:20.0.0 --binary --name=payment -l app=payment
 ----
 
 Start and watch the build, which will take about 3-4 minutes to complete:
 
 [source,sh,role="copypaste"]
 ----
-oc start-build payment --from-file --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/target/*-runner --follow
+oc start-build payment --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/target/payment-1.0-SNAPSHOT-runner --follow
 ----
 
 This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
