@@ -39,7 +39,7 @@ OpenShift Serverless applications can be integrated with other OpenShift service
 
 https://www.openshift.com/learn/topics/service-mesh[OpenShift Service Mesh] provides traffic monitoring, access control, discovery, security, resiliency, and other useful things to a group of services. https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Istio,window=_blank] does all that, but it doesn’t require any changes to the code of any of those services. To make the magic happen, Istio deploys a proxy (called a _sidecar_) next to each service. All of the traffic meant for a service goes to the proxy, which uses policies to decide how, when, or if that traffic should go on to the service. _Istio_ also enables sophisticated DevOps techniques such as canary deployments, circuit breakers, fault injection, and more.
 
-image::openshift_service_mesh.png[ossm, 700]
+image::openshift_service_mesh.png[ossm, 500]
 
 _Istio_ also moves operational aspects away from code development and into the domain of operations. Why should a developer be burdened with circuit breakers and fault injections and should they respond to them? Yes, but for handling and/or creating them? Take that out of your code and let your code focus on the underlying business domain.
 
@@ -249,9 +249,9 @@ oc start-build payment --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4
 
 This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
 
-Create a 'Knative Service' in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View] and click on `+` icon on the right top corner:
+Create a `Knative Service` in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View] and click on `+` icon on the right top corner:
 
-image::plus-icon.png[serverless, 700]
+image::plus-icon.png[serverless, 500]
 
 Copy the following _Service_ in `YAML` editor then click on *Create*:
 
@@ -290,7 +290,7 @@ Let's move on to create *KafkaSource* to enable *Knative Eventing*. In this lab,
 
 Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], click on `+` icon on the right top corner.
 
-image::plus-icon.png[serverless, 700]
+image::plus-icon.png[serverless, 500]
 
 Copy the following `KafkaSource` in `YAML` editor then click on *Create*:
 
@@ -314,11 +314,7 @@ You can see a new connection between Kafka and our *payments* service:
 
 image::kafka-event-source-link.png[serverless, 700]
 
-Create a *NetworkPolicy* to access normal, non-istioified sidecar applications(i.e. inventory). Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], click on `+` icon on the right top corner:
-
-image::plus-icon.png[serverless, 700]
-
-Copy the following `NetworkPolicy` in `YAML` editor then click on *Create*:
+Create a *NetworkPolicy* to access normal, non-istioified sidecar applications(i.e. inventory). Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], click on `+` icon on the right top corner. Copy the following `NetworkPolicy` in `YAML` editor then click on *Create*:
 
 [source,sh,role="copypaste"]
 ----
@@ -398,7 +394,7 @@ platforms/systems. This sometimes makes it more complex for DevOps teams to be a
 * Full control over team’s delivery pipelines, plugins and access control with no central CI/CD server to manage.
 * A streamlined user experience through the OpenShift Console developer perspective, CLIs, and IDEs.
 
-image::pipeline-features.png[pipeline, 700]
+image::pipeline-features.png[pipeline, 800]
 
 [NOTE]
 ====
@@ -415,7 +411,7 @@ In order to define a pipeline, you need to create _custom resources_ as listed b
 * *TaskRun*: the execution and result (i.e. success or failure) of running an instance of task
 * *PipelineRun*: the execution and result (i.e. success or failure) of running a pipeline
 
-image::tekton-arch.png[severless, 700]
+image::tekton-arch.png[severless, 800]
 
 For further details on pipeline concepts, refer to the https://github.com/tektoncd/pipeline/tree/master/docs#learn-more[Tekton documentation,window=_blank] that provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
 
@@ -566,7 +562,7 @@ oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/
 
 Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View, window=_blank] for the pipeline, and ensure you *don't* get the blue circles yet!
 
-image::petclinic-deployed-1.png[serverless, 700]
+image::petclinic-deployed-1.png[serverless, 500]
 
 *Tasks* consist of a number of steps that are executed sequentially. Each _task_ is executed in a separate container within the same pod. They can also have inputs and outputs in order to interact with other tasks in the pipeline.
 
@@ -612,10 +608,10 @@ image::pipeline-diagram.png[serverless, 700]
 
 This pipeline performs the following:
 
-* Clones the source code of the application from a Git repository (*app-git* resource)
-* Builds the container image using the `s2i-java-8` task that generates a *Dockerfile* for the application and uses https://buildah.io/[Buildah,window=_blank] to build the image 
-* The application image is pushed to an image registry (*app-image* resource)
-* The new application image is deployed on OpenShift using the *openshift-cli*
+* Clones the source code of the application from a Git repository (_app-git_ resource)
+* Builds the container image using the s2i-java-8 task that generates a Dockerfile for the application and uses https://buildah.io/[Buildah,window=_blank] to build the image 
+* The application image is pushed to an image registry (_app-image_ resource)
+* The new application image is deployed on OpenShift using the _openshift-cli_
 
 [NOTE]
 ====
@@ -628,7 +624,7 @@ The execution order of _tasks_ is determined by dependencies that are defined be
 
 Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View, window=_blank], and click on *Create Pipeline*:
 
-image::console-import-yaml-1.png[serverless, 700]
+image::console-import-yaml-1.png[serverless, 800]
 
 Replace the following YAML into the textfield, and click on *Create*:
 
@@ -673,7 +669,7 @@ spec:
 
 You will see the pipeline you have created:
 
-image::console-import-yaml-2.png[serverless, 700]
+image::console-import-yaml-2.png[serverless, 800]
 
 Now that the pipeline is created, you can trigger it to execute the tasks specified in the pipeline. First, you should create a number of *PipelineResources* that contain the specifics of the Git repository and image registry to be used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
 
@@ -725,7 +721,7 @@ petclinic-image   image   url: image-registry.openshift-image-registry.svc:5000/
 
 A *PipelineRun* is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. Let's go to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev~v1alpha1~Pipeline[OpenShift Pipelines, window=_blank] and click on *Start*:
 
-image::pipeline-start.png[serverless, 700]
+image::pipeline-start.png[serverless, 800]
 
 Then click on *Start* in the resources popup:
 
@@ -733,12 +729,12 @@ image::pipeline-start-popup.png[serverless, 700]
 
 As soon as you started the *petclinic-deploy-pipeline*, a pipelinerun is instantiated and pods are created to execute the tasks that are defined in the pipeline. After a few minutes, the pipeline should finish successfully.
 
-image::pipeline-complete.png[serverless, 700]
+image::pipeline-complete.png[serverless, 800]
 
 
 Looking back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View, window=_blank], and click on *Open URL*. You should see that the PetClinic image is successfully built and deployed.
 
-image::petclinic-openurl.png[serverless, 700]
+image::petclinic-openurl.png[serverless, 800]
 
 === Summary
 
