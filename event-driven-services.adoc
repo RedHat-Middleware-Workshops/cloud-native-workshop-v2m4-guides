@@ -299,7 +299,7 @@ We will watch the Kafka topic via a CLI to confirm the messages are being sent/r
 bin/kafka-console-consumer.sh --topic payments --bootstrap-server localhost:9092
 ----
 
-image::kafka-console-consumer.png[payment, 700]
+image::kafka-console-consumer.png[payment, 900]
 
 Keep this tab open to act as a debugger for Kafka messages.
 
@@ -329,7 +329,7 @@ following result in `Pod Terminal`:
 
 Before moving to the next step, stop the Kafka consumer console via kbd:[CTRL+C] (or kbd:[Command+C] on Mac OS):
 
-image::kafka-console-consumer-stop.png[payment, 700]
+image::kafka-console-consumer-stop.png[payment, 900]
 
 === 3. Adding Kafka Client to Cart Service
 
@@ -576,17 +576,17 @@ image::add-to-cart.png[serverless, 900]
 [arabic, start=2]
 . Go to the *Your Shopping Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should be 16 digits and begin with the digit `4`. For example `4123987754646678`.
 
-image::checkout.png[serverless, 1000]
+image::checkout.png[serverless, 900]
 
 [arabic, start=3]
 . Input your Credit Card information to pay for the items:
 
-image::input-cc-info.png[serverless, 1000]
+image::input-cc-info.png[serverless, 900]
 
 [arabic, start=4]
 . Confirm the _Payment Status_ of the your shopping items in the *All Orders* tab. It should be `Processing`.
 
-image::payment-processing.png[serverless, 1000]
+image::payment-processing.png[serverless, 900]
 
 [arabic, start=5]
 . After a few moments, reload the *All Orders* page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
@@ -596,7 +596,7 @@ image::payment-processing.png[serverless, 1000]
 If the status is still `Processing`, the order service is processing incoming Kafka messages and storing them in MongoDB. Please reload the page a few times more.
 ====
 
-image::payment-completedorfailed.png[serverless, 1000]
+image::payment-completedorfailed.png[serverless, 900]
 
 === Summary
 

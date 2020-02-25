@@ -122,8 +122,8 @@ You should see something like:
 
 [source,shell]
 ----
-   PID   RSS COMMAND
-  1517 46564 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
+    PID   RSS COMMAND
+   2021 50392 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
 ----
 
 This shows that our process is taking around `50 MB` of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
@@ -249,33 +249,54 @@ oc start-build payment --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4
 
 This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
 
+Create a 'Knative Service' in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View] and click on '+' icon on the right top corner:
 
-`oc apply -f /projects/cloud-native-workshop-v2m4-labs/payment-service/knative/knative-serving-service.yaml`
+image::plus-icon.png[serverless, 700]
 
-After successful creation of the service we should see a Kubernetes Deployment named similar to `payment-v1-deployment` available.
+Copy the following _Service_ in `YAML` editor then click on *Create*:
 
-Go to _Home > Status_ on the left menu and click on *payment-v1-deployment*. You will confirm 1 pod is _available_.
+[source,sh,role="copypaste"]
+----
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: payment
+spec:
+  template:
+    metadata:
+      name: payment-v1
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - image: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnativeapps/payment:latest
+----
 
-image::payment-serving-deployment.png[serverless, 700]
+image::import-service.png[serverless, 700]
 
-In the lab environment, _OpenShift Serverless_ will automatically scale services down to zero instances when the service(i.e. payment) has no request after *30 seconds* which means the payment service pod will unavailable in 30 seconds. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank]. Ensure there's no blue circle in the payment service!
+After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
 
-image::payment-serving-down-to-zero.png[serverless, 700]
+image::kservice-up.png[serverless, 700]
 
-If you send traffic to this endpoint it will trigger the autoscaler to scale the app up. Click on Open URL to _trigger_ the payment service. This will send some dummy data to the `payment` service, but more importantly it triggered knative to spin up the pod again automatically, and will shut it down 30 seconds later.
+In the lab environment, _OpenShift Serverless_ will automatically scale services down to zero instances when the service(i.e. payment) has no request after *30 seconds* which means the payment service pod will unavailable in 30 seconds. Visit again the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank]. Ensure there's no *blue circle* in the payment service!
+
+image::kservice-down.png[serverless, 700]
+
+If you send traffic to this endpoint it will trigger the autoscaler to scale the app up. Click on http://payment.{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}[Open URL] to _trigger_ the payment service. This will send some dummy data to the `payment` service, but more importantly it triggered knative to spin up the pod again automatically, and will shut it down 30 seconds later.
 
 image::payment-serving-magic.png[serverless, 700]
 
 *Congratulations!* You’ve now deployed the payment service as a Quarkus native image, served with _OpenShift Serverless_, quicker than traditional Java applications. This is not the end of Serverless capabilites so we will now see how the payment service will scale up _magically_ in the following exercises.
 
-Let's move on to create *KafkaSource* to enable *Knative Eventing*. In this lab, __Knative Eventing_ is already installed via the _Knative Eventing Operator_ in OpenShift 4 cluster.
+Let's move on to create *KafkaSource* to enable *Knative Eventing*. In this lab, _Knative Eventing_ is already installed via the _Knative Eventing Operator_ in OpenShift 4 cluster.
 
-Open `knative/kafka-event-source.yaml` (in the _payment-service_ project) to define a _KafkaSource_ to integrate with the Knative
-Eventing. Copy the following YAML code to this file:
+Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], click on '+' icon on the right top corner:
 
-Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], click on `+` button then copy the following YAML codes:
+image::plus-icon.png[serverless, 700]
 
-[source,yaml,role="copypaste"]
+Copy the following `KafkaSource` in `YAML` editor then click on *Create*:
+
+[source,sh,role="copypaste"]
 ----
 apiVersion: sources.eventing.knative.dev/v1alpha1
 kind: KafkaSource
@@ -293,18 +314,9 @@ spec:
 
 image::kafka-event-source.png[serverless, 700]
 
-You can see a new pod spun up which will manage the connection between Kafka and our *payments* service:
+You can see a new connection between Kafka and our *payments* service:
 
-[source,sh,role="copypaste"]
-----
-oc get pods -l eventing.knative.dev/SourceName=kafka-source
-----
-
-[source,console]
-----
-NAME                                                              READY   STATUS    RESTARTS   AGE
-kafkasource-kafka-source-268a71ea-2335-11ea-abea-120eed0aat5998   2/2     Running   1          21s
-----
+image::kafka-event-source-link.png[serverless, 700]
 
 *Great job!* Let’s make sure if the payment service works properly with _Serverless_ features via Coolstore Web UI.
 
@@ -312,23 +324,21 @@ kafkasource-kafka-source-268a71ea-2335-11ea-abea-120eed0aat5998   2/2     Runnin
 
 Before getting started, we need to make sure if _payment service_ is scaled down to _zero_ again in {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank]:
 
-image::payment-down-again.png[serverless, 700]
+image::payment-down-again.png[serverless, 900]
 
 Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store, window=_blank]!
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 
 [arabic]
-. Add a _Forge Laptop Sticker_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top
-menu.
+. Add a _Forge Laptop Sticker_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top menu.
 
-image::add-to-cart-serverless.png[serverless, 700]
+image::add-to-cart-serverless.png[serverless, 900]
 
 [arabic, start=2]
-. Go to the *Your Shopping Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should
-be 16 digits and begin with the digit `4`. For example `4123987754646678`.
+. Go to the *Your Shopping Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should be 16 digits and begin with the digit `4`. For example `4123987754646678`.
 
-image::checkout-serverless.png[serverless, 700]
+image::checkout-serverless.png[serverless, 900]
 
 [arabic, start=3]
 . Input your Credit Card information to pay for the items:
@@ -338,12 +348,12 @@ image::input-cc-info-serverless.png[serverless, 700]
 [arabic, start=4]
 . Let’s find out how _Kafka Event_ enables _Knative Eventing_. Go back to {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] then confirm if _payment service_ is up automatically. It’s `MAGIC!!`
 
-image::payment-up-again.png[serverless, 700]
+image::payment-up-again.png[serverless, 900]
 
 [arabic, start=5]
 . Confirm the _Payment Status_ of the your shopping items in the *All Orders* tab. It should be `Processing`.
 
-image::payment-processing-serverless.png[serverless, 700]
+image::payment-processing-serverless.png[serverless, 900]
 
 
 [arabic, start=5]
