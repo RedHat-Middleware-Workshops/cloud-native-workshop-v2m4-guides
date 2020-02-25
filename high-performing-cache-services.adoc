@@ -229,10 +229,10 @@ The project displayed in the landing page depends on which labs you will run tod
 `Service Mesh and Identity` then you will see pre-created projects as the above screeenshot.
 ====
 
-Let's switch to Developer Perspective.
+Let's switch to *Developer Perspective*.
 
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new
-instance of PostgreSQL. Click *+Add* on the left, on the _Database_ box on the * {{ USER_ID }}-cloudnativeapps* project overview:
+instance of PostgreSQL. Click *+Add* on the left, on the _Database_ box on the *{{ USER_ID }}-cloudnativeapps* project overview:
 
 image::db.png[db, 700]
 
@@ -692,7 +692,7 @@ Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}
 
 image::cart-topology.png[catalog, 700]
 
-And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Cart Swagger UI, window=_blank]:
+And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}/swagger-ui}[Cart Swagger UI, window=_blank]:
 
 image::cart-swagger-ui.png[cart, 700]
 
@@ -720,7 +720,7 @@ This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B a
 
 image::order-pom-dependency.png[order, 700]
 
-Before we create the order service using JSON REST service, let's have a look at the `Order` bean in `src/main/java/com/redhat/cloudnative/`as follows:
+Before we create the order service using JSON REST service, let's have a look at the `Order` bean in `src/main/java/com/redhat/cloudnative/` as follows:
 
 image::order_bean.png[order, 700]
 
