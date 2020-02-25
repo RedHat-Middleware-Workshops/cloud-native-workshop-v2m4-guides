@@ -109,7 +109,7 @@ Notice the amazingly fast startup time:
 2020-02-22 03:11:28,173 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
 ----
 
-That’s _17 milliseconds_ to start up.
+That’s *17 milliseconds* to start up. The start-up time might be different in your environment.
 
 And extremely low memory usage as reported by the Linux `ps` utility. While the app is running, run the following command in another Terminal:
 
@@ -196,9 +196,9 @@ The _Apache Kafka Event source_ enables Knative Eventing integration with Apache
 
 Remove direct Knative integration code. Currently our Payment service directly binds to Kafka to listen for events. Now that we have Knative eventing integration, we no longer need this code. Open the `PaymentResource.java` file (in `payment-service/src/main/java/com/redhat/cloudnative` directory).
 
-Delete (or comment out) the `onMessage()` method:
+Comment out the `onMessage()` method via kbd:[CTRL+/] (or kbd:[Command+/] on Mac OS):
 
-[source,java,role="copypaste"]
+[source,java]
 ----
 //    @Incoming("orders")
 //    public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
@@ -210,19 +210,19 @@ Delete (or comment out) the `onMessage()` method:
 //    }
 ----
 
-And delete the configuration for the incoming stream. In `application.properties`, delete (or comment out) the following lines for the _Incoming_ stream:
+And delete the configuration for the incoming stream. In `application.properties`, comment out the following lines for the _Incoming_ stream via kbd:[CTRL+/] (or kbd:[Command+/] on Mac OS):
 
-[source,none,role="copypaste"]
+[source,none]
 ----
 # Incoming stream (unneeded when using Knative events)
-# mp.messaging.incoming.orders.connector=smallrye-kafka
-# mp.messaging.incoming.orders.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
-# mp.messaging.incoming.orders.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
-# mp.messaging.incoming.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092
-# mp.messaging.incoming.orders.group.id=payment-order-service
-# mp.messaging.incoming.orders.auto.offset.reset=earliest
-# mp.messaging.incoming.orders.enable.auto.commit=true
-# mp.messaging.incoming.orders.request.timeout.ms=30000
+; mp.messaging.incoming.orders.connector=smallrye-kafka
+; mp.messaging.incoming.orders.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+; mp.messaging.incoming.orders.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+; mp.messaging.incoming.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+; mp.messaging.incoming.orders.group.id=payment-order-service
+; mp.messaging.incoming.orders.auto.offset.reset=earliest
+; mp.messaging.incoming.orders.enable.auto.commit=true
+; mp.messaging.incoming.orders.request.timeout.ms=30000
 ----
 
 Rebuild and re-deploy new payment service via running the following maven plugin in CodeReady Workspaces Terminal:
@@ -386,7 +386,7 @@ In order to define a pipeline, you need to create _custom resources_ as listed b
 * *TaskRun*: the execution and result (i.e. success or failure) of running an instance of task
 * *PipelineRun*: the execution and result (i.e. success or failure) of running a pipeline
 
-image::tekton-arch.png[severless]
+image::tekton-arch.png[severless, 700]
 
 For further details on pipeline concepts, refer to the https://github.com/tektoncd/pipeline/tree/master/docs#learn-more[Tekton documentation,window=_blank] that provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
 
@@ -785,10 +785,10 @@ pipelinerun of your interest and inspect the logs:
 [deploy : oc] deploymentconfig.apps.openshift.io/spring-petclinic rolled out
 ----
 
-____
-`Note`: The build log(_ImageResource petclinic-image doesn’t have an index.json file_) doesn’t mean an error but it’s vailation
-check. Even if you’re failed, *Pipeline Build* will continue.
-____
+[NOTE]
+====
+The build log(_ImageResource petclinic-image doesn’t have an index.json file_) doesn’t mean an error but it’s vailation check. Even if you’re failed, *Pipeline Build* will continue.
+====
 
 After a few minutes, the pipeline should finish successfully.
 

@@ -327,8 +327,6 @@ following result in `Pod Terminal`:
 {"orderId":"12321","paymentId":"25658","remarks":"Payment of 232.23 succeeded for Jane Doe CC details: {\"number\":\"4232454678667866\",\"expiration\":\"04/22\",\"nameOnCard\":\"Jane G Doe\"}","status":"COMPLETED"}
 ----
 
-image::payment_curl_result.png[payment, 700]
-
 Before moving to the next step, stop the Kafka consumer console via kbd:[CTRL+C] (or kbd:[Command+C] on Mac OS):
 
 image::kafka-console-consumer-stop.png[payment, 700]
