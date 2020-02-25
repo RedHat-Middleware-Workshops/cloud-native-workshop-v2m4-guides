@@ -692,7 +692,7 @@ Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}
 
 image::cart-topology.png[catalog, 700]
 
-And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}/swagger-ui[Cart Swagger UI, window=_blank]:
+And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}/swagger-ui[Cart Swagger UI, window=_blank]:
 
 image::cart-swagger-ui.png[cart, 700]
 

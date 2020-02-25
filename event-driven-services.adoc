@@ -571,22 +571,22 @@ Add some cool items to your shopping cart in the following shopping scenarios:
 [arabic]
 . Add a _Red Hat Fedora_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top munu.
 
-image::add-to-cart.png[serverless, 700]
+image::add-to-cart.png[serverless, 900]
 
 [arabic, start=2]
 . Go to the *Your Shopping Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should be 16 digits and begin with the digit `4`. For example `4123987754646678`.
 
-image::checkout.png[serverless, 700]
+image::checkout.png[serverless, 1000]
 
 [arabic, start=3]
 . Input your Credit Card information to pay for the items:
 
-image::input-cc-info.png[serverless, 700]
+image::input-cc-info.png[serverless, 1000]
 
 [arabic, start=4]
 . Confirm the _Payment Status_ of the your shopping items in the *All Orders* tab. It should be `Processing`.
 
-image::payment-processing.png[serverless, 700]
+image::payment-processing.png[serverless, 1000]
 
 [arabic, start=5]
 . After a few moments, reload the *All Orders* page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
@@ -596,7 +596,7 @@ image::payment-processing.png[serverless, 700]
 If the status is still `Processing`, the order service is processing incoming Kafka messages and storing them in MongoDB. Please reload the page a few times more.
 ====
 
-image::payment-completedorfailed.png[serverless, 700]
+image::payment-completedorfailed.png[serverless, 1000]
 
 === Summary
 
