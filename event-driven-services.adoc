@@ -1,3 +1,4 @@
+= Lab2 - Creating Event-Driven/Reactive Services
 :experimental:
 
 Traditional microservice architecture is typically composed of many individual services with different functions. Each application service has many clients that need to communicate with the service for fetching data. It will become more complex to handle data streams because everything can be a stream of data such as end-user clicks, RESTful APIs, IoT devices generating data. And complexity rises when these services are running on hybrid or multi-cloud infrastructure.
