@@ -179,14 +179,14 @@ Login successful.
 
 You have access to the following projects and can switch between them with 'oc project <projectname>':
 
-  * user1-bookinfo
-    user1-catalog
-    user1-cloudnative-pipeline
-    user1-cloudnativeapps
-    user1-inventory
-    user1-istio-system
+  * {{ USER_ID }}-bookinfo
+    {{ USER_ID }}-catalog
+    {{ USER_ID }}-cloudnative-pipeline
+    {{ USER_ID }}-cloudnativeapps
+    {{ USER_ID }}-inventory
+    {{ USER_ID }}-istio-system
 
-Using project "user1-bookinfo".
+Using project "{{ USER_ID }}-bookinfo".
 Welcome! See 'oc help' to get started.
 ----
 
@@ -201,15 +201,13 @@ Login using:
 
 [NOTE]
 ====
-Use of self-signed certificates
-
 When you access the [=OpenShift web console or other URLs via _HTTPS_ protocol, you will see browser warnings like `Your > Connection is not secure` since this workshop uses self-signed certificates (which you should not do in production!).
 For example, if you’re using *Chrome*, you will see the following screen.
 
 Click on `Advanced` then, you can access the HTTPS page when you click on `Proceed to...`!!!
 ====
 
-image::browser_warning.png[warning]
+image::browser_warning.png[warning, 700]
 
 Other browsers have similar procedures to accept the security exception.
 
