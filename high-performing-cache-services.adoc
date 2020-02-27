@@ -346,7 +346,7 @@ image::db-postgres.png[db, 700]
 
 Click on *Instantiate Template* and fill in the following fields, leaving the others as their default values:
 
-* *Namespace*: _choose `{{ USER_ID }}-catalog` for the first Namespace. Leave the second one as `openshift`_
+* *Namespace*: _choose `{{ USER_ID }}-cloudnativeapps` for the first Namespace. Leave the second one as `openshift`_
 * *Database Service Name*: `catalog-database`
 * *PostgreSQL Connection Username*: `catalog`
 * *PostgreSQL Connection Password*: `mysecretpassword`
