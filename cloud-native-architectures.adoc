@@ -5,7 +5,7 @@ Developing applications that are reactive, imperative, event driven, and polyglo
 
 Moreover, applications require hybrid and multi cloud architecture to thrive in the digital economy. A unified cloud native application environment has become essential to developers because it enables higher productivity and innovation with a full, cohesive development platform. An application environment is equally critical to operations because of the rapid change and high demands for scalability, agility, and reliability.
 
-In this module, we will learn what cloud-native architecture we need to design for running containerized applications on DevOps/Cloud Native platform in scale and speed. Then we will also develop cloud native applications based on architecture patterns such as high-performing cache, event-driven/reactive, and serverless using https://www.redhat.com/en/technologies/cloud-computing/openshift/application-runtimes[Red Hat Runtimes], https://developers.redhat.com/products/codeready-workspaces/overview[Red Hat CodeReady Workspaces,window=_blank] and https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift Container Platform].
+In this module, we will learn what cloud-native architecture we need to design for running containerized applications on DevOps/Cloud Native platform in scale and speed. Then we will also develop cloud native applications based on architecture patterns such as high-performing cache, event-driven/reactive, and serverless using https://www.redhat.com/en/technologies/cloud-computing/openshift/application-runtimes[Red Hat Runtimes], https://developers.redhat.com/products/codeready-workspaces/overview[Red Hat CodeReady Workspaces^] and https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift Container Platform].
 
 === Capabilities of a Cloud Native Application Architectures?
 
@@ -39,7 +39,7 @@ Red Hat Runtimes​​ also provide integrated and optimized products and compon
 
 Additionally, we have also chosen to use Quarkus for most of the applications in the labs. Read on to learn more about Quarkus.
 
-[NOTE] 
+[NOTE]
 ====
 At the time of writing this guide, Quarkus is still a community project and is not part of any of the Red Hat Middleware
 products.
@@ -62,9 +62,9 @@ https://Quarkus.io/[Qurakus] offers 4 major benefits to build cloud-native, micr
 
 ==== If this is the first module you are doing today
 
-You will be using Red Hat CodeReady Workspaces, an online IDE based on https://www.eclipse.org/che/[Eclipe Che, window=_blank]. *Changes to files are auto-saved every few seconds*, so you don’t need to explicitly save changes.
+You will be using Red Hat CodeReady Workspaces, an online IDE based on https://www.eclipse.org/che/[Eclipe Che^]. *Changes to files are auto-saved every few seconds*, so you don’t need to explicitly save changes.
 
-To get started, {{ ECLIPSE_CHE_URL }}[access the Che instance, window=_blank] and log in using the username and password you’ve been assigned (e.g. `{{ USER_ID }}/{{ CHE_USER_PASSWORD }}`):
+To get started, {{ ECLIPSE_CHE_URL }}[access the Che instance^] and log in using the username and password you’ve been assigned (e.g. `{{ USER_ID }}/{{ CHE_USER_PASSWORD }}`):
 
 image::che-login.png[cdw, 700]
 

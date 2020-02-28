@@ -23,9 +23,9 @@ While the code is surprisingly simple, under the hood this is using:
 
 _Hibernate ORM_ is the de facto JPA implementation and offers you the full breadth of an Object Relational Mapper. It makes complex mappings possible, but it does not make simple and common mappings trivial. Hibernate ORM with Panache focuses on making your entities trivial and fun to write in Quarkus.
 
-When you open `Inventory.java` in `src/main/java/com/redhat/cloudnative/` as below, you will understand how easy to create a domain model using Quarkus extension(https://quarkus.io/guides/hibernate-orm-panache-guide[Hibernate ORM with Panache,window=_blank]).
+When you open `Inventory.java` in `src/main/java/com/redhat/cloudnative/` as below, you will understand how easy to create a domain model using Quarkus extension(https://quarkus.io/guides/hibernate-orm-panache-guide[Hibernate ORM with Panache^]).
 
-[source,none]
+[source,java]
 ----
 @Entity
 @Cacheable
@@ -169,7 +169,7 @@ oc login https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT --insecure-sk
 Enter your username and password assigned to you:
 
 * Username: `{{ USER_ID }}`
-* Password: `r3dh4t1!`
+* Password: `{{ OPENSHIFT_USER_PASSWORD }}`
 
 You should see something like this (the project names may be different):
 
@@ -190,14 +190,14 @@ Using project "{{ USER_ID }}-bookinfo".
 Welcome! See 'oc help' to get started.
 ----
 
-First, open a new brower with the {{ CONSOLE_URL }}[OpenShift web console, window=_blank]:
+First, open a new brower with the {{ CONSOLE_URL }}[OpenShift web console^]:
 
 image::openshift_login.png[openshift_login, 700]
 
 Login using:
 
 * Username: `{{ USER_ID }}`
-* Password: `r3dh4t1!`
+* Password: `{{ OPENSHIFT_USER_PASSWORD }}`
 
 [NOTE]
 ====
@@ -242,7 +242,7 @@ Click on *Instantiate Template* and fill in the following fields, leaving the ot
 
 image::db-postgres-inventory-values.png[db, 700]
 
-This will deploy the database to our new project. Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] to see it:
+This will deploy the database to our new project. Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] to see it:
 
 image::inventory-database-deployment.png[inventory_db_deployments, 700]
 
@@ -250,13 +250,12 @@ Create a build configuration for your application using OpenJDK base container i
 
 [source,sh,role="copypaste"]
 ----
-oc project {{ USER_ID }}-cloudnativeapps
-oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory -l app=inventory
+oc project {{ USER_ID }}-cloudnativeapps && oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory -l app=inventory
 ----
 
-[INFO]
+[NOTE]
 ====
-This build uses the new https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index[Red Hat OpenJDK Container Image, window=_blank], providing foundational software needed to run Java applications, while staying at
+This build uses the new https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index[Red Hat OpenJDK Container Image^], providing foundational software needed to run Java applications, while staying at
 a reasonable size.
 ====
 
@@ -271,10 +270,10 @@ Once the build is done, we’ll deploy it as an OpenShift application and overri
 
 [source,sh,role="copypaste"]
 ----
-oc new-app inventory; oc expose svc/inventory
+oc new-app inventory && oc expose svc/inventory
 ----
 
-Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], make sure it's done deploying (dark blue circle):
+Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], make sure it's done deploying (dark blue circle):
 
 image::inventory_topology.png[inventory, 700]
 
@@ -293,7 +292,7 @@ image::codeready-workspace-catalog-project.png[catalog, 700]
 First of all, we won’t implement the catalog application to retrieve data because of all funtions are already built when we imported this project from Git server. There’re a few interesting things what we need to take a look at this Spring Boot
 application before we will deploy it to OpenShift cluster.
 
-This catalog service is not using the default BOM (Bill of material) that Spring Boot projects typically use. Instead, we are using a BOM provided by Red Hat as part of the http://snowdrop.me/[Snowdrop, window=_blank] project.
+This catalog service is not using the default BOM (Bill of material) that Spring Boot projects typically use. Instead, we are using a BOM provided by Red Hat as part of the http://snowdrop.me/[Snowdrop^] project.
 
 [source,xml]
 ----
@@ -334,7 +333,7 @@ mvn clean package spring-boot:repackage -DskipTests -f $CHE_PROJECTS_ROOT/cloud-
 
 The build and deploy may take a minute or two. Wait for it to complete. You should see a `BUILD SUCCESS` at the end of the build output.
 
-Our `production` catalog microservice will use an external database (PostgreSQL) to house inventory data. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank].
+Our `production` catalog microservice will use an external database (PostgreSQL) to house inventory data. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^].
 
 Click *+Add* on the left, on the _Database_ box on the project overview:
 
@@ -354,7 +353,7 @@ Click on *Instantiate Template* and fill in the following fields, leaving the ot
 
 image::db-catalog-postgres-fields.png[db, 700]
 
-This will deploy the database to our catalog project. Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] to see it.
+This will deploy the database to our catalog project. Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] to see it.
 
 Create a build configuration for your application using OpenJDK base container image in OpenShift:
 
@@ -374,14 +373,14 @@ Once the build is done, we’ll deploy it as an OpenShift application and overri
 
 [source,sh,role="copypaste"]
 ----
-oc new-app catalog -e JAVA_OPTS_APPEND='-Dspring.profiles.active=openshift'; oc expose service catalog
+oc new-app catalog -e JAVA_OPTS_APPEND='-Dspring.profiles.active=openshift' && oc expose service catalog
 ----
 
-Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] for the catalog, and ensure you get the blue circles!
+Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles!
 
 image::inventory-catalog-topology.png[catalog, 700]
 
-And then access the http://catalog-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Catalog Web frontend, window=_blank] and ensure you get the expected inventory quantity (and not `-1`):
+And then access the http://catalog-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Catalog Web frontend^] and ensure you get the expected inventory quantity (and not `-1`):
 
 [NOTE]
 ====
@@ -427,7 +426,7 @@ oc new-app jboss/infinispan-server:10.0.0.Beta3 --name=datagrid-service
 This will create a single instance of infinispan server the community version of the DataGrid. At the time of writing this guide, the infinspan client for Quarkus does not work with DataGrid, and Quarkus itself is also a community project.
 ====
 
-Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] to see it.
+Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] to see it.
 
 Now that our cache service a.k.a datagrid-service is deployed. We want to ensure that everything in our cart is persisted in this blazing fast cache. It will help us when we have a few million users per second on a black Friday.
 
@@ -440,9 +439,9 @@ Following is what we need to do:
 
 We have made this choice easier for you. The default serialization is done using a library based on *protobuf*. We need to define the protobuf schema and a marshaller for each user type(s).
 
-Let’s take a look at our `cart.proto` file in `META-INF`:
+Let’s take a look at our `cart.proto` file in `cart-service/src/main/resources/META-INF`:
 
-[source,none]
+[source,java]
 ----
 package coolstore;
 
@@ -476,7 +475,7 @@ message Promotion {
 
 But we haven't defined the `Product` yet. Let'sgo ahead and do that. Add this code to the `//TODO ADD Product` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
 message Product {
   required string itemId = 1;
@@ -488,9 +487,9 @@ message Product {
 
 *Great!* Now we have the Product defined in our proto model. We should also ensure that this model also exists as *POJO*(Plain Old Java Object), that way our *REST Endpoint*, or *Cache* will be able to directly serialize and desrialize the data.
 
-Let's take a look at our `Product.java` in package model:
+Let's take a look at our `Product.java` in `cart-service/src/main/java/com/redhat/cloudnative/model`:
 
-[source,none]
+[source,java]
 ----
     private String itemId;
     private String name;
@@ -504,7 +503,7 @@ Let's go ahead and create a *Marshaller* for our Product class which will do exa
 
 Create a new Java class called `ProductMarshaller.java` in `com.redhat.cloudnative.model` and copy the below code into the file:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
 package com.redhat.cloudnative.model;
 
@@ -567,7 +566,7 @@ We use the producer to ensure our RemoteCache gets instantiated. We create metho
 
 Add this code below the `// TODO Add getCache` and `// TODO add getConfigBuilder` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @Produces
     RemoteCache<String, ShoppingCart> getCache() throws IOException {
@@ -602,7 +601,7 @@ Add this code below the `// TODO Add getCache` and `// TODO add getConfigBuilder
 
 Next we need to make sure we will inject our cache in our service. Open `com.redhat.cloudnative.service.ShoppingCartServiceImpl` and add this at the `// TODO Inject RemoteCache` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @Inject
     @Remote("default")
@@ -613,14 +612,14 @@ The cart is quite simple; All the information from the browser i.e., via our *An
 
 * *GET* request _/{cartId}_ gets the items in the cart, or creates a new unique ID if one is not present.
 * *POST* to _/{cartId}/{itemId}/{quantity}_ will add items to the cart.
-* *DELETE* to _/{cartId}/{itemId}/{quantity}_ will remove items from the cart. 
+* *DELETE* to _/{cartId}/{itemId}/{quantity}_ will remove items from the cart.
 * And finally a *POST* to _/checkout/{cartId}_ will remove the items and invoke the checkout procedure.
 
 Let’s take a look at how we do this with Quarkus. In our *cart-service* project and in our main package i.e., `com.redhat.cloudnative` is the `CartResource`. Let’s take a look at the getCart method.
 
 At the `// TODO ADD getCart method` marker, add this method:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     public ShoppingCart getCart(@PathParam("cartId") String cartId) {
         return shoppingCartService.getShoppingCart(cartId);
@@ -635,7 +634,7 @@ The code above is using the _ShoppingCartService_, which is injected into the _C
 
 Add the following code on top of the `getCart` method
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -677,21 +676,21 @@ Deploy it as an OpenShift application after the build is done:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app cart; oc expose svc/cart
+oc new-app cart && oc expose svc/cart
 ----
 
-Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] for the catalog, and ensure you get the blue circles!
+Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles!
 
 image::cart-topology.png[catalog, 700]
 
-And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}/swagger-ui[Cart Swagger UI, window=_blank]:
+And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}/swagger-ui[Cart Swagger UI^]:
 
 image::cart-swagger-ui.png[cart, 700]
 
 Notice that the documentation after the methods, this is an excellent way for other service developers to know what you intend to
 do with each service method. You can try to invoke the methods and see the output from the service. Hence an excellent way to test
 quickly as well.
-T
+
 === 4. Developing and Deploying Order Service
 
 _Order Service_ manages all orders when customers checkout items in the shopping cart. Lets’s go through quickly how the order
@@ -722,14 +721,14 @@ Now, open a `com.redhat.cloudnative.OrderService` that will be the business laye
 
 `// TODO: Inject MongoClient here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @Inject MongoClient mongoClient;
 ----
 
-`// TODO: Add a while loop to make an order lists using MongoCursor here` marker in `list()` method:
+Next, add this code below the `// TODO: Add a while loop to make an order lists using MongoCursor here` marker (in the `list()` method):
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
         MongoCursor<Document> cursor = getCollection().find().iterator();
 
@@ -751,9 +750,9 @@ Now, open a `com.redhat.cloudnative.OrderService` that will be the business laye
         }
 ----
 
-* `// TODO: Add to create a Document based order here` marker in `add(Order order)` method:
+Next, add this code below the `// TODO: Add to create a Document based order here` marker in `add(Order order)` method:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
         Document document = new Document()
                 .append("orderId", order.getOrderId())
@@ -770,7 +769,7 @@ Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each ma
 
 `// TODO: Add JAX-RS annotations here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
 @Path("/api/orders")
 @Produces(MediaType.APPLICATION_JSON)
@@ -779,14 +778,14 @@ Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each ma
 
 `// TODO: Inject OrderService here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @Inject OrderService orderService;
 ----
 
 `// TODO: Add list(), add(), updateStatus() methods here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @GET
     public List<Order> list() {
@@ -811,7 +810,7 @@ The implementation is pretty straightforward and you just need to define your en
 
 The main property to configure is the URL to access to *MongoDB*, almost all configuration can be included in the connection URI
 so we advise you to do so, you can find more information in the
-https://docs.mongodb.com/manual/reference/connection-string/[MongoDB documentation,window=_blank]
+https://docs.mongodb.com/manual/reference/connection-string/[MongoDB documentation^]
 
 Open `application.properties` in `src/main/resources/` and add the following configuration:
 
@@ -823,13 +822,13 @@ quarkus.mongodb.connection-string = mongodb://order-database:27017
 By using a Bson *Codec*, the MongoDB Client will take care of the transformation of your domain object to/from a MongoDB *Document* automatically.
 
 First you need to create a Bson Codec that will tell Bson how to transform your entity to/from a MongoDB Document. Here we use a _CollectibleCodec_ as our object is retrievable from the database (it has a MongoDB identifier), if not we would have used a _Codec_ instead. More information in the https://mongodb.github.io/mongo-java-driver/3.10/bson/codecs[codec
-documentation,window=_blank].
+documentation^].
 
 Edit the `com.redhat.cloudnative.codec.OrderCodec` class as follows:
 
 `// TODO: Add Encode & Decode contexts here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @Override
     public void encode(BsonWriter writer, Order Order, EncoderContext encoderContext) {
@@ -890,7 +889,7 @@ Edit the `com.redhat.cloudnative.codec.OrderCodecProvider` class as follows:
 
 `// TODO: Add Codec get method here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @Override
     public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
@@ -909,7 +908,7 @@ Edit the `com.redhat.cloudnative.CodecOrderService` class as follows:
 
 `// TODO: Add MongoCollection method here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     private MongoCollection<Order> getCollection(){
         return mongoClient.getDatabase("order").getCollection("order", Order.class);
@@ -948,14 +947,14 @@ Deploy it as an OpenShift application after the build is done:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app order; oc expose svc/order
+oc new-app order && oc expose svc/order
 ----
 
-Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] for the orders. Ensure you get the blue circles!
+Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the orders. Ensure you get the blue circles!
 
 image::order-topology.png[order, 700]
 
-And then access the http://order-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}/api/orders[Orders, window=_blank]. You will see empty result because you didn’t add any shopping items yet:
+And then access the http://order-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}/api/orders[Orders^]. You will see empty result because you didn’t add any shopping items yet:
 
 [source,sh]
 ----
@@ -964,7 +963,7 @@ And then access the http://order-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAI
 
 === 5. Deploying WEB-UI Service
 
-_WEB-UI Service_ serves a frontend based on https://angularjs.org/[AngularJS, window=_blank] and http://patternfly.org/[PatternFly, window=_blank] running in a https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i[Node.js] container. https://developers.redhat.com/products/rhoar[Red Hat OpenShift Application Runtimes] includes *Node.js* support in enterprise prouction environment.
+_WEB-UI Service_ serves a frontend based on https://angularjs.org/[AngularJS^] and http://patternfly.org/[PatternFly^] running in a https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i[Node.js] container. https://developers.redhat.com/products/rhoar[Red Hat OpenShift Application Runtimes] includes *Node.js* support in enterprise prouction environment.
 
 Lets’s go through quickly how the frontend service works and built on Node.js runtimes. Go to _Explorer: /projects_ in CodeReady Workspaces Web IDE and expand _coolstore-ui_ directory.
 
@@ -978,22 +977,21 @@ Install the `Nodeshift` tool via CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
 ----
-cd $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/coolstore-ui
-npm install --save-dev nodeshift
+cd $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/coolstore-ui && npm install --save-dev nodeshift
 ----
 
 Deploy the web-ui service using `Nodeshift` via CodeReady Workspaces Terminal and it will take a couple of minutes to complete the web-ui application deployment:
 
 [source,sh,role="copypaste"]
 ----
-npm run nodeshift; oc expose svc/coolstore-ui
+npm run nodeshift && oc expose svc/coolstore-ui
 ----
 
-Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], make sure it's done deploying (dark blue circle):
+Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], make sure it's done deploying (dark blue circle):
 
 image::coolstore-ui_topology.png[coolstore-ui, 700]
 
-And then access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store, window=_blank] and ensure you get the expected products and inventories:
+And then access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store^] and ensure you get the expected products and inventories:
 
 image::web-ui-landing.png[coolstore-ui, 700]
 
@@ -1003,4 +1001,4 @@ In this scenario we developed five microservices with *REST API* exposure to com
 
 To deploy the cloud-native applications with multiple datasources on OpenShift cluster, _Quarkus_ provides an easy way to connect multiple datasources and obtain a reference to those datasources such as *PostgreSQL* and *MongoDB* in code.
 
-In the end, we optimized *data transaction performance* of the shopping cart service thru integrating with a *JBoss Data Grid* to increase end users’(customers) satification. *Congratulations!*
+In the end, we optimized *data transaction performance* of the shopping cart service thru integrating with a *Red Hat Data Grid* to increase end users’(customers) satification. *Congratulations!*

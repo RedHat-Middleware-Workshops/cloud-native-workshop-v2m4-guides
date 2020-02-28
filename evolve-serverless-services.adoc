@@ -5,7 +5,7 @@ In our cloud-native application architecture, We now have multiple microservices
 
 * *Serverless* is often used interchangeably with the term _FaaS_ (Functions-as-a-Service). But serverless doesn’t mean that there is no server. In fact, there _are_ servers - a public cloud provider provides the servers that deploy, run, and manage your application.
 * *Serverless computing* is an emerging category that represents a shift in the way developers build and deliver software systems. Abstracting application infrastructure away from the code can greatly simplify the development process while introducing new cost and efficiency benefits. Serverless computing and FaaS will play an important role in helping to define the next era of enterprise
-IT, along with cloud-native services and the https://enterprisersproject.com/hybrid-cloud[hybrid cloud,window=_blank].
+IT, along with cloud-native services and the https://enterprisersproject.com/hybrid-cloud[hybrid cloud^].
 * *Serverless platforms* provide APIs that allow users to run code snippets (functions, also called _actions_) and return the results of each function. Serverless platforms also provide endpoints to allow the developer to retrieve function results. These endpoints can be used as inputs for other functions, thereby providing a sequence (or chain) of related functions.
 
 The severless application enables DevOps teams to enjoy benefits like:
@@ -16,7 +16,7 @@ The severless application enables DevOps teams to enjoy benefits like:
 
 === Goals of this lab
 
-The goal is to develop serverless applications on *Red Hat Runtimes* and deploy them on *OpenShift 4* using https://www.openshift.com/learn/topics/serverless[OpenShift Serverless,window=_blank] with a cloud-native, continuous integration and delivery (CI/CD) Pipelines. In this lab, we’ll deploy the Payment Service as a Quarkus-based serverless application using Knative Serving, Istio, and Tekton
+The goal is to develop serverless applications on *Red Hat Runtimes* and deploy them on *OpenShift 4* using https://www.openshift.com/learn/topics/serverless[OpenShift Serverless^] with a cloud-native, continuous integration and delivery (CI/CD) Pipelines. In this lab, we’ll deploy the Payment Service as a Quarkus-based serverless application using Knative Serving, Istio, and Tekton
 Pipelines. After this lab, you should end up with something like:
 
 image::lab3-goal.png[goal, 700]
@@ -29,15 +29,15 @@ OpenShift Serverless helps developers to deploy and run applications that will s
 
 image::knative-serving-diagram.png[knative, 800]
 
-Applications can be triggered by a variety of event sources, such as events from your own applications, cloud services from multiple providers, Software as a Service (SaaS) systems and Red Hat Services (https://access.redhat.com/products/red-hat-amq[AMQ Streams,window=_blank]).
+Applications can be triggered by a variety of event sources, such as events from your own applications, cloud services from multiple providers, Software as a Service (SaaS) systems and Red Hat Services (https://access.redhat.com/products/red-hat-amq[AMQ Streams^]).
 
 image::knative-eventing-diagram.png[knative, 800]
 
-OpenShift Serverless applications can be integrated with other OpenShift services, such as OpenShift https://www.openshift.com/learn/topics/pipelines[Pipelines,window=_blank], https://www.openshift.com/learn/topics/service-mesh[Service Mesh,window=_blank], Monitoring and https://github.com/operator-framework/operator-metering[Metering,window=_blank], delivering a complete serverless application development and deployment experience.
+OpenShift Serverless applications can be integrated with other OpenShift services, such as OpenShift https://www.openshift.com/learn/topics/pipelines[Pipelines^], https://www.openshift.com/learn/topics/service-mesh[Service Mesh^], Monitoring and https://github.com/operator-framework/operator-metering[Metering^], delivering a complete serverless application development and deployment experience.
 
 ==== What is Red Hat OpenShift Service Mesh?
 
-https://www.openshift.com/learn/topics/service-mesh[OpenShift Service Mesh] provides traffic monitoring, access control, discovery, security, resiliency, and other useful things to a group of services. https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Istio,window=_blank] does all that, but it doesn’t require any changes to the code of any of those services. To make the magic happen, Istio deploys a proxy (called a _sidecar_) next to each service. All of the traffic meant for a service goes to the proxy, which uses policies to decide how, when, or if that traffic should go on to the service. _Istio_ also enables sophisticated DevOps techniques such as canary deployments, circuit breakers, fault injection, and more.
+https://www.openshift.com/learn/topics/service-mesh[OpenShift Service Mesh] provides traffic monitoring, access control, discovery, security, resiliency, and other useful things to a group of services. https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Istio^] does all that, but it doesn’t require any changes to the code of any of those services. To make the magic happen, Istio deploys a proxy (called a _sidecar_) next to each service. All of the traffic meant for a service goes to the proxy, which uses policies to decide how, when, or if that traffic should go on to the service. _Istio_ also enables sophisticated DevOps techniques such as canary deployments, circuit breakers, fault injection, and more.
 
 image::openshift_service_mesh.png[ossm, 600]
 
@@ -45,7 +45,7 @@ _Istio_ also moves operational aspects away from code development and into the d
 
 === 1. Building a Native Executable
 
-Let’s now produce a native executable for an example Quarkus application. It improves the startup time of the application, and produces a minimal disk and memory footprint. The executable would have everything to run the application including the `JVM`(shrunk to be just enough to run the application), and the application. This is accomplished using https://graalvm.org/[GraalVM,window=_blank].
+Let’s now produce a native executable for an example Quarkus application. It improves the startup time of the application, and produces a minimal disk and memory footprint. The executable would have everything to run the application including the `JVM`(shrunk to be just enough to run the application), and the application. This is accomplished using https://graalvm.org/[GraalVM^].
 
 `GraalVM` is a universal virtual machine for compiling and running applications written in JavaScript, Python, Ruby, R, JVM-based languages like Java, Scala, Groovy, Kotlin, Clojure, and LLVM-based languages such as C and C++. It includes ahead-of-time compilation, aggressive dead code elimination, and optimal packaging as native binaries that moves a lot of startup logic to build-time, thereby reducing startup time and memory resource requirements significantly.
 
@@ -105,7 +105,7 @@ Notice the amazingly fast startup time:
 [source,shell]
 ----
 2020-02-22 03:11:28,173 INFO  [io.quarkus] (main) getting-started 1.0-SNAPSHOT (running on Quarkus 1.2.1.Final) started in 0.017s. Listening on: http://0.0.0.0:8080
-2020-02-22 03:11:28,173 INFO  [io.quarkus] (main) Profile prod activated. 
+2020-02-22 03:11:28,173 INFO  [io.quarkus] (main) Profile prod activated.
 2020-02-22 03:11:28,173 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
 ----
 
@@ -127,7 +127,7 @@ You should see something like:
 ----
 
 This shows that our process is taking around `50 MB` of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
-Size,window=_blank], or RSS). Pretty compact!
+Size^], or RSS). Pretty compact!
 
 [NOTE]
 ====
@@ -168,7 +168,7 @@ The OpenShift Serverless provides middleware primitives that enable:
 * Point-in-time snapshots of deployed code and configurations
 
 In the lab, _OpenShift Serverless Operator_ is already installed on your OpenShift 4 cluster but if you want to install it on your
-own OpenShift cluster, follow https://docs.openshift.com/container-platform/latest/serverless/installing-openshift-serverless.html[Installing OpenShift Serverless,window=_blank].
+own OpenShift cluster, follow https://docs.openshift.com/container-platform/latest/serverless/installing-openshift-serverless.html[Installing OpenShift Serverless^].
 
 First, we need to delete existing `BuildConfig` as it is based an excutable Jar that we deployed it in the previous lab.
 
@@ -249,13 +249,13 @@ oc start-build payment --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4
 
 This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
 
-Create a `Knative Service` in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View] and click on `+` icon on the right top corner:
+To create a _Knative Service_ in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View], click on `+` icon on the right top corner:
 
 image::plus-icon.png[serverless, 500]
 
 Copy the following _Service_ in `YAML` editor then click on *Create*:
 
-[source,sh,role="copypaste"]
+[source,yaml,role="copypaste"]
 ----
 apiVersion: serving.knative.dev/v1alpha1
 kind: Service
@@ -274,13 +274,23 @@ spec:
 
 After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
 
+[NOTE]
+====
+It may take a few moments to fully render. Try reloading the browser page if all you see is an empty box!
+====
+
 image::kservice-up.png[serverless, 700]
 
-In the lab environment, _OpenShift Serverless_ will automatically scale services down to zero instances when the service(i.e. payment) has no request after *30 seconds* which means the payment service pod will unavailable in 30 seconds. Visit again the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank]. Ensure there's no *blue circle* in the payment service!
+In the lab environment, _OpenShift Serverless_ will automatically scale services down to zero instances when the service(i.e. payment) has no request after *30 seconds* which means the payment service pod will unavailable in 30 seconds. Visit again the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^]. Ensure there's no *blue circle* in the payment service!
+
+[NOTE]
+====
+You need to wait ~30 seconds before it scales to 0!
+====
 
 image::kservice-down.png[serverless, 700]
 
-If you send traffic to this endpoint it will trigger the autoscaler to scale the app up. Click on http://payment.{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}[Open URL] to _trigger_ the payment service. This will send some dummy data to the `payment` service, but more importantly it triggered knative to spin up the pod again automatically, and will shut it down 30 seconds later.
+If you send traffic to this endpoint it will trigger the autoscaler to scale the app up. Click on http://payment.{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}[Open URL^] to _trigger_ the payment service. This will send some dummy data to the `payment` service, but more importantly it triggered knative to spin up the pod again automatically, and will shut it down 30 seconds later.
 
 image::payment-serving-magic.png[serverless, 700]
 
@@ -288,13 +298,13 @@ image::payment-serving-magic.png[serverless, 700]
 
 Let's move on to create *KafkaSource* to enable *Knative Eventing*. In this lab, _Knative Eventing_ is already installed via the _Knative Eventing Operator_ in OpenShift 4 cluster.
 
-Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], click on `+` icon on the right top corner.
+Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], click on `+` icon on the right top corner.
 
 image::plus-icon.png[serverless, 500]
 
 Copy the following `KafkaSource` in `YAML` editor then click on *Create*:
 
-[source,sh,role="copypaste"]
+[source,yaml,role="copypaste"]
 ----
 apiVersion: sources.eventing.knative.dev/v1alpha1
 kind: KafkaSource
@@ -314,9 +324,9 @@ You can see a new connection between Kafka and our *payments* service:
 
 image::kafka-event-source-link.png[serverless, 700]
 
-Create a *NetworkPolicy* to access normal, non-istioified sidecar applications(i.e. inventory). Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank], click on `+` icon on the right top corner. Copy the following `NetworkPolicy` in `YAML` editor then click on *Create*:
+Create a *NetworkPolicy* to access normal, non-istioified sidecar applications(i.e. inventory). Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], click on `+` icon on the right top corner. Copy the following `NetworkPolicy` in `YAML` editor then click on *Create*:
 
-[source,sh,role="copypaste"]
+[source,yaml,role="copypaste"]
 ----
 apiVersion: extensions/v1beta1
 kind: NetworkPolicy
@@ -337,11 +347,11 @@ spec:
 
 === 4. End to End Functional Testing
 
-Before getting started, we need to make sure if _payment service_ is scaled down to _zero_ again in {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank]:
+Before getting started, we need to make sure if _payment service_ is scaled down to _zero_ again in {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^]:
 
 image::payment-down-again.png[serverless, 1000]
 
-Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store, window=_blank]!
+Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store^]!
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 
@@ -361,7 +371,7 @@ image::checkout-serverless.png[serverless, 1000]
 image::input-cc-info-serverless.png[serverless, 1000]
 
 [arabic, start=4]
-. Let’s find out how _Kafka Event_ enables _Knative Eventing_. Go back to {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] then confirm if *payment service* is up automatically. It’s `MAGIC!!`
+. Let’s find out how _Kafka Event_ enables _Knative Eventing_. Go back to {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] then confirm if *payment service* is up automatically. It’s `MAGIC!!`
 
 image::payment-serving-magic.png[serverless, 500]
 
@@ -413,11 +423,11 @@ In order to define a pipeline, you need to create _custom resources_ as listed b
 
 image::tekton-arch.png[severless, 800]
 
-For further details on pipeline concepts, refer to the https://github.com/tektoncd/pipeline/tree/master/docs#learn-more[Tekton documentation,window=_blank] that provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
+For further details on pipeline concepts, refer to the https://github.com/tektoncd/pipeline/tree/master/docs#learn-more[Tekton documentation^] that provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
 
 In this lab, we will walk you through pipeline concepts and how to create and run a CI/CD pipeline for building and deploying microservices on OpenShift Serverless platform.
 
-Let's deploy a https://github.com/spring-projects/spring-petclinic[Spring PetClinic,window=_blank] microserivces on Spring Boot framework to `{{ USER_ID }}-cloudnative-pipeline` project.
+Let's deploy a https://github.com/spring-projects/spring-petclinic[Spring PetClinic^] microservices app using the Spring Boot framework to `{{ USER_ID }}-cloudnative-pipeline` project.
 
 Create the Kubernetes objects for deploying the _PetClinic_ app on OpenShift. The deployment will not complete since there are no container images built for the PetClinic application yet. That you will do in the following sections through a CI/CD pipeline.
 
@@ -556,11 +566,10 @@ Then create the object in Kubernetes:
 
 [source,sh,role="copypaste"]
 ----
-oc project {{ USER_ID }}-cloudnative-pipeline
-oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/petclinic.yaml
+oc project {{ USER_ID }}-cloudnative-pipeline && oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/petclinic.yaml
 ----
 
-Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View, window=_blank] for the pipeline, and ensure you *don't* get the blue circles yet!
+Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View^] for the pipeline, and ensure you *don't* get the blue circles yet!
 
 image::petclinic-deployed-1.png[serverless, 500]
 
@@ -570,20 +579,18 @@ When a _task_ starts running, it starts a pod and runs each *step* sequentially 
 
 [NOTE]
 ====
-Only the requirement for a git repository is declared on the task and not a specific git repository to be used. That allows _tasks_ to be reusable for multiple pipelines and purposes. You can find more examples of reusable _tasks_ in the https://github.com/tektoncd/catalog[Tekton Catalog, window=_blank] and
-https://github.com/openshift/pipelines-catalog[OpenShift Catalog, window=_blank] repositories.
+Only the requirement for a git repository is declared on the task and not a specific git repository to be used. That allows _tasks_ to be reusable for multiple pipelines and purposes. You can find more examples of reusable _tasks_ in the https://github.com/tektoncd/catalog[Tekton Catalog^] and
+https://github.com/openshift/pipelines-catalog[OpenShift Catalog^] repositories.
 ====
 
 Install the `openshift-client` and `s2i-java` tasks from the catalog repository using _oc_ or _kubectl_, which you will need for creating a pipeline in the next section. Create the following Tekton tasks which will be used in the *Pipelines*:
 
 [source,sh,role="copypaste"]
 ----
-oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/openshift-client-task.yaml
-
-oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/s2i-java-8-task.yaml
+oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/openshift-client-task.yaml && oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/s2i-java-8-task.yaml
 ----
 
-Let’s confirm if the *tasks* are installed properly using https://github.com/tektoncd/cli/releases[Tekton CLI,window=_blank] that already installed in CodeReady Workspaces:
+Let’s confirm if the *tasks* are installed properly using https://github.com/tektoncd/cli/releases[Tekton CLI^] that already installed in CodeReady Workspaces:
 
 [source,sh,role="copypaste"]
 ----
@@ -602,14 +609,14 @@ s2i-java-8         27 seconds ago
 A pipeline defines a number of tasks that should be executed and how they interact with each other via their inputs and outputs.
 
 In this lab, we will create a pipeline that takes the source code of PetClinic application from GitHub and then builds and deploys it on OpenShift using
-https://docs.openshift.com/container-platform/latest/builds/understanding-image-builds.html#build-strategy-s2i_understanding-image-builds[Source-to-Image(S2I),window=_blank].
+https://docs.openshift.com/container-platform/latest/builds/understanding-image-builds.html#build-strategy-s2i_understanding-image-builds[Source-to-Image(S2I)^].
 
 image::pipeline-diagram.png[serverless, 700]
 
 This pipeline performs the following:
 
 * Clones the source code of the application from a Git repository (_app-git_ resource)
-* Builds the container image using the s2i-java-8 task that generates a Dockerfile for the application and uses https://buildah.io/[Buildah,window=_blank] to build the image 
+* Builds the container image using the s2i-java-8 task that generates a Dockerfile for the application and uses https://buildah.io/[Buildah^] to build the image
 * The application image is pushed to an image registry (_app-image_ resource)
 * The new application image is deployed on OpenShift using the _openshift-cli_
 
@@ -622,7 +629,7 @@ Pipelines abstract away the specifics of the Git source repository and image to 
 
 The execution order of _tasks_ is determined by dependencies that are defined between the tasks via *inputs* and *outputs* as well as explicit orders that are defined via *runAfter*.
 
-Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View, window=_blank], and click on *Create Pipeline*:
+Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View^], and click on *Create Pipeline*:
 
 image::console-import-yaml-1.png[serverless, 800]
 
@@ -673,7 +680,7 @@ image::console-import-yaml-2.png[serverless, 800]
 
 Now that the pipeline is created, you can trigger it to execute the tasks specified in the pipeline. First, you should create a number of *PipelineResources* that contain the specifics of the Git repository and image registry to be used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
 
-The following *PipelineResource* defines the Git repository and reference for the PetClinic application. Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View, window=_blank], and click on `+` icon on the right top corner. Copy the following `petclinic-git` pipelineResource in `YAML` editor then click on *Create*:
+The following *PipelineResource* defines the Git repository and reference for the PetClinic application. Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View^], and click on `+` icon on the right top corner. Copy the following `petclinic-git` pipelineResource in `YAML` editor then click on *Create*:
 
 [source,yaml,role="copypaste"]
 ----
@@ -688,7 +695,7 @@ spec:
     value: https://github.com/spring-projects/spring-petclinic
 ----
 
-And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Create the following pipeline resources via the {{ CONSOLE_URL }}[OpenShift web console,window=_blank] via clicking again on `+` icon on the right top corner. Copy the following `petclinic-image` pipelineResource in `YAML` editor then click on *Create*:
+And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Create the following pipeline resources via the {{ CONSOLE_URL }}[OpenShift web console^] via clicking again on `+` icon on the right top corner. Copy the following `petclinic-image` pipelineResource in `YAML` editor then click on *Create*:
 
 [source,yaml,role="copypaste"]
 ----
@@ -719,7 +726,7 @@ petclinic-git     git     url: https://github.com/spring-projects/spring-petclin
 petclinic-image   image   url: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/spring-petclinic
 ----
 
-A *PipelineRun* is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. Let's go to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev~v1alpha1~Pipeline[OpenShift Pipelines, window=_blank] and click on *Start*:
+A *PipelineRun* is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. Let's go to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev\~v1alpha1~Pipeline[OpenShift Pipelines^] and click on *Start*:
 
 image::pipeline-start.png[serverless, 800]
 
@@ -732,20 +739,20 @@ As soon as you started the *petclinic-deploy-pipeline*, a pipelinerun is instant
 image::pipeline-complete.png[serverless, 800]
 
 
-Looking back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View, window=_blank], and click on *Open URL*. You should see that the PetClinic image is successfully built and deployed.
+Looking back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View^], and click on *Open URL*. You should see that the PetClinic image is successfully built and deployed.
 
 image::petclinic-openurl.png[serverless, 800]
 
 === Summary
 
-In this module, we learned how to develop cloud-native applications using multiple Java runtimes (Quarkus and Spring Boot), Javascript (Node.js) and different datasources (i.e. PostgreSQL, MongoDB) to handle a variety of business use cases which implement real-time _request/response_ communication using REST APIs, high performing cacheable services using _JBoss Data Grid_, event-driven/reactive shopping cart service using Apache Kafka in _Red Hat AMQ Streams_, and in the end, we treated the payment service as a *Serverless* application using _OpenShift Serverless_ with _Knative Eventing_.
+In this module, we learned how to develop cloud-native applications using multiple Java runtimes (Quarkus and Spring Boot), Javascript (Node.js) and different datasources (i.e. PostgreSQL, MongoDB) to handle a variety of business use cases which implement real-time _request/response_ communication using REST APIs, high performing cacheable services using _Red Hat Data Grid_, event-driven/reactive shopping cart service using Apache Kafka in _Red Hat AMQ Streams_, and in the end, we treated the payment service as a *Serverless* application using _OpenShift Serverless_ with _Knative Eventing_.
 
 *Red Hat Runtimes* enables enterprise developers to design the advanced cloud-native architecture and develop, build, deploy the cloud-native application on hybrid cloud on the *Red Hat OpenShift Container Platform*. *Congratulations!*
 
 ==== Additional Resources:
 
-* https://learn.openshift.com/middleware/courses/middleware-quarkus/[Quarkus Tutorials Right in Your Browser,window=_blank]
+* https://learn.openshift.com/middleware/courses/middleware-quarkus/[Quarkus Tutorials Right in Your Browser^]
 * https://developers.redhat.com/articles/quarkus-quick-start-guide-kubernetes-native-java-stack/[Quarkus Quickstart Guide]
-* https://docs.openshift.com/container-platform/latest/serverless/serverless-getting-started.html[Getting started with OpenShift Serverless,window=_blank]
-* https://www.openshift.com/learn/topics/pipelines[Cloud-native CI/CD on OpenShift,window=_blank]
-* https://developers.redhat.com/topics/serverless-architecture/[Serverless Architecture Articles,window=_blank]
+* https://docs.openshift.com/container-platform/latest/serverless/serverless-getting-started.html[Getting started with OpenShift Serverless^]
+* https://www.openshift.com/learn/topics/pipelines[Cloud-native CI/CD on OpenShift^]
+* https://developers.redhat.com/topics/serverless-architecture/[Serverless Architecture Articles^]

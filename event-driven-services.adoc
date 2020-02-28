@@ -7,8 +7,8 @@ In an event-driven architecture, we can treat data streams as *events* using rea
 
 In this lab, we’ll change our shopping cart and order implementation and add a payment service as an Event-Driven/Reactive application in our cloud-native appliation architecture. These cloud-native applications will use AMQ Streams (based on Apache Kafka) as a messaging/streaming backbome. AMQ Streams makes it easy to run Apache Kafka on OpenShift with key features:
 
-* Designed for horizontal scalability 
-* Message ordering guarantee at the partition level 
+* Designed for horizontal scalability
+* Message ordering guarantee at the partition level
 * Message rewind/replay - _Long term_ storage allows the reconstruction of an application state by replaying the messages
 
 === Goals of this lab
@@ -21,7 +21,7 @@ Scalability is one of the flagship features of Apache Kafka. It is achieved by p
 
 https://strimzi.io/[Strimzi] is an open source project that provides container images and operators for running https://developers.redhat.com/videos/youtube/CZhOJ_ysIiI/[Apache kafka].
 
-In this lab, we will use productized and supported versions of the Strimzi and Apache Kafka projects through https://www.redhat.com/en/technologies/jboss-middleware/amq?extIdCarryOver=true&sc_cid=701f2000001OH7TAAW[Red Hat AMQ,window=_blank].
+In this lab, we will use productized and supported versions of the Strimzi and Apache Kafka projects through https://www.redhat.com/en/technologies/jboss-middleware/amq?extIdCarryOver=true&sc_cid=701f2000001OH7TAAW[Red Hat AMQ^].
 
 === 1. Create a Kafka Cluster and Topics
 
@@ -101,7 +101,7 @@ Let’s start by adding fields to access configuration using *@ConfigProperty* a
 
 Add this code to the `PaymentResource.java` file (in the `src/main/java/com/redhat/cloudnative` directory) at the `// TODO: Add Messaging ConfigProperty here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @ConfigProperty(name = "mp.messaging.outgoing.payments.bootstrap.servers")
     public String bootstrapServers;
@@ -124,7 +124,7 @@ Next, we need a method to handle incoming events, which in this lab will be comi
 
 Add this code at the `// TODO: Add handleCloudEvent method here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -162,7 +162,7 @@ Now we need to implement the pass() and fail() methods referenced above. These m
 
 Add the following code to the `// TODO: Add pass method here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     private void pass(String orderId, String paymentId, String remarks) {
 
@@ -178,7 +178,7 @@ Add the following code to the `// TODO: Add pass method here` marker:
 
 Add this code to the `// TODO: Add fail method here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     private void fail(String orderId, String paymentId, String remarks) {
         JsonObject payload = new JsonObject();
@@ -195,7 +195,7 @@ Next, add a method that will receive events from Kafka. We will use the MicroPro
 
 Add this code to the `// TODO: Add consumer method here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @Incoming("orders")
     public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
@@ -211,7 +211,7 @@ And finally, we need a method to initialize the Kafka producer (the consumer wil
 
 Add this code to the `// TODO: Add init method here` marker:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     public void init(@Observes StartupEvent ev) {
         Properties props = new Properties();
@@ -281,10 +281,10 @@ Deploy it as an OpenShift application after the build is done:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app payment; oc expose svc/payment
+oc new-app payment && oc expose svc/payment
 ----
 
-Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View, window=_blank] for the orders. Ensure you get the blue circles!
+Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the orders. Ensure you get the blue circles!
 
 image::payment-topology.png[order, 700]
 
@@ -345,9 +345,9 @@ mvn quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-nativ
 
 This will add the Kafka extension and APIs to our Cart service app.
 
-Like our Payment service, add this code to the `// TODO: Add annotation of orders messaging configuration here` marker inside the `CartResource` class inside the `com.redhat.cloudnative` package:
+Like our Payment service, add this code to the `// TODO: Add annotation of orders messaging configuration here` marker inside the `CartResource` class inside the `com.redhat.cloudnative` package in the `cart-service` subdirectory of your workspace:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @ConfigProperty(name = "mp.messaging.outgoing.orders.bootstrap.servers")
     public String bootstrapServers;
@@ -366,7 +366,7 @@ Like our Payment service, add this code to the `// TODO: Add annotation of order
 
 Next, `un-comment` (or add if they are missing) the following `import` statements:
 
-[source,none]
+[source,java]
 ----
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -375,7 +375,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 The init method as it denotes creates the Kafka configuration, we have externalized this configuration and injected the variables as properties on the class. Replace the empty `init()` method with this code:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     public void init(@Observes StartupEvent ev) {
         Properties props = new Properties();
@@ -390,7 +390,7 @@ The init method as it denotes creates the Kafka configuration, we have externali
 The `sendOrder()` method is quite simple, it takes the Order POJO as a param and serializes that into JSON to send over the Kafka
 topic. Replace the empty `sendOrder()` method with this code:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     private void sendOrder(Order order, String cartId) {
         order.setTotal(shoppingCartService.getShoppingCart(cartId).getCartTotal() + "");
@@ -399,9 +399,9 @@ topic. Replace the empty `sendOrder()` method with this code:
     }
 ----
 
-Now that we have those methods, Let'sadd a call to our `sendOrder()` method when we are checking out. Replace the code for `checkout()` with this code:
+Now that we have those methods, Let's add a call to our `sendOrder()` method when we are checking out. Replace the code for `checkout()` with this code:
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
     @POST
     @Path("/checkout/{cartId}")
@@ -439,7 +439,7 @@ Rebuild a container image based the cart artifact that we just packaged, which w
 oc start-build cart --from-file $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service/target/*-runner.jar --follow
 ----
 
-The cart service will be redeployed automatically via https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift Deployment triggers,window=_blank] after it completes to build.
+The cart service will be redeployed automatically via https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift Deployment triggers^] after it completes to build.
 
 === 4. Adding Kafka Client to Order Service
 
@@ -452,11 +452,11 @@ Add Maven Dependencies using Quarkus *Kafka* Extensions:
 mvn quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
 ----
 
-This command generates a Maven project, importing the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with the Kafka clusters and subscribe _payments_ topic and _orders_ topic. 
+This command generates a Maven project, importing the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with the Kafka clusters and subscribe _payments_ topic and _orders_ topic.
 
 Create orders and payments consumer in _order service_ via creating a new Java class, `KafkaOrders.java` in `src/main/java/com/redhat/cloudnative` to consume messages from the Kafka _orders_ and _payments_ topic. Copy the following entire code into _KafkaOrders.java_.
 
-[source,none,role="copypaste"]
+[source,java,role="copypaste"]
 ----
 package com.redhat.cloudnative;
 
@@ -558,13 +558,15 @@ Rebuild a container image based the cart artifact that we just packaged, which w
 oc start-build order --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service/target/order-1.0-SNAPSHOT-runner.jar --follow
 ----
 
-The order service will be redeployed automatically via https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift Deployment triggers,window=_blank] after it completes to build.
+The order service will be redeployed automatically via https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift Deployment triggers^] after it completes to build.
+
+Wait for all of the rebuilds and redeployments to complete, and you have all your blue circles!
 
 Let’s confirm if the all services works correctly using `Kafka` messaging via coolstore GUI test.
 
 === 5. End to End Functional Testing
 
-Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store, window=_blank]!
+Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store^]!
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 
