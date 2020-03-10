@@ -87,9 +87,10 @@ You should see a bunch of log output that ends with:
 
 [source,console]
 ----
-2020-02-13 19:09:01,346 INFO  [io.quarkus] (main) inventory 1.0-SNAPSHOT (running on Quarkus 1.2.0.Final) started in 2.979s. Listening on: http://0.0.0.0:8080
-2020-02-13 19:09:01,348 INFO  [io.quarkus] (main) Profile dev activated. Live Coding activated.
-2020-02-13 19:09:01,348 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, narayana-jta, resteasy, resteasy-jsonb, smallrye-health]
+2020-03-10 00:55:12,598 INFO  [io.agr.pool] (main) Datasource '<default>': Initial size smaller than min. Connections will be created when necessary
+2020-03-10 00:55:12,887 INFO  [io.quarkus] (main) inventory 1.0-SNAPSHOT (running on Quarkus 1.2.1.Final) started in 3.166s. Listening on: http://0.0.0.0:8080
+2020-03-10 00:55:12,890 INFO  [io.quarkus] (main) Profile dev activated. Live Coding activated.
+2020-03-10 00:55:12,890 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, narayana-jta, resteasy, resteasy-jsonb, smallrye-health]
 ----
 
 CodeReady will also detect that the Quarkus app opens port `5005` (for debugging) and `8080` (for web requests). Do not open port 5005, but when prompted, open the port `8080`, which opens a small web browser in CodeReady:
@@ -145,6 +146,13 @@ maven plugin:
 [source,sh,role="copypaste"]
 ----
 mvn quarkus:add-extension -Dextensions="jdbc-postgresql" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
+----
+
+You should see in the output:
+
+[source,console]
+----
+✅ Adding extension io.quarkus:quarkus-jdbc-postgresql
 ----
 
 Package the applicaiton via running the following maven plugin in CodeReady Workspaces Terminal:
@@ -221,7 +229,7 @@ The project displayed in the landing page depends on which labs you will run tod
 `Service Mesh and Identity` then you will see pre-created projects as the above screeenshot.
 ====
 
-Let's switch to *Developer Perspective*.
+Let's switch to {{CONSOLE_URL}}/add/ns/{{USER_ID}}-cloudnativeapps[Developer Console^].
 
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new
 instance of PostgreSQL. Click *+Add* on the left, on the _Database_ box on the *{{ USER_ID }}-cloudnativeapps* project overview:
@@ -705,6 +713,14 @@ Execute the following command for adding Maven Dependencies using Quarkus Extens
 [source,sh,role="copypaste"]
 ----
 mvn quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
+----
+
+You should see in the output:
+
+[source,console]
+----
+✅ Adding extension io.quarkus:quarkus-resteasy-jsonb
+✅ Adding extension io.quarkus:quarkus-mongodb-client
 ----
 
 This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, the quarkus-mongodb-client extension has been added to your *pom.xml*.

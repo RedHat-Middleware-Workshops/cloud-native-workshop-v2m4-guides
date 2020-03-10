@@ -84,6 +84,13 @@ Let's add Maven Dependencies using Quarkus Kafka extensions in CodeReady Workspa
 mvn quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
 ----
 
+You should see in the output:
+
+[source,console]
+----
+✅ Adding extension io.quarkus:quarkus-smallrye-reactive-messaging-kafka
+----
+
 This command imports the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with Kafka clusters. Confirm your *pom.xml* looks as below, with the new dependencies:
 
 [source,sh]
@@ -343,6 +350,13 @@ Add Maven Dependencies using Quarkus *Kafka* Extensions:
 mvn quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
 ----
 
+You should see in the output:
+
+[source,console]
+----
+✅ Adding extension io.quarkus:quarkus-smallrye-reactive-messaging-kafka
+----
+
 This will add the Kafka extension and APIs to our Cart service app.
 
 Like our Payment service, add this code to the `// TODO: Add annotation of orders messaging configuration here` marker inside the `CartResource` class inside the `com.redhat.cloudnative` package in the `cart-service` subdirectory of your workspace:
@@ -450,6 +464,13 @@ Add Maven Dependencies using Quarkus *Kafka* Extensions:
 [source,sh,role="copypaste"]
 ----
 mvn quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
+----
+
+You should see in the output:
+
+[source,console]
+----
+✅ Adding extension io.quarkus:quarkus-smallrye-reactive-messaging-kafka
 ----
 
 This command generates a Maven project, importing the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with the Kafka clusters and subscribe _payments_ topic and _orders_ topic.
@@ -593,7 +614,7 @@ image::payment-processing.png[serverless, 1000]
 [arabic, start=5]
 . After a few moments, reload the *All Orders* page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
 
-[Info]
+[NOTE]
 ====
 If the status is still `Processing`, the order service is processing incoming Kafka messages and storing them in MongoDB. Please reload the page a few times more.
 ====
