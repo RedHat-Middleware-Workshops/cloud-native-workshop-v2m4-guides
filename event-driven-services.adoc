@@ -1,7 +1,7 @@
 = Lab2 - Creating Event-Driven/Reactive Services
 :experimental:
 
-Traditional microservice architecture is typically composed of many individual services with different functions. Each application service has many clients that need to communicate with the service for fetching data. It will become more complex to handle data streams because everything can be a stream of data such as end-user clicks, RESTful APIs, IoT devices generating data. And complexity rises when these services are running on hybrid or multi-cloud infrastructure.
+Traditional microservice architectures are typically composed of many individual services with different functions. Each application service has many clients that need to communicate with the service for fetching data. It will become more complex to handle data streams because everything can be a stream of data such as end-user clicks, RESTful APIs, IoT devices generating data. And complexity rises when these services are running on hybrid or multi-cloud infrastructure.
 
 In an event-driven architecture, we can treat data streams as *events* using reactive programming and distributed messaging. *Reactive programming* is an asynchronous programming paradigm concerned with data streams and the propagation of change. In the previous lab, we developed Inventory, Catalog, Shopping Cart and Order services with obvious interactions.
 
@@ -91,9 +91,9 @@ You should see in the output:
 ✅ Adding extension io.quarkus:quarkus-smallrye-reactive-messaging-kafka
 ----
 
-This command imports the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with Kafka clusters. Confirm your *pom.xml* looks as below, with the new dependencies:
+This command imports the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with Kafka clusters. It adds this to `pom.xml` for you:
 
-[source,sh]
+[source,xml]
 ----
     ...
     <dependency>
@@ -104,7 +104,7 @@ This command imports the Kafka extensions for Quarkus applications and provides 
     ...
 ----
 
-Let’s start by adding fields to access configuration using *@ConfigProperty* and a *Producer* field which will be used to send messages. We’ll also add a `log` field so we can see debug messages later on.
+Let’s start by adding injecting configuration using *@ConfigProperty* and a *Producer* field which will be used to send messages. We’ll also add a `log` field so we can see debug messages later on.
 
 Add this code to the `PaymentResource.java` file (in the `src/main/java/com/redhat/cloudnative` directory) at the `// TODO: Add Messaging ConfigProperty here` marker:
 
@@ -149,7 +149,7 @@ Add this code at the `// TODO: Add handleCloudEvent method here` marker:
             String name = event.getString("name");
 
             // fake processing time
-            Thread.sleep(5000);
+            Thread.sleep(5000); // <1>
             if (!ccDetails.getString("number").startsWith("4")) {
                  fail(orderId, paymentId, "Invalid Credit Card: " + ccDetails.getString("number"));
             }
@@ -159,13 +159,9 @@ Add this code at the `// TODO: Add handleCloudEvent method here` marker:
         }
     }
 ----
+<1> This will simulate a 5 second credit card processing time
 
-[NOTE]
-====
-*Thread.sleep(5000);* will cause credit card _processing_ to take 5 seconds, to simulate a real world processing time.
-====
-
-Now we need to implement the pass() and fail() methods referenced above. These methods will send messages to Kafka using our _producer_ field.
+Now we need to implement the `pass()` and `fail()` methods referenced above. These methods will send messages to Kafka using our _producer_ field.
 
 Add the following code to the `// TODO: Add pass method here` marker:
 
@@ -299,7 +295,7 @@ In order to test the payment application, click on the `my-cluster-kafka-0` pod:
 
 image::my-cluster-kafka-0.png[payment, 700]
 
-We will watch the Kafka topic via a CLI to confirm the messages are being sent/received in Kafka. Click on the Terminal tab in OpenShift (not in CodeReady!) then execute the following command:
+We will watch the Kafka topic via a CLI to confirm the messages are being sent/received in Kafka. Click on the *Terminal* tab in OpenShift (not in CodeReady!) then execute the following command:
 
 [source,sh,role="copypaste"]
 ----
@@ -310,7 +306,9 @@ image::kafka-console-consumer.png[payment, 900]
 
 Keep this tab open to act as a debugger for Kafka messages.
 
-Let’s produce a new topic message using `curl` command in CodeReady Workspaces Terminal:
+Now, back in *CodeReady Workspaces*, open a new Terminal.
+
+Let’s produce a new topic message using `curl`:
 
 First, fetch the URL of our new payment service and store it in an environment variable:
 
@@ -326,6 +324,8 @@ Then execute this to HTTP POST a message to our payment service with an example 
 curl -i -H 'Content-Type: application/json' -X POST -d'{"orderId": "12321","total": "232.23", "creditCard": {"number": "4232454678667866","expiration": "04/22","nameOnCard": "Jane G Doe"}, "billingAddress": "123 Anystreet, Pueblo, CO 32213", "name": "Jane Doe"}' $URL
 ----
 
+This will return in 5 seconds (our fake credit card processing time).
+
 The payment service will recieve this _order_ and produce a _payment_ result on the Kafka _payment_ topic. You will see the
 following result in `Pod Terminal`:
 
@@ -334,7 +334,10 @@ following result in `Pod Terminal`:
 {"orderId":"12321","paymentId":"25658","remarks":"Payment of 232.23 succeeded for Jane Doe CC details: {\"number\":\"4232454678667866\",\"expiration\":\"04/22\",\"nameOnCard\":\"Jane G Doe\"}","status":"COMPLETED"}
 ----
 
-Before moving to the next step, stop the Kafka consumer console via kbd:[CTRL+C] (or kbd:[Command+C] on Mac OS):
+
+This shows that the `order-service` can successfully process orders in the backend and send them to the payment processor.
+
+Before moving to the next step, stop the Kafka consumer console via kbd:[CTRL+C]:
 
 image::kafka-console-consumer-stop.png[payment, 900]
 
@@ -387,7 +390,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 ----
 
-The init method as it denotes creates the Kafka configuration, we have externalized this configuration and injected the variables as properties on the class. Replace the empty `init()` method with this code:
+The `init()` method creates the Kafka configuration, and we have externalized this configuration and injected the variables as properties on the class. Replace the empty `init()` method with this code:
 
 [source,java,role="copypaste"]
 ----
@@ -473,9 +476,9 @@ You should see in the output:
 ✅ Adding extension io.quarkus:quarkus-smallrye-reactive-messaging-kafka
 ----
 
-This command generates a Maven project, importing the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with the Kafka clusters and subscribe _payments_ topic and _orders_ topic.
+This command generates a Maven project, importing the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with Kafka and subscribe to the _payments_ and _orders_ topic.
 
-Create orders and payments consumer in _order service_ via creating a new Java class, `KafkaOrders.java` in `src/main/java/com/redhat/cloudnative` to consume messages from the Kafka _orders_ and _payments_ topic. Copy the following entire code into _KafkaOrders.java_.
+To process the incoming and outgoing messages, Create a new Java class named `KafkaOrders.java` in the `src/main/java/com/redhat/cloudnative` directory to consume messages from the Kafka _orders_ and _payments_ topic. Copy the following entire code into _KafkaOrders.java_.
 
 [source,java,role="copypaste"]
 ----
@@ -623,6 +626,6 @@ image::payment-completedorfailed.png[serverless, 1000]
 
 === Summary
 
-In this scenario we developed an _Event-Driven/Reactive_ cloud-native appliction to deal with data streams from the shopping cart service to the order service and payment service using _Apache Kafka_). We also used Quarkus and its _Kafka extension_ to integrate the app with Kafka. `AMQ Streams`, a fully supported Kafka solution from Red Hat, enables you to create Apache Kafka clusters very easily via OpenShift developer catalog.
+In this scenario we developed an _Event-Driven/Reactive_ cloud-native appliction to deal with data streams from the shopping cart service to the order service and payment service using _Apache Kafka_. We also used Quarkus and its _Kafka extension_ to integrate the app with Kafka. _AMQ Streams_, a fully supported Kafka solution from Red Hat, enables you to create Apache Kafka clusters very easily via the OpenShift developer catalog.
 
-In the end, we now have message-driven microservices for implementing reactive systems, where all the components interact using asynchronous messages passing. Most importantly, *Quarkus* is perfectly suited to implement event-driven microservices and reactive systems. Congratulations!
+We now have message-driven microservices for implementing reactive systems, where all the components interact using asynchronous message passing for greater reliability, scalability, and faster time to market. Most importantly, Quarkus is perfectly suited to implement event-driven microservices and reactive systems. *Congratulations!*

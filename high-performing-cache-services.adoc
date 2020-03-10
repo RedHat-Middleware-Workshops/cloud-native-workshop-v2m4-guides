@@ -403,36 +403,24 @@ So now `Catalog` service is deployed to OpenShift. You can also see it in the Pr
 
 By now, you have deployed some of the essential elements for the Coolstore application. However, an online shop without a cart means no checkout experience. In this section, we are going to implement the Shopping Cart; in our Microservice world, we are going to call it the *cart service* and our java artifact/repo is called the *cart-service*.
 
-In a nutshell, the Cart service is RESTful and built with Quarkus using the Red Hat’s Distributed `Data Grid` technology. It uses a Red Hat’s Distributed *Data Grid* technology to store all shopping carts and assigns a unique id to them. It uses the *Quarkus Infinispan client* to do this. The Shopping cart makes a call via the Quarkus Rest client to fetch all items in the Catalog. In the end, Shopping cart also throws out a _Kafka_ message to the topic Orders, when checking out. For that, we use the *Quarkus Kafka client* in the next lab. Last and perhaps worth mentioning the _REST+Swagger UI_ also part of the REST API support in _Quarkus_.
+The Cart service is RESTful and built with Quarkus using Red Hat’s Distributed _Data Grid_ technology. It stores all shopping cart data and assigns a unique id to each. It uses the Quarkus _Infinispan client_ to do this (_Infinispan_ is the name of the upstream project that Red Hat Data Grid is based on). The Shopping cart makes a call via the Quarkus REST client to fetch all items in the Catalog. In the end, Shopping cart also pushes messages to a _Kafka_ for each order, when the user is checking out. For that, we use the Quarkus Kafka client.
 
-What is a _Shopping Cart_ in our context? A Shopping cart has a list of Shopping Items. Quantity of a product in the Items list _Discount_ and promotional details. We will see these in more details when we look at our model.
+What is a _Shopping Cart_ in our context? A Shopping cart has a list of Shopping Items. Each item has a _quantity_, and other fields like discounts and promotional details. We will see these in more detail when we look at our model.
 
-For this lab, we are using the code ready workspaces, make sure you have the following project open in your workspace. Lets’s go through quickly how the cart service works and built on _Quarkus_ Java runtimes. Go to _Explorer: /projects_ in CodeReady Workspaces Web IDE and expand *cart-service* directory.
+For this lab, we are using CodeReady Workspaces. Make sure you have the following project open in your workspace. Lets’s go through quickly how the cart service works and is built on _Quarkus_ Java runtimes. Go to _Explorer_ in CodeReady Workspaces and expand the *cart-service* directory.
 
 image::codeready-workspace-cart-project.png[cart, 700]
 
-We are going to use the Red hat Distributed `Data Grid` for caching all the users’ carts.
+We are going to use the Red Hat Distributed _Data Grid_ for caching all the users' carts.
 
-`Red Hat® Distributed Data Grid` is an in-memory, distributed, NoSQL datastore solution. Your applications can access, process, and analyze data at in-memory speed to deliver a superior user experience with features and benefits as below:
-
-* *Act faster* - Quickly access your data through fast, low-latency data processing using memory (RAM) and distributed parallel execution.
-* *Scale quickly* - Achieve linear scalability with data partitioning and distribution across cluster nodes.
-* *Always available*- Gain high availability through data replication across cluster nodes.
-* *Fault tolerance* - Attain fault tolerance and recover from disaster through cross-data center geo-replication and clustering.
-* *More productivity* - Gain development flexibly and higher productivity with a highly versatile, functionally rich NoSQL data store.
-* *Protect data* - Obtain comprehensive data security with encryption and role-based access.
-
-Let'screate a simple version of the *cache service* in our cluster. Open the Terminal in your CodeReady workspace and run the following command:
+Let's create a simple version of the *cache service* in our cluster. Open the Terminal in your CodeReady workspace and run the following command:
 
 [source,sh,role="copypaste"]
 ----
 oc new-app jboss/infinispan-server:10.0.0.Beta3 --name=datagrid-service
 ----
 
-[NOTE]
-====
-This will create a single instance of infinispan server the community version of the DataGrid. At the time of writing this guide, the infinspan client for Quarkus does not work with DataGrid, and Quarkus itself is also a community project.
-====
+This will create a single instance of the Data Grid server to store our shopping carts.
 
 Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] to see it.
 
@@ -481,7 +469,7 @@ message Promotion {
 * So our ShoppingCart has ShoppingCartItem
 * ShoppingCartItem has Product
 
-But we haven't defined the `Product` yet. Let'sgo ahead and do that. Add this code to the `//TODO ADD Product` marker:
+But we haven't defined the `Product` yet. Add this code to the `//TODO ADD Product` marker:
 
 [source,java,role="copypaste"]
 ----
@@ -495,7 +483,7 @@ message Product {
 
 *Great!* Now we have the Product defined in our proto model. We should also ensure that this model also exists as *POJO*(Plain Old Java Object), that way our *REST Endpoint*, or *Cache* will be able to directly serialize and desrialize the data.
 
-Let's take a look at our `Product.java` in `cart-service/src/main/java/com/redhat/cloudnative/model`:
+Next, open `Product.java` in `cart-service/src/main/java/com/redhat/cloudnative/model`:
 
 [source,java]
 ----
@@ -618,10 +606,10 @@ Next we need to make sure we will inject our cache in our service. Open `com.red
 
 The cart is quite simple; All the information from the browser i.e., via our *Angular App* is via _JSON_ at the _/api/cart_ endpoint:
 
-* *GET* request _/{cartId}_ gets the items in the cart, or creates a new unique ID if one is not present.
-* *POST* to _/{cartId}/{itemId}/{quantity}_ will add items to the cart.
-* *DELETE* to _/{cartId}/{itemId}/{quantity}_ will remove items from the cart.
-* And finally a *POST* to _/checkout/{cartId}_ will remove the items and invoke the checkout procedure.
+* `GET /{cartId}` gets the items in the cart, or creates a new unique ID if one is not present.
+* `POST /{cartId}/{itemId}/{quantity}` will add items to the cart.
+* `DELETE /{cartId}/{itemId}/{quantity}` will remove items from the cart.
+* `POST /checkout/{cartId}` will remove the items and invoke the checkout procedure.
 
 Let’s take a look at how we do this with Quarkus. In our *cart-service* project and in our main package i.e., `com.redhat.cloudnative` is the `CartResource`. Let’s take a look at the getCart method.
 
@@ -634,7 +622,7 @@ At the `// TODO ADD getCart method` marker, add this method:
     }
 ----
 
-The code above is using the _ShoppingCartService_, which is injected into the _CartResource_ via the Dependency Injection. The _ShoppingCartService_ take a _cartId_ as a parameter and returns the associated ShoppingCart. So that’s perfect, however, for our Endpoint i.e., CartResource to respond, we need to define a couple of things:
+The code above is using the `ShoppingCartService`, which is injected into the `CartResource` via the Dependency Injection. The `ShoppingCartService` take a `cartId` as a parameter and returns the associated ShoppingCart. So that’s perfect, however, for our Endpoint i.e., CartResource to respond, we need to define a couple of things:
 
 * The type of HTTPRequest
 * The type of data it can receive
@@ -650,9 +638,9 @@ Add the following code on top of the `getCart` method
     @Operation(summary = "get the contents of cart by cartId")
 ----
 
-We have now successfully stated that the method adheres to a GET request and accepts data in *plain text*. The path would be _/api/cart/{cartId}_ finally, we add the *@Operation* annotation for some documentation, which is important for other developers using our service.
+We have now successfully stated that the method adheres to a GET request and accepts data in *plain text*. The path would be `/api/cart/{cartId}` finally, we add the `@Operation` annotation for some documentation, which is important for other developers using our service.
 
-Take this opportunity to look at some of the other methods. You will find *@POST* and *@DELETE* and also the paths they adhere too. This is how we can construct a simple Endpoint for our application.
+Take this opportunity to look at some of the other methods. You will find `@POST` and `@DELETE` and also the paths they adhere to. This is how we can construct a simple endpoint for our application.
 
 [NOTE]
 ====
@@ -701,7 +689,7 @@ quickly as well.
 
 === 4. Developing and Deploying Order Service
 
-_Order Service_ manages all orders when customers checkout items in the shopping cart. Lets’s go through quickly how the order
+The Order Service manages all orders when customers checkout items in the shopping cart. Lets’s go through quickly how the order
 service get REST services to use the *MongoDB* database with *Quarkus* Java runtimes. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand *order-service* directory.
 
 image::codeready-workspace-order-project.png[order, 700]
@@ -733,7 +721,7 @@ image::order_bean.png[order, 700]
 
 Nothing fancy. One important thing to note is that having a default constructor is required by the *JSON serialization layer*.
 
-Now, open a `com.redhat.cloudnative.OrderService` that will be the business layer of our application and _store/load_ the orders from the mongoDB database. Add the following Java codes at each market.
+Now, open the `com.redhat.cloudnative.OrderService` class -- it will be the business layer of our application and _store/load_ the orders from the MongoDB database. Add the following java code at each marker.
 
 `// TODO: Inject MongoClient here` marker:
 
@@ -742,7 +730,7 @@ Now, open a `com.redhat.cloudnative.OrderService` that will be the business laye
     @Inject MongoClient mongoClient;
 ----
 
-Next, add this code below the `// TODO: Add a while loop to make an order lists using MongoCursor here` marker (in the `list()` method):
+Next, add this code below the `// TODO: Add a while loop to make an order lists using MongoCursor here` marker (in the `list()` method).
 
 [source,java,role="copypaste"]
 ----
@@ -780,6 +768,8 @@ Next, add this code below the `// TODO: Add to create a Document based order her
                 .append("status", order.getStatus());
         getCollection().insertOne(document);
 ----
+
+These two methods convert between a `Document` object suitable for use with MongoDB and the `Order` document which is our business value object.
 
 Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each marker:
 
@@ -977,26 +967,35 @@ And then access the http://order-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAI
 []
 ----
 
+You can also see this with `curl` with this command in a Terminal:
+
+[source,sh,role="copypaste"]
+----
+curl -s http://order-{{USER_ID}}-cloudnativeapps.{{ROUTE_SUBDOMAIN}}/api/orders | jq
+----
+
+Which will also return an empty array `[]`.
+
 === 5. Deploying WEB-UI Service
 
-_WEB-UI Service_ serves a frontend based on https://angularjs.org/[AngularJS^] and http://patternfly.org/[PatternFly^] running in a https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i[Node.js] container. https://developers.redhat.com/products/rhoar[Red Hat OpenShift Application Runtimes] includes *Node.js* support in enterprise prouction environment.
+Our Web UI serves a frontend based on https://angularjs.org/[AngularJS^] and http://patternfly.org/[PatternFly^] running in a https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i[Node.js] container. https://www.redhat.com/en/products/runtimes[Red Hat Runtimes^] includes *Node.js* support along with other runtimes used for cloud native development.
 
-Lets’s go through quickly how the frontend service works and built on Node.js runtimes. Go to _Explorer: /projects_ in CodeReady Workspaces Web IDE and expand _coolstore-ui_ directory.
+Lets’s go through quickly how the frontend service works and is built on Node.js runtimes. Go to _Explorer: /projects_ in CodeReady Workspaces and expand the `coolstore-ui` directory.
 
 image::codeready-workspace-coolstore-ui.png[coolstore-ui, 700]
 
-You will see javascripts for specific cloud-native services such as cart, catatlog, and order service as above.
+You will see javascript for specific cloud-native services such as the cart, catatlog, and order service as above.
 
 Now, we will deploy a presentation layer to OpenShift cluster using https://www.npmjs.com/package/nodeshift[Nodeshift] command line tool, a programmable API that you can use to deploy Node.js projects to OpenShift.
 
-Install the `Nodeshift` tool via CodeReady Workspaces Terminal:
+Install Nodeshift via the CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
 ----
 cd $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/coolstore-ui && npm install --save-dev nodeshift
 ----
 
-Deploy the web-ui service using `Nodeshift` via CodeReady Workspaces Terminal and it will take a couple of minutes to complete the web-ui application deployment:
+Deploy the coolstore-ui service using `Nodeshift` in a CodeReady Workspaces Terminal. It will take a minute to complete the deployment:
 
 [source,sh,role="copypaste"]
 ----
@@ -1011,10 +1010,12 @@ And then access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_S
 
 image::web-ui-landing.png[coolstore-ui, 700]
 
+This confirms that the frontend is properly hooked up to the backend, which is properly hooked up to our Data Grid deployment.
+
 === Summary
 
-In this scenario we developed five microservices with *REST API* exposure to communicate with the other microservices. We also used a variety of application runtimes such as `Quarkus`, `Spring Boot`, and `NodeJS` to compile, package, and containerize applications which is a major capability of the advanced cloud-native architecture.
+In this scenario we developed and deployed 5 microservices, each with a REST API and each of which communicate with the other microservices. We also used a variety of application runtimes such as Quarkus, Spring Boot, and Node.js to compile, package, and containerize applications -- this is an important capability of advanced cloud-native architectures.
 
-To deploy the cloud-native applications with multiple datasources on OpenShift cluster, _Quarkus_ provides an easy way to connect multiple datasources and obtain a reference to those datasources such as *PostgreSQL* and *MongoDB* in code.
+To deploy cloud-native applications with multiple datasources on an OpenShift cluster, Quarkus provides an easy way to connect multiple datasources and obtain a reference to those datasources such as PostgreSQL and MongoDB in code.
 
-In the end, we optimized *data transaction performance* of the shopping cart service thru integrating with a *Red Hat Data Grid* to increase end users’(customers) satification. *Congratulations!*
+In the end, we optimized the _transaction performance_ of the shopping cart service by integrating it with *Red Hat Data Grid* to increase end users’ (customers) satification. This may not be obvious with only one user (you), but at scale these components can ensure relability and business performance. *Congratulations!*
