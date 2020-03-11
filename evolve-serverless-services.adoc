@@ -1,7 +1,7 @@
 = Lab3 - Evolving services with Serverless
 :experimental:
 
-In our cloud-native application architecture, We now have multiple microservices in a *reactive* system. However, it’s not necessary our applications and services be up and running 24 hours day. They only need to be running *on-demand*, when something needs to use the service. This is one of the reasons why *serverless* architectures have gained popularity.
+In our cloud-native application architecture, We now have multiple microservices in a *reactive* system. However, it’s not necessary that applications and services remain up and running 24 hours day. They only need to be running *on-demand*, when something needs to use the service. This is one of the reasons why *serverless* architectures have gained popularity.
 
 * *Serverless* is often used interchangeably with the term _FaaS_ (Functions-as-a-Service). But serverless doesn’t mean that there is no server. In fact, there _are_ servers - a public cloud provider provides the servers that deploy, run, and manage your application.
 * *Serverless computing* is an emerging category that represents a shift in the way developers build and deliver software systems. Abstracting application infrastructure away from the code can greatly simplify the development process while introducing new cost and efficiency benefits. Serverless computing and FaaS will play an important role in helping to define the next era of enterprise
@@ -35,17 +35,9 @@ image::knative-eventing-diagram.png[knative, 800]
 
 OpenShift Serverless applications can be integrated with other OpenShift services, such as OpenShift https://www.openshift.com/learn/topics/pipelines[Pipelines^], https://www.openshift.com/learn/topics/service-mesh[Service Mesh^], Monitoring and https://github.com/operator-framework/operator-metering[Metering^], delivering a complete serverless application development and deployment experience.
 
-==== What is Red Hat OpenShift Service Mesh?
-
-https://www.openshift.com/learn/topics/service-mesh[OpenShift Service Mesh] provides traffic monitoring, access control, discovery, security, resiliency, and other useful things to a group of services. https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh[Istio^] does all that, but it doesn’t require any changes to the code of any of those services. To make the magic happen, Istio deploys a proxy (called a _sidecar_) next to each service. All of the traffic meant for a service goes to the proxy, which uses policies to decide how, when, or if that traffic should go on to the service. _Istio_ also enables sophisticated DevOps techniques such as canary deployments, circuit breakers, fault injection, and more.
-
-image::openshift_service_mesh.png[ossm, 600]
-
-_Istio_ also moves operational aspects away from code development and into the domain of operations. Why should a developer be burdened with circuit breakers and fault injections and should they respond to them? Yes, but for handling and/or creating them? Take that out of your code and let your code focus on the underlying business domain.
-
 === 1. Building a Native Executable
 
-Let’s now produce a native executable for an example Quarkus application. It improves the startup time of the application, and produces a minimal disk and memory footprint. The executable would have everything to run the application including the `JVM`(shrunk to be just enough to run the application), and the application. This is accomplished using https://graalvm.org/[GraalVM^].
+Let’s now produce a native executable for an example Quarkus application. It improves the startup time of the application, and produces a minimal disk and memory footprint, which is important in serverless applications. The executable would have everything to run the application including the `JVM`(shrunk to be just enough to run the application), and the application. This is accomplished using https://graalvm.org/[GraalVM^].
 
 `GraalVM` is a universal virtual machine for compiling and running applications written in JavaScript, Python, Ruby, R, JVM-based languages like Java, Scala, Groovy, Kotlin, Clojure, and LLVM-based languages such as C and C++. It includes ahead-of-time compilation, aggressive dead code elimination, and optimal packaging as native binaries that moves a lot of startup logic to build-time, thereby reducing startup time and memory resource requirements significantly.
 
@@ -276,7 +268,7 @@ After successful creation of the service we should see a *Knative Service*(_KSVC
 
 [NOTE]
 ====
-It may take a few moments to fully render. Try reloading the browser page if all you see is an empty box!
+It will take a few moments (up to 2 minutes) to fully render while the networking is setup properly. Try reloading the browser page if all you see is an empty box!
 ====
 
 image::kservice-up.png[serverless, 700]
@@ -745,7 +737,7 @@ image::petclinic-openurl.png[serverless, 800]
 
 === Summary
 
-In this module, we learned how to develop cloud-native applications using multiple Java runtimes (Quarkus and Spring Boot), Javascript (Node.js) and different datasources (i.e. PostgreSQL, MongoDB) to handle a variety of business use cases which implement real-time _request/response_ communication using REST APIs, high performing cacheable services using _Red Hat Data Grid_, event-driven/reactive shopping cart service using Apache Kafka in _Red Hat AMQ Streams_, and in the end, we treated the payment service as a *Serverless* application using _OpenShift Serverless_ with _Knative Eventing_.
+In this module, we learned how to develop cloud-native applications using multiple Java runtimes (Quarkus and Spring Boot), Javascript (Node.js) and different datasources (i.e. PostgreSQL, MongoDB) to handle a variety of business use cases which implement real-time _request/response_ communication using REST APIs, high performing cacheable services using _Red Hat Data Grid_, event-driven/reactive shopping cart service using Apache Kafka in _Red Hat AMQ Streams_. Finally, we converted the payment service to be a *Serverless* application using _OpenShift Serverless_ with Knative.
 
 *Red Hat Runtimes* enables enterprise developers to design the advanced cloud-native architecture and develop, build, deploy the cloud-native application on hybrid cloud on the *Red Hat OpenShift Container Platform*. *Congratulations!*
 

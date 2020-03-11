@@ -20,30 +20,13 @@ The benefits of cloud native application architectures enable speed of developme
 
 === How to build Cloud Native applications and architecture with Red Hat?
 
-`Red Hat Runtime​s​` is a recommended set of products, tools, and components to develop and maintain cloud-native applications. It provides lightweight runtimes and frameworks for highly-distributed cloud environments such as microservices, with in-memory caching for fast data access, and messaging for quick data transfer supporting existing applications.
-
-Red Hat Runtime​s​ products and components:
+_Red Hat Runtime​s​_ is a recommended set of products, tools, and components to develop and maintain cloud-native applications. It provides lightweight runtimes and frameworks for highly-distributed cloud environments such as microservices, with in-memory caching for fast data access, and messaging for quick data transfer supporting existing applications.
 
 image::rhar.png[Red Hat Runtimes Prducts and Components, 900]
-
-* *Red Hat® JBoss® Enterprise Application Platform 7​​ (JBoss EAP)* is the market-leading opensource platform for modern Java applications deployed in any environment. JBoss EAP’s architecture is lightweight, modular, and cloud ready. Based on the opensource WildFly app server project, the platform offers powerful management and automation for higher developer productivity.
-* *A set of cloud-native runtimes* are Spring Boot with Tomcat, Reactive Vert.x, Javascript Node.Js, MicroProfile Throntail.(Quarkus is coming soon!)
-* *Red Hat OpenJDK​* is an opensource implementation of the Java Platform SE (Standard Edition) supported and maintained by the OpenJDK community. OpenJDK is the default Java development and runtime in Red Hat Enterprise Linux.
-* *Red Hat Data Grid​*​ is an opensource ​in-memory distributed data management system designed for scalability and fast access to large volumes of data. More than just a distributed caching solution, it also offers additional functionality such as map/reduce, querying, processing for streaming data, and transaction capabilities​.
-* *Red Hat AMQ​​ (Broker)* is a pure-Java multiprotocol message broker that offers specialized queueing behaviors, message persistence, and manageability.
-* *Red Hat Application Migration Toolkit​*​ provides a set of utilities for easing the process of taking customers’ proprietary or outdated middleware platforms to state-of-the-art lightweight, modular, and cloud-ready middleware application infrastructure is making teams more productive and ready for the future.
-* *Missions and Boosters*​​ are a combination of runtime implementations and working applications that accelerate application development. ​Missions are working applications that showcase different fundamental pieces of building cloudnative applications and services. A booster is the implementation of a mission in a specific runtime.
-* *Red Hat Single Sign-On​​* based on the Keycloak project, Red Hat sso enables customers to secure web applications byproviding Web single sign-on) capabilities based on popular standards such as SAML 2.0, OpenID Connect and OAuth 2.0.The RH-sso server can act as a SAML or OpenID Connect-based identity provider, mediating your enterprise user directoryor 3rd-party SSO provider for identity information with your applications via standards-based tokens.
 
 Red Hat Runtimes​​ also provide integrated and optimized products and components to deliver modern applications, whether the goal is to keep existing applications or create new ones. Applications Runtimes enable developers to containerize applications with a microservices architecture, improve data access speed via in-memory data caching, enhance application performance with messaging, or adapt cloud-native application development using modern development patterns and technologies.
 
 Additionally, we have also chosen to use Quarkus for most of the applications in the labs. Read on to learn more about Quarkus.
-
-[NOTE]
-====
-At the time of writing this guide, Quarkus is still a community project and is not part of any of the Red Hat Middleware
-products.
-====
 
 ==== What is Quarkus?
 
@@ -59,6 +42,11 @@ https://Quarkus.io/[Qurakus] offers 4 major benefits to build cloud-native, micr
 * _Best of Breed Frameworks & Standards_ - CodeReady Workspaces Vert.x, Hibernate, RESTEasy, Apache Camel, CodeReady Workspaces MicroProfile, Netty, Kubernetes, OpenShift, Jaeger, Prometheus, Apacke Kafka, Infinispan, and more.
 
 === Getting Ready for the labs
+
+[NOTE]
+====
+If you’ve already completed other labs today then you'll be familiar with the CodeReady environment and can skip down to the *Import Project* section.
+====
 
 ==== If this is the first module you are doing today
 
@@ -89,6 +77,8 @@ Many features of CodeReady Workspaces are accessed via *Commands*. You can see a
 
 If you ever need to run commands that you don't see in a menu, you can press kbd:[F1] to open the command window, or the more traditional kbd:[Control+SHIFT+P] (or kbd:[Command+SHIFT+P] on Mac OS X).
 
+==== Import Project
+
 Let's import our first project. Click on *Git Clone..* (or type kbd:[F1], enter 'git' and click on the auto-completed _Git Clone.._ )
 
 image::che-workspace-gitclone.png[cdw, 900]
@@ -113,6 +103,12 @@ Once imported, choose *Add to workspace* when prompted.
 The project is imported into your workspace and is visible in the project explorer:
 
 image::crw-clone-explorer.png[crw,900]
+
+=== Remove other projects
+
+If you've completed other modules today (such as `cloud-native-workshop-v2m2-labs`), remove them from your workspace by right-clicking on the project name in the explorer and choose *Remove from Workspace* and accept the warning. Be sure not to delete the new project you just imported for this lab!
+
+image::remove-workspace.png[remove, 700]
 
 [NOTE]
 ====
