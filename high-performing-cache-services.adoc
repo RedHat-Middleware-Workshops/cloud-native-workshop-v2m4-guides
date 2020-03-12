@@ -155,7 +155,7 @@ You should see in the output:
 ✅ Adding extension io.quarkus:quarkus-jdbc-postgresql
 ----
 
-Package the applicaiton via running the following maven plugin in CodeReady Workspaces Terminal:
+Package the application via running the following maven plugin in CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -1011,6 +1011,28 @@ And then access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_S
 image::web-ui-landing.png[coolstore-ui, 700]
 
 This confirms that the frontend is properly hooked up to the backend, which is properly hooked up to our Data Grid deployment.
+
+=== Add labels
+
+To make the OpenShift console display a bit more pleasing, add labels to each app:
+
+[source,sh,role="copypaste"]
+----
+oc label dc/datagrid-service app.openshift.io/runtime=datagrid --overwrite && \
+oc label dc/cart app.openshift.io/runtime=java --overwrite && \
+oc label dc/catalog app.openshift.io/runtime=spring --overwrite && \
+oc label dc/catalog-database app.openshift.io/runtime=postgresql --overwrite && \
+oc label dc/order app.openshift.io/runtime=java --overwrite && \
+oc label dc/inventory app.openshift.io/runtime=java --overwrite && \
+oc label dc/inventory-database app.openshift.io/runtime=postgresql --overwrite && \
+oc label dc/datagrid-service app.openshift.io/runtime=java --overwrite && \
+oc label dc/order-database app.openshift.io/runtime=mongodb --overwrite && \
+oc label dc/coolstore-ui app.openshift.io/runtime=nodejs --overwrite
+----
+
+There, that's better:
+
+image::labels.png[coolstore-ui, 800]
 
 === Summary
 

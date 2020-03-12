@@ -217,6 +217,11 @@ And delete the configuration for the incoming stream. In `application.properties
 ; mp.messaging.incoming.orders.request.timeout.ms=30000
 ----
 
+[WARNING]
+====
+Make sure you only comment out or delete the lines starting with `mp.messaging.incoming` and leave the rest!
+====
+
 Rebuild and re-deploy new payment service via running the following maven plugin in CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
@@ -440,6 +445,7 @@ kind: DeploymentConfig
 metadata:
   labels:
     app: spring-petclinic
+    app.openshift.io/runtime: spring
   name: spring-petclinic
 spec:
   replicas: 1
@@ -621,7 +627,7 @@ Pipelines abstract away the specifics of the Git source repository and image to 
 
 The execution order of _tasks_ is determined by dependencies that are defined between the tasks via *inputs* and *outputs* as well as explicit orders that are defined via *runAfter*.
 
-Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View^], and click on *Create Pipeline*:
+Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Pipelines > Topology View^], click on *Create Pipeline*:
 
 image::console-import-yaml-1.png[serverless, 800]
 
@@ -672,7 +678,7 @@ image::console-import-yaml-2.png[serverless, 800]
 
 Now that the pipeline is created, you can trigger it to execute the tasks specified in the pipeline. First, you should create a number of *PipelineResources* that contain the specifics of the Git repository and image registry to be used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
 
-The following *PipelineResource* defines the Git repository and reference for the PetClinic application. Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View^], and click on `+` icon on the right top corner. Copy the following `petclinic-git` pipelineResource in `YAML` editor then click on *Create*:
+The following *PipelineResource* defines the Git repository and reference for the PetClinic application. Click on `+` icon on the right top corner of the OpenShift console. Copy the following `petclinic-git` pipelineResource in `YAML` editor then click on *Create*:
 
 [source,yaml,role="copypaste"]
 ----
@@ -687,7 +693,7 @@ spec:
     value: https://github.com/spring-projects/spring-petclinic
 ----
 
-And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Create the following pipeline resources via the {{ CONSOLE_URL }}[OpenShift web console^] via clicking again on `+` icon on the right top corner. Copy the following `petclinic-image` pipelineResource in `YAML` editor then click on *Create*:
+And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Again, click on the `+` icon on the right top corner. Copy the following `petclinic-image` pipelineResource in `YAML` editor then click on *Create*:
 
 [source,yaml,role="copypaste"]
 ----
@@ -702,7 +708,7 @@ spec:
     value: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/spring-petclinic
 ----
 
-Execute the following _Tekton CLI_ in CodeReady Workspaces Terminal:
+To confirm they're created properly, execute the following _Tekton CLI_ in CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -722,16 +728,15 @@ A *PipelineRun* is how you can start a pipeline and tie it to the Git and image 
 
 image::pipeline-start.png[serverless, 800]
 
-Then click on *Start* in the resources popup:
+This dialog box is where you bind the final target values for the source repo of the _build_ step, and the name of the image to deploy in the _deploy_ step. You can see default values, so just click on *Start*:
 
 image::pipeline-start-popup.png[serverless, 700]
 
-As soon as you started the *petclinic-deploy-pipeline*, a pipelinerun is instantiated and pods are created to execute the tasks that are defined in the pipeline. After a few minutes, the pipeline should finish successfully.
+As soon as you started the *petclinic-deploy-pipeline*, a pipelinerun is instantiated and pods are created to execute the tasks that are defined in the pipeline. After a few minutes, the pipeline should finish successfully. You can hover over the steps to get a quick snapshot of the step's progress, or click on the steps to see detailed logs of the steps.
 
 image::pipeline-complete.png[serverless, 800]
 
-
-Looking back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View^], and click on *Open URL*. You should see that the PetClinic image is successfully built and deployed.
+Once the build completes, on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View^], and click on *Open URL*. You should see that the PetClinic image is successfully built and deployed.
 
 image::petclinic-openurl.png[serverless, 800]
 
