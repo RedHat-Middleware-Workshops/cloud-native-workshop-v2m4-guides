@@ -266,13 +266,6 @@ Create a build configuration for your application using OpenJDK base container i
 oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=payment -l app=payment
 ----
 
-Force update the OpenJDK image tags just in case they haven’t been imported yet:
-
-[source,sh,role="copypaste"]
-----
-oc import-image openjdk18-openshift --all
-----
-
 Start and watch the build, which will take about minutes to complete:
 
 [source,sh,role="copypaste"]

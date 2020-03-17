@@ -166,14 +166,14 @@ First, we need to delete existing `BuildConfig` as it is based an excutable Jar 
 
 [source,sh,role="copypaste"]
 ----
-oc delete bc/payment
+oc delete bc/payment imagestream.image.openshift.io/payment 
 ----
 
 We also will delete our existing payment _deployment_ and _route_ since Knative will handle deploying the payment service and routing traffic to its managed pod when needed. Delete the existing payment deployment and its associated route and service with:
 
 [source,sh,role="copypaste"]
 ----
-oc delete dc/payment route/payment svc/payment
+oc delete dc/payment route/payment svc/payment 
 ----
 
 === 3. Enable Knative Eventing integration with Apache Kafka Event
