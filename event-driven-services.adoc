@@ -67,6 +67,16 @@ image::kafka-topic-payments-create.png[kafka, 700]
 
 image::kafka-topics-created.png[kafka, 700]
 
+Label them for easy visualizing using the AMQ Streams icon:
+
+[source,sh,role="copypaste"]
+----
+oc label kafka/my-cluster app.openshift.io/runtime=amq --overwrite && \
+oc label kafkatopic/payments app.openshift.io/runtime=amq --overwrite && \
+oc label kafkatopic/orders app.openshift.io/runtime=amq --overwrite
+----
+
+
 === 2. Develop and Deploy Payment Service
 
 Our _Payment Service_ will offer online services for accepting electronic payments by a variety of payment methods including credit card or bank-based payments when orders are checked out in shopping cart. It doesn’t really do anything but will represent a payment microservice that will *process* online shopping orders as they are posted to our services.
@@ -277,7 +287,7 @@ Deploy it as an OpenShift application after the build is done:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app payment && oc expose svc/payment
+oc new-app payment -l app.openshift.io/runtime=java && oc expose svc/payment
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the orders. Ensure you get the blue circles!
