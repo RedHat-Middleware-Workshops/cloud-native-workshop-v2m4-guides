@@ -262,8 +262,6 @@ spec:
   template:
     metadata:
       name: payment-v1
-      annotations:
-        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - image: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnativeapps/payment:latest
