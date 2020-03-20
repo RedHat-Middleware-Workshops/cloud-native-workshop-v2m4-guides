@@ -193,7 +193,7 @@ Comment out the `onMessage()` method via kbd:[CTRL+/] (or kbd:[Command+/] on Mac
 [source,java]
 ----
 //    @Incoming("orders")
-//    public CompletionStage<Void> onMessage(KafkaMessage<String, String> message)
+//    public CompletionStage<Void> onMessage(KafkaRecord<String, String> message)
 //            throws IOException {
 //
 //        log.info("Kafka message with value = {} arrived", message.getPayload());
