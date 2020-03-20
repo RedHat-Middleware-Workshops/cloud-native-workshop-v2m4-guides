@@ -287,7 +287,12 @@ Deploy it as an OpenShift application after the build is done:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app payment -l app.openshift.io/runtime=java && oc expose svc/payment
+oc new-app payment -l app.openshift.io/runtime=java && oc expose svc/payment && \
+oc label dc/payment app.kubernetes.io/part-of=payment --overwrite && \
+oc annotate dc/payment app.openshift.io/connects-to=my-cluster-kafka --overwrite && \
+oc annotate dc/payment app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
+oc annotate dc/payment app.openshift.io/vcs-ref=ocp-4.3 --overwrite && \
+oc annotate statefulset my-cluster-kafka app.openshift.io/connects-to=my-cluster-zookeeper --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the orders. Ensure you get the blue circles!
@@ -456,7 +461,8 @@ Rebuild a container image based the cart artifact that we just packaged, which w
 
 [source,sh,role="copypaste"]
 ----
-oc start-build cart --from-file $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service/target/*-runner.jar --follow
+oc start-build cart --from-file $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service/target/*-runner.jar --follow && \
+oc annotate dc/cart app.openshift.io/connects-to=my-cluster-kafka,datagrid-service --overwrite
 ----
 
 The cart service will be redeployed automatically via https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift Deployment triggers^] after it completes to build.
@@ -582,7 +588,8 @@ Rebuild a container image based the cart artifact that we just packaged, which w
 
 [source,sh,role="copypaste"]
 ----
-oc start-build order --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service/target/order-1.0-SNAPSHOT-runner.jar --follow
+oc start-build order --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service/target/order-1.0-SNAPSHOT-runner.jar --follow && \
+oc annotate dc/order app.openshift.io/connects-to=my-cluster-kafka,order-database --overwrite
 ----
 
 The order service will be redeployed automatically via https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift Deployment triggers^] after it completes to build.

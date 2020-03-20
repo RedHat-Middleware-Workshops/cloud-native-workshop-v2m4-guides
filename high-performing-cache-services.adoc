@@ -87,10 +87,10 @@ You should see a bunch of log output that ends with:
 
 [source,console]
 ----
-2020-03-10 00:55:12,598 INFO  [io.agr.pool] (main) Datasource '<default>': Initial size smaller than min. Connections will be created when necessary
-2020-03-10 00:55:12,887 INFO  [io.quarkus] (main) inventory 1.0-SNAPSHOT (running on Quarkus 1.2.1.Final) started in 3.166s. Listening on: http://0.0.0.0:8080
-2020-03-10 00:55:12,890 INFO  [io.quarkus] (main) Profile dev activated. Live Coding activated.
-2020-03-10 00:55:12,890 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, narayana-jta, resteasy, resteasy-jsonb, smallrye-health]
+2020-03-19 00:55:12,598 INFO  [io.agr.pool] (main) Datasource '<default>': Initial size smaller than min. Connections will be created when necessary
+2020-03-19 00:55:12,887 INFO  [io.quarkus] (main) inventory 1.0-SNAPSHOT (running on Quarkus 1.3.0.Final) started in 3.166s. Listening on: http://0.0.0.0:8080
+2020-03-19 00:55:12,890 INFO  [io.quarkus] (main) Profile dev activated. Live Coding activated.
+2020-03-19 00:55:12,890 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, narayana-jta, resteasy, resteasy-jsonb, smallrye-health]
 ----
 
 CodeReady will also detect that the Quarkus app opens port `5005` (for debugging) and `8080` (for web requests). Do not open port 5005, but when prompted, open the port `8080`, which opens a small web browser in CodeReady:
@@ -278,7 +278,12 @@ Once the build is done, we’ll deploy it as an OpenShift application and overri
 
 [source,sh,role="copypaste"]
 ----
-oc new-app inventory && oc expose svc/inventory
+oc new-app inventory && oc expose svc/inventory && \
+oc label dc/inventory app.kubernetes.io/part-of=inventory app.openshift.io/runtime=java --overwrite && \
+oc label dc/inventory-database app.kubernetes.io/part-of=inventory app.openshift.io/runtime=postgresql --overwrite && \
+oc annotate dc/inventory app.openshift.io/connects-to=inventory-database --overwrite && \
+oc annotate dc/inventory app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
+oc annotate dc/inventory app.openshift.io/vcs-ref=ocp-4.3 --overwrite
 ----
 
 Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], make sure it's done deploying (dark blue circle):
@@ -381,7 +386,12 @@ Once the build is done, we’ll deploy it as an OpenShift application and overri
 
 [source,sh,role="copypaste"]
 ----
-oc new-app catalog -e JAVA_OPTS_APPEND='-Dspring.profiles.active=openshift' && oc expose service catalog
+oc new-app catalog -e JAVA_OPTS_APPEND='-Dspring.profiles.active=openshift' && oc expose service catalog && \
+oc label dc/catalog app.kubernetes.io/part-of=catalog app.openshift.io/runtime=spring --overwrite && \
+oc label dc/catalog-database app.kubernetes.io/part-of=catalog app.openshift.io/runtime=postgresql --overwrite && \
+oc annotate dc/catalog app.openshift.io/connects-to=inventory,catalog-database --overwrite && \
+oc annotate dc/catalog app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
+oc annotate dc/catalog app.openshift.io/vcs-ref=ocp-4.3 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles!
@@ -672,7 +682,12 @@ Deploy it as an OpenShift application after the build is done:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app cart && oc expose svc/cart
+oc new-app cart && oc expose svc/cart && \
+oc label dc/cart app.kubernetes.io/part-of=cart app.openshift.io/runtime=java --overwrite && \
+oc label dc/datagrid-service app.kubernetes.io/part-of=cart app.openshift.io/runtime=datagrid --overwrite && \
+oc annotate dc/cart app.openshift.io/connects-to=catalog,datagrid-service --overwrite && \
+oc annotate dc/cart app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
+oc annotate dc/cart app.openshift.io/vcs-ref=ocp-4.3 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles!
@@ -953,7 +968,12 @@ Deploy it as an OpenShift application after the build is done:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app order && oc expose svc/order
+oc new-app order && oc expose svc/order && \
+oc label dc/order app.kubernetes.io/part-of=order app.openshift.io/runtime=java --overwrite && \
+oc label dc/order-database app.kubernetes.io/part-of=order app.openshift.io/runtime=mongodb --overwrite && \
+oc annotate dc/order app.openshift.io/connects-to=order-database --overwrite && \
+oc annotate dc/order app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
+oc annotate dc/order app.openshift.io/vcs-ref=ocp-4.3 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the orders. Ensure you get the blue circles!
@@ -999,7 +1019,11 @@ Deploy the coolstore-ui service using `Nodeshift` in a CodeReady Workspaces Term
 
 [source,sh,role="copypaste"]
 ----
-npm run nodeshift && oc expose svc/coolstore-ui
+npm run nodeshift && oc expose svc/coolstore-ui && \
+oc label dc/coolstore-ui app.kubernetes.io/part-of=coolstore app.openshift.io/runtime=nodejs && \
+oc annotate dc/coolstore-ui app.openshift.io/connects-to=order-cart,catalog,inventory,order --overwrite && \
+oc annotate dc/coolstore-ui app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
+oc annotate dc/coolstore-ui app.openshift.io/vcs-ref=ocp-4.3 --overwrite
 ----
 
 Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], make sure it's done deploying (dark blue circle):
@@ -1011,28 +1035,6 @@ And then access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_S
 image::web-ui-landing.png[coolstore-ui, 700]
 
 This confirms that the frontend is properly hooked up to the backend, which is properly hooked up to our Data Grid deployment.
-
-=== Add labels
-
-To make the OpenShift console display a bit more pleasing, add labels to each app:
-
-[source,sh,role="copypaste"]
-----
-oc label dc/datagrid-service app.openshift.io/runtime=datagrid --overwrite && \
-oc label dc/cart app.openshift.io/runtime=java --overwrite && \
-oc label dc/catalog app.openshift.io/runtime=spring --overwrite && \
-oc label dc/catalog-database app.openshift.io/runtime=postgresql --overwrite && \
-oc label dc/order app.openshift.io/runtime=java --overwrite && \
-oc label dc/inventory app.openshift.io/runtime=java --overwrite && \
-oc label dc/inventory-database app.openshift.io/runtime=postgresql --overwrite && \
-oc label dc/datagrid-service app.openshift.io/runtime=java --overwrite && \
-oc label dc/order-database app.openshift.io/runtime=mongodb --overwrite && \
-oc label dc/coolstore-ui app.openshift.io/runtime=nodejs --overwrite
-----
-
-There, that's better:
-
-image::labels.png[coolstore-ui, 800]
 
 === Summary
 
