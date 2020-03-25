@@ -593,7 +593,7 @@ Let's go shopping! Open the Web UI in your browser. To get the URL to the Web UI
 
 Add some cool items to your shopping cart in the following shopping scenarios:
 
- * 1) Add a _Red Hat Fedora_ to your cart by click on **Add to Cart**. You will see the `Success! Added!` message under the top munu.
+ * 1) Add a _Red Hat Fedora_ to your cart by click on **Add to Cart**. You will see the `Success! Added!` message under the top menu.
 
 ![serverless]({% image_path add-to-cart.png %})
 
