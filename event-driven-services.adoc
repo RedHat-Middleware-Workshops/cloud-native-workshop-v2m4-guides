@@ -605,7 +605,7 @@ Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapp
 Add some cool items to your shopping cart in the following shopping scenarios:
 
 [arabic]
-. Add a _Red Hat Fedora_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top munu.
+. Add a _Red Hat Fedora_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top menu.
 
 image::add-to-cart.png[serverless, 1000]
 
