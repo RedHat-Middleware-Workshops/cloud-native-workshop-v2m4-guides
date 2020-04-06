@@ -1020,7 +1020,7 @@ Deploy the coolstore-ui service using `Nodeshift` in a CodeReady Workspaces Term
 [source,sh,role="copypaste"]
 ----
 npm run nodeshift && oc expose svc/coolstore-ui && \
-oc label dc/coolstore-ui app.kubernetes.io/part-of=coolstore app.openshift.io/runtime=nodejs && \
+oc label dc/coolstore-ui app.kubernetes.io/part-of=coolstore --overwrite && \
 oc annotate dc/coolstore-ui app.openshift.io/connects-to=order-cart,catalog,inventory,order --overwrite && \
 oc annotate dc/coolstore-ui app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
 oc annotate dc/coolstore-ui app.openshift.io/vcs-ref=ocp-4.3 --overwrite
