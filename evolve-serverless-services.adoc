@@ -119,7 +119,7 @@ You should see something like:
 [source,shell]
 ----
     PID   RSS COMMAND
-   2021 50392 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
+   2828 49716 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
 ----
 
 This shows that our process is taking around `50 MB` of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
