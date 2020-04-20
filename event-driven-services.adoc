@@ -322,7 +322,7 @@ First, fetch the URL of our new payment service and store it in an environment v
 
 [source,sh,role="copypaste"]
 ----
-export URL="http://$(oc get route | grep payment | awk '{print $2}')"
+export URL=http://$(oc get route -n {{ USER_ID}}-cloudnativeapps payment -o jsonpath={% raw %}"{.spec.host}"{% endraw %})
 ----
 
 Then execute this to HTTP POST a message to our payment service with an example order:
@@ -611,6 +611,11 @@ image::add-to-cart.png[serverless, 1000]
 
 [arabic, start=2]
 . Go to the *Your Shopping Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should be 16 digits and begin with the digit `4`. For example `4123987754646678`.
+
+[NOTE]
+====
+Our fake credit card processor will look for credit card numbers that begin with `4`. Any credit card number that does not start with `4` will result in a `FAILED` processing. This is a good way to check the logic of our code!
+====
 
 image::checkout.png[serverless, 1000]
 

@@ -92,16 +92,21 @@ Since our environment here is Linux, you can just run it. In the CodeReady Works
 /tmp/hello/getting-started/target/*-runner
 ----
 
+[WARNING]
+====
+If you still have a previous application running in a separate CodeReady Terminal, you may get an error like `java.net.BindException: Address already in use`. Go to that other tab and press kbd:[CTRL+C] to stop the previous application, then try to run the native application again!
+====
+
 Notice the amazingly fast startup time:
 
 [source,shell]
 ----
-__  ____  __  _____   ___  __ ____  ______ 
- --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
- -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
---\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
+__  ____  __  _____   ___  __ ____  ______
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
+ -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/
 2020-04-06 13:48:33,523 INFO  [io.quarkus] (main) getting-started 1.0-SNAPSHOT (powered by Quarkus xx.xx.xx) started in 0.022s. Listening on: http://0.0.0.0:8080
-2020-04-06 13:48:33,523 INFO  [io.quarkus] (main) Profile prod activated. 
+2020-04-06 13:48:33,523 INFO  [io.quarkus] (main) Profile prod activated.
 2020-04-06 13:48:33,523 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
 ----
 
@@ -150,7 +155,7 @@ hello
 
 *Congratuations!* You’ve now built a Java application as a native executable JAR and a Linux native binary. We’ll explore the benefits of native binaries later in when we start deploying to Kubernetes.
 
-Be sure to terminate the running Quarkus development via kbd:[CTRL+C] (or kbd:[Command+C] on Mac OS).
+Be sure to terminate the running Quarkus development via kbd:[CTRL+C]).
 
 === 2. Delete old payment service
 
@@ -170,14 +175,14 @@ First, we need to delete existing `BuildConfig` as it is based an excutable Jar 
 
 [source,sh,role="copypaste"]
 ----
-oc delete bc/payment imagestream.image.openshift.io/payment 
+oc delete bc/payment imagestream.image.openshift.io/payment
 ----
 
 We also will delete our existing payment _deployment_ and _route_ since Knative will handle deploying the payment service and routing traffic to its managed pod when needed. Delete the existing payment deployment and its associated route and service with:
 
 [source,sh,role="copypaste"]
 ----
-oc delete dc/payment route/payment svc/payment 
+oc delete dc/payment route/payment svc/payment
 ----
 
 === 3. Enable Knative Eventing integration with Apache Kafka Event
@@ -305,7 +310,7 @@ Copy the following `KafkaSource` in `YAML` editor then click on *Create*:
 
 [source,yaml,role="copypaste"]
 ----
-apiVersion: sources.eventing.knative.dev/v1alpha1
+apiVersion: sources.knative.dev/v1alpha1
 kind: KafkaSource
 metadata:
   name: kafka-source
@@ -320,6 +325,11 @@ spec:
 ----
 
 You can see a new connection between Kafka and our *payments* service:
+
+[NOTE]
+====
+Serverless is an advanced and still evolving feature, and in this case you may not see the `KafkaSource` represented on the Topology view depending on the version of OpenShift and OpenShift serverless in use. If it does not appear, do not worry! The underlying technology will work as expected, so simply continue on.
+====
 
 image::kafka-event-source-link.png[serverless, 700]
 

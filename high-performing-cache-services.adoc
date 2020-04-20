@@ -209,7 +209,7 @@ Login using:
 
 [NOTE]
 ====
-When you access the [=OpenShift web console or other URLs via _HTTPS_ protocol, you will see browser warnings like `Your > Connection is not secure` since this workshop uses self-signed certificates (which you should not do in production!).
+When you access the OpenShift web console or other URLs via _HTTPS_ protocol, you will see browser warnings like `Your > Connection is not secure` since this workshop uses self-signed certificates (which you should not do in production!).
 For example, if you’re using *Chrome*, you will see the following screen.
 
 Click on `Advanced` then, you can access the HTTPS page when you click on `Proceed to...`!!!
@@ -229,7 +229,7 @@ The project displayed in the landing page depends on which labs you will run tod
 `Service Mesh and Identity` then you will see pre-created projects as the above screeenshot.
 ====
 
-Let's switch to {{CONSOLE_URL}}/add/ns/{{USER_ID}}-cloudnativeapps[Developer Console^].
+Open the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^].
 
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new
 instance of PostgreSQL. Click *+Add* on the left, on the _Database_ box on the *{{ USER_ID }}-cloudnativeapps* project overview:
@@ -290,7 +290,7 @@ Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology
 
 image::inventory_topology.png[inventory, 700]
 
-Click on Open URL then you will see inventories:
+Click on the small arrow icon as shown above and you will see inventories:
 
 image::inventory_topology_openurl.png[inventory, 700]
 
