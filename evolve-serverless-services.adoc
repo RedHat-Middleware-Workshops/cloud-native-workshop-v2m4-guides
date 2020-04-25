@@ -73,7 +73,7 @@ Next, create a `native executable` with this command:
 
 [source,sh,role="copypaste"]
 ----
-mvn -f /tmp/hello/getting-started clean package -Pnative -DskipTests
+mvn -f /tmp/hello/getting-started/pom.xml clean package -Pnative -DskipTests
 ----
 
 This may take a minute or two to run. One of the benefits of Quarkus is amazingly fast startup time, at the expense of a longer build time to optimize and remove dead code, process annotations, etc. This is only incurred once, at build time rather than _every_ startup!
