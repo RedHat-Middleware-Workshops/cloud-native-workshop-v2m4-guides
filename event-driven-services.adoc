@@ -291,7 +291,7 @@ oc new-app payment -l app.openshift.io/runtime=java && oc expose svc/payment && 
 oc label dc/payment app.kubernetes.io/part-of=payment --overwrite && \
 oc annotate dc/payment app.openshift.io/connects-to=my-cluster-kafka --overwrite && \
 oc annotate dc/payment app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
-oc annotate dc/payment app.openshift.io/vcs-ref=ocp-4.3 --overwrite && \
+oc annotate dc/payment app.openshift.io/vcs-ref=ocp-4.4 --overwrite && \
 oc annotate statefulset my-cluster-kafka app.openshift.io/connects-to=my-cluster-zookeeper --overwrite
 ----
 
