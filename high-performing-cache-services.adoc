@@ -167,17 +167,12 @@ mvn clean compile package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-worksho
 You should `SKIP` the Unit test because you don’t have PostgreSQL database in local environment.
 ====
 
-Although your Eclipse Che workspace is running on the Kubernetes cluster, it’s running with a default restricted _Service Account_ that prevents you from creating most resource types. If you’ve completed other modules, you’re probably already logged in, but let’s login again: open a Terminal and issue the following command:
-
-[source,sh,role="copypaste"]
-----
-oc login https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT --insecure-skip-tls-verify=true
-----
-
-Enter your username and password assigned to you:
+Although your Eclipse Che workspace is running on the Kubernetes cluster, it’s running with a default restricted _Service Account_ that prevents you from creating most resource types. If you’ve completed other modules, you’re probably already logged in, but let’s login again: click on *Login to OpenShift*, and enter your given credentials:
 
 * Username: `{{ USER_ID }}`
 * Password: `{{ OPENSHIFT_USER_PASSWORD }}`
+
+image::cmd-login.png[login,700]
 
 You should see something like this (the project names may be different):
 
