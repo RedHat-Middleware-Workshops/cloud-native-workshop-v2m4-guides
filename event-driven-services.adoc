@@ -240,7 +240,7 @@ This method will consume Kafka streams from the `orders` topic and call our `han
 
 Quarkus and its extensions are configured by an `application.properties` file. Open this file (it is in the `src/main/resources` directory).
 
-Add these values to the file:
+Add these values to the file at the `# TODO: Add for messaging configuration` marker:
 
 [source,properties,role="copypaste"]
 ----
@@ -262,35 +262,29 @@ mp.messaging.incoming.orders.enable.auto.commit=true
 mp.messaging.incoming.orders.request.timeout.ms=30000
 ----
 
-Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
+Build and deploy the project using using the OpenShift extension, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
 ----
 mvn clean package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
 ----
+The output should end with `BUILD SUCCESS`.
 
-Create a build configuration for your application using OpenJDK base container image in OpenShift:
-
-[source,sh,role="copypaste"]
-----
-oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=payment -l app=payment
-----
-
-Start and watch the build, which will take about minutes to complete:
+Make sure it's actually done rolling out:
 
 [source,sh,role="copypaste"]
 ----
-oc start-build payment --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/target/payment-1.0-SNAPSHOT-runner.jar --follow
+oc rollout status -w dc/payment
 ----
 
-Deploy it as an OpenShift application after the build is done:
+Wait for that command to report *replication controller payment-1_ successfully rolled out* before continuing.
+
+And label the items with proper icons:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app payment -l app.openshift.io/runtime=java && oc expose svc/payment && \
 oc label dc/payment app.kubernetes.io/part-of=payment --overwrite && \
 oc annotate dc/payment app.openshift.io/connects-to=my-cluster-kafka --overwrite && \
-oc annotate dc/payment app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
 oc annotate dc/payment app.openshift.io/vcs-ref=ocp-4.4 --overwrite && \
 oc annotate statefulset my-cluster-kafka app.openshift.io/connects-to=my-cluster-zookeeper --overwrite
 ----
@@ -439,7 +433,7 @@ Now that we have those methods, Let's add a call to our `sendOrder()` method whe
     }
 ----
 
-Almost there! Next let’s add the configuration to our `application.properties` file (in the `src/main/resources` of the `cart-service` project):
+Almost there! Next let’s add the configuration to our `application.properties` file at the `# TODO: Add Kafka messaging keys and values here` marker: (in the `src/main/resources` of the `cart-service` project):
 
 [source,none,role="copypaste"]
 ----
@@ -454,18 +448,9 @@ Re-package the _cart service_ using the following command, which will use the ma
 
 [source,sh,role="copypaste"]
 ----
-mvn clean package -DskipTests -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
-----
-
-Rebuild a container image based the cart artifact that we just packaged, which will take about minutes to complete:
-
-[source,sh,role="copypaste"]
-----
-oc start-build cart --from-file $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service/target/*-runner.jar --follow && \
+mvn clean package -DskipTests -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service && \
 oc annotate dc/cart app.openshift.io/connects-to=my-cluster-kafka,datagrid-service --overwrite
 ----
-
-The cart service will be redeployed automatically via https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift Deployment triggers^] after it completes to build.
 
 === 4. Adding Kafka Client to Order Service
 
@@ -549,7 +534,7 @@ public class KafkaOrders {
 }
 ----
 
-Almost there; Next Let's add the configuration to our `src/main/resources/application.properties` file in the _order-service_ project:
+Almost there; Next Let's add the configuration to our `src/main/resources/application.properties` file at the `# TODO: Add for messaging configuration` marker in the _order-service_ project:
 
 [source,none,role="copypaste"]
 ----
@@ -581,18 +566,9 @@ Re-package the order service using the following command, which will use the mav
 
 [source,sh,role="copypaste"]
 ----
-mvn clean package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
-----
-
-Rebuild a container image based the cart artifact that we just packaged, which will take about minutes to complete:
-
-[source,sh,role="copypaste"]
-----
-oc start-build order --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service/target/order-1.0-SNAPSHOT-runner.jar --follow && \
+mvn clean package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service && \
 oc annotate dc/order app.openshift.io/connects-to=my-cluster-kafka,order-database --overwrite
 ----
-
-The order service will be redeployed automatically via https://docs.openshift.com/container-platform/4.1/applications/deployments/managing-deployment-processes.html#deployments-triggers_deployment-operations[OpenShift Deployment triggers^] after it completes to build.
 
 Wait for all of the rebuilds and redeployments to complete, and you have all your blue circles!
 

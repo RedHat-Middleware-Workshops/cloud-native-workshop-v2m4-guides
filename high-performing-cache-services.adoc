@@ -66,21 +66,21 @@ image::inventoryResource.png[inventory_service, 700]
 
 [source,none]
 ----
-quarkus.datasource.url=jdbc:h2:file://projects/database.db
-quarkus.datasource.driver=org.h2.Driver
-quarkus.datasource.username=inventory
-quarkus.datasource.password=mysecretpassword
-quarkus.datasource.max-size=8
-quarkus.datasource.min-size=2
-quarkus.hibernate-orm.database.generation=drop-and-create
-quarkus.hibernate-orm.log.sql=false
+%dev.quarkus.datasource.url=jdbc:h2:file://projects/database.db
+%dev.quarkus.datasource.driver=org.h2.Driver
+%dev.quarkus.datasource.username=inventory
+%dev.quarkus.datasource.password=mysecretpassword
+%dev.quarkus.datasource.max-size=8
+%dev.quarkus.datasource.min-size=2
+%dev.quarkus.hibernate-orm.database.generation=drop-and-create
+%dev.quarkus.hibernate-orm.log.sql=false
 ----
 
 Let’s run the inventory application locally using `maven plugin command` via CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
 ----
-mvn clean compile quarkus:dev -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
+mvn quarkus:dev -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
 ----
 
 You should see a bunch of log output that ends with:
@@ -155,44 +155,6 @@ You should see in the output:
 ✅ Adding extension io.quarkus:quarkus-jdbc-postgresql
 ----
 
-Package the application via running the following maven plugin in CodeReady Workspaces Terminal:
-
-[source,sh,role="copypaste"]
-----
-mvn clean compile package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
-----
-
-[NOTE]
-====
-You should `SKIP` the Unit test because you don’t have PostgreSQL database in local environment.
-====
-
-Although your Eclipse Che workspace is running on the Kubernetes cluster, it’s running with a default restricted _Service Account_ that prevents you from creating most resource types. If you’ve completed other modules, you’re probably already logged in, but let’s login again: click on *Login to OpenShift*, and enter your given credentials:
-
-* Username: `{{ USER_ID }}`
-* Password: `{{ OPENSHIFT_USER_PASSWORD }}`
-
-image::cmd-login.png[login,700]
-
-You should see something like this (the project names may be different):
-
-[source,none]
-----
-Login successful.
-
-You have access to the following projects and can switch between them with 'oc project <projectname>':
-
-  * {{ USER_ID }}-bookinfo
-    {{ USER_ID }}-catalog
-    {{ USER_ID }}-cloudnative-pipeline
-    {{ USER_ID }}-cloudnativeapps
-    {{ USER_ID }}-inventory
-    {{ USER_ID }}-istio-system
-
-Using project "{{ USER_ID }}-bookinfo".
-Welcome! See 'oc help' to get started.
-----
-
 First, open a new brower with the {{ CONSOLE_URL }}[OpenShift web console^]:
 
 image::openshift_login.png[openshift_login, 700]
@@ -201,18 +163,6 @@ Login using:
 
 * Username: `{{ USER_ID }}`
 * Password: `{{ OPENSHIFT_USER_PASSWORD }}`
-
-[NOTE]
-====
-When you access the OpenShift web console or other URLs via _HTTPS_ protocol, you will see browser warnings like `Your > Connection is not secure` since this workshop uses self-signed certificates (which you should not do in production!).
-For example, if you’re using *Chrome*, you will see the following screen.
-
-Click on `Advanced` then, you can access the HTTPS page when you click on `Proceed to...`!!!
-====
-
-image::browser_warning.png[warning, 700]
-
-Other browsers have similar procedures to accept the security exception.
 
 You will see a list of projects to which you have access:
 
@@ -249,35 +199,59 @@ This will deploy the database to our new project. Click on the {{ CONSOLE_URL }}
 
 image::inventory-database-deployment.png[inventory_db_deployments, 700]
 
-Create a build configuration for your application using OpenJDK base container image in OpenShift:
+
+Although your CodeReady workspace is running on the Kubernetes cluster, it’s running with a default restricted _Service Account_ that prevents you from creating most resource types. If you’ve completed other modules, you’re probably already logged in, but let’s login again: click on *Login to OpenShift*, and enter your given credentials:
+
+* Username: `{{ USER_ID }}`
+* Password: `{{ OPENSHIFT_USER_PASSWORD }}`
+
+image::cmd-login.png[login,700]
+
+You should see something like this (the project names may be different):
+
+[source,none]
+----
+Login successful.
+
+You have access to the following projects and can switch between them with 'oc project <projectname>':
+
+  * {{ USER_ID }}-bookinfo
+    {{ USER_ID }}-catalog
+    {{ USER_ID }}-cloudnative-pipeline
+    {{ USER_ID }}-cloudnativeapps
+    {{ USER_ID }}-inventory
+    {{ USER_ID }}-istio-system
+
+Using project "{{ USER_ID }}-bookinfo".
+Welcome! See 'oc help' to get started.
+----
+
+Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
 
 [source,sh,role="copypaste"]
 ----
-oc project {{ USER_ID }}-cloudnativeapps && oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=inventory -l app=inventory
+oc project {{ USER_ID }}-cloudnativeapps && \
+mvn clean compile package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
 ----
 
-[NOTE]
-====
-This build uses the new https://access.redhat.com/documentation/en-us/red_hat_jboss_middleware_for_openshift/3/html/red_hat_java_s2i_for_openshift/index[Red Hat OpenJDK Container Image^], providing foundational software needed to run Java applications, while staying at
-a reasonable size.
-====
+The output should end with `BUILD SUCCESS`.
 
-Start and watch the build, which will take about minutes to complete:
+Finally, make sure it's actually done rolling out:
 
 [source,sh,role="copypaste"]
 ----
-oc start-build inventory --from-file $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service/target/*-runner.jar --follow
+oc rollout status -w dc/inventory
 ----
 
-Once the build is done, we’ll deploy it as an OpenShift application and override the Postgres URL to specify our production Postgres credentials:
+Wait for that command to report *replication controller _inventory-1_ successfully rolled out* before continuing.
+
+And label the items with proper icons:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app inventory && oc expose svc/inventory && \
-oc label dc/inventory app.kubernetes.io/part-of=inventory app.openshift.io/runtime=java --overwrite && \
+oc label dc/inventory app.kubernetes.io/part-of=inventory app.openshift.io/runtime=quarkus --overwrite && \
 oc label dc/inventory-database app.kubernetes.io/part-of=inventory app.openshift.io/runtime=postgresql --overwrite && \
 oc annotate dc/inventory app.openshift.io/connects-to=inventory-database --overwrite && \
-oc annotate dc/inventory app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
 oc annotate dc/inventory app.openshift.io/vcs-ref=ocp-4.4 --overwrite
 ----
 
@@ -652,44 +626,76 @@ Take this opportunity to look at some of the other methods. You will find `@POST
 There are other *// TODO* markers and commented-out code we will use later. Leave them alone for now.
 ====
 
-Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
+Quarkus also offers the ability to automatically generate OpenShift resources based on sane default and user supplied configuration. The OpenShift extension is actually a wrapper extension that brings together the [kubernetes](https://quarkus.io/guides/deploying-to-kubernetes) and [container-image-s2i](https://quarkus.io/guides/container-image#s2i) extensions with defaults so that it’s easier for the user to get started with Quarkus on OpenShift.
+
+Add _openshift_ extension via CodeReady Workspaces Terminal:
+
+[source,sh,role="copypaste"]
+----
+mvn quarkus:add-extension -Dextensions="openshift" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
+----
+
+you will see:
+
+✅ Adding extension io.quarkus:quarkus-openshift
+
+Quarkus supports the notion of _configuration profiles_. These allows you to have multiple configurations in the same file and
+select between then via a _profile name_.
+
+Let’s `add` the following variables at the `# TODO: Add for OpenShift extension` marker in _src/main/resources/application.properties_:
+
+[source,shell,role="copypaste"]
+----
+%prod.quarkus.kubernetes-client.trust-certs=true
+%prod.quarkus.container-image.build=true
+%prod.quarkus.kubernetes.deploy=true
+%prod.quarkus.kubernetes.deployment-target=openshift
+%prod.quarkus.openshift.expose=true
+%prod.quarkus.openshift.labels.app.openshift.io/runtime=quarkus 
+----
+
+For more details of the above options:
+
+* `quarkus.kubernetes-client.trust-certs=true` - We are using self-signed certs in this simple example, so this simply says to the extension to trust them.
+* `quarkus.container-image.build=true` - Instructs the extension to build a container image
+* `quarkus.kubernetes.deploy=true` - Instructs the extension to deploy to OpenShift after the container image is built
+* `quarkus.kubernetes.deployment-target=openshift` - Instructs the extension to generate and create the OpenShift resources (like `DeploymentConfig`s and `Service`s) after building the container
+* `quarkus.openshift.expose=true` - Instructs the extension to generate an OpenShift `Route`.
+* `quarkus.openshift.labels.app.openshift.io/runtime=java` - Adds a nice-looking icon to the app when viewing the OpenShift Developer Toplogy
+
+Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
 
 [source,sh,role="copypaste"]
 ----
 mvn clean package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
 ----
 
-Create a build configuration for your application using OpenJDK base container image in OpenShift:
+The output should end with `BUILD SUCCESS`.
+
+Finally, make sure it's actually done rolling out:
 
 [source,sh,role="copypaste"]
 ----
-oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=cart -l app=cart
+oc rollout status -w dc/cart-service
 ----
 
-Start and watch the build, which will take about minutes to complete:
+Wait for that command to report *replication controller cart-service-1_ successfully rolled out* before continuing.
 
-[source,sh,role="copypaste"]
-----
-oc start-build cart --from-file $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service/target/*-runner.jar --follow
-----
-
-Deploy it as an OpenShift application after the build is done:
+And label the items with proper icons:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app cart && oc expose svc/cart && \
-oc label dc/cart app.kubernetes.io/part-of=cart app.openshift.io/runtime=java --overwrite && \
+oc label dc/cart-service app.kubernetes.io/part-of=cart app.openshift.io/runtime=quarkus --overwrite && \
 oc label dc/datagrid-service app.kubernetes.io/part-of=cart app.openshift.io/runtime=datagrid --overwrite && \
-oc annotate dc/cart app.openshift.io/connects-to=catalog,datagrid-service --overwrite && \
-oc annotate dc/cart app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
-oc annotate dc/cart app.openshift.io/vcs-ref=ocp-4.4 --overwrite
+oc annotate dc/cart-service app.openshift.io/connects-to=catalog,datagrid-service --overwrite && \
+oc annotate dc/cart-service app.openshift.io/vcs-ref=ocp-4.4 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles!
 
 image::cart-topology.png[catalog, 700]
 
-And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}/swagger-ui[Cart Swagger UI^]:
+And then access the http://cart-service-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}/swagger-ui[Cart Swagger UI^]:
 
 image::cart-swagger-ui.png[cart, 700]
 
@@ -828,7 +834,7 @@ The main property to configure is the URL to access to *MongoDB*, almost all con
 so we advise you to do so, you can find more information in the
 https://docs.mongodb.com/manual/reference/connection-string/[MongoDB documentation^]
 
-Open `application.properties` in `src/main/resources/` and add the following configuration:
+Open `application.properties` in `src/main/resources/` and add the following configuration at the `# TODO: Add for MongoDB configuration` marker:
 
 [source,sh,role="copypaste"]
 ----
@@ -931,13 +937,6 @@ Edit the `com.redhat.cloudnative.CodecOrderService` class as follows:
     }
 ----
 
-Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
-
-[source,sh,role="copypaste"]
-----
-mvn clean package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
-----
-
 Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
@@ -945,29 +944,31 @@ Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady 
 oc new-app -n {{ USER_ID }}-cloudnativeapps --docker-image mongo:4.0 --name=order-database
 ----
 
-Once the MongoDB is deployed successfully, create a build configuration for your application using OpenJDK base container image in OpenShift:
+Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
 
 [source,sh,role="copypaste"]
 ----
-oc new-build registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5 --binary --name=order -l app=order
+mvn clean package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
 ----
 
-Start and watch the build, which will take about minutes to complete:
+The output should end with `BUILD SUCCESS`.
 
-[source,sh,role="copypaste"]
-----
-oc start-build order --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service/target/order-1.0-SNAPSHOT-runner.jar --follow
-----
-
-Deploy it as an OpenShift application after the build is done:
+Finally, make sure it's actually done rolling out:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app order && oc expose svc/order && \
-oc label dc/order app.kubernetes.io/part-of=order app.openshift.io/runtime=java --overwrite && \
+oc rollout status -w dc/order
+----
+
+Wait for that command to report *replication controller order-1_ successfully rolled out* before continuing.
+
+And label the items with proper icons:
+
+[source,sh,role="copypaste"]
+----
+oc label dc/order app.kubernetes.io/part-of=order --overwrite && \
 oc label dc/order-database app.kubernetes.io/part-of=order app.openshift.io/runtime=mongodb --overwrite && \
 oc annotate dc/order app.openshift.io/connects-to=order-database --overwrite && \
-oc annotate dc/order app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
 oc annotate dc/order app.openshift.io/vcs-ref=ocp-4.4 --overwrite
 ----
 
