@@ -135,7 +135,7 @@ Add this code at the `// TODO: Add handleCloudEvent method here` marker:
 ----
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public void handleCloudEvent(String cloudEventJson) {
         String orderId = "unknown";
         String paymentId = "" + ((int)(Math.floor(Math.random() * 100000)));
@@ -402,7 +402,8 @@ topic. Replace the empty `sendOrder()` method with this code:
 ----
     private void sendOrder(Order order, String cartId) {
         order.setTotal(shoppingCartService.getShoppingCart(cartId).getCartTotal() + "");
-        producer.send(new ProducerRecord<String, String>(ordersTopic, Json.encode(order)));
+        ProducerRecord<String, String> producerRecord = new ProducerRecord<>(ordersTopic, null, null, null, Json.encode(order), new RecordHeaders().add("content-type", "application/json".getBytes()));
+        producer.send(producerRecord);
         log.info("Sent message: " + Json.encode(order));
     }
 ----
