@@ -249,7 +249,7 @@ And label the items with proper icons:
 
 [source,sh,role="copypaste"]
 ----
-oc label dc/inventory app.kubernetes.io/part-of=inventory app.openshift.io/runtime=quarkus --overwrite && \
+oc label dc/inventory app.kubernetes.io/part-of=inventory --overwrite && \
 oc label dc/inventory-database app.kubernetes.io/part-of=inventory app.openshift.io/runtime=postgresql --overwrite && \
 oc annotate dc/inventory app.openshift.io/connects-to=inventory-database --overwrite && \
 oc annotate dc/inventory app.openshift.io/vcs-ref=ocp-4.4 --overwrite
@@ -646,12 +646,12 @@ Let’s `add` the following variables at the `# TODO: Add for OpenShift extensio
 
 [source,shell,role="copypaste"]
 ----
-%prod.quarkus.kubernetes-client.trust-certs=true
-%prod.quarkus.container-image.build=true
-%prod.quarkus.kubernetes.deploy=true
-%prod.quarkus.kubernetes.deployment-target=openshift
-%prod.quarkus.openshift.expose=true
-%prod.quarkus.openshift.labels.app.openshift.io/runtime=quarkus 
+quarkus.kubernetes-client.trust-certs=true
+quarkus.container-image.build=true
+quarkus.kubernetes.deploy=true
+quarkus.kubernetes.deployment-target=openshift
+quarkus.openshift.expose=true
+quarkus.openshift.labels.app.openshift.io/runtime=quarkus 
 ----
 
 For more details of the above options:
@@ -676,26 +676,26 @@ Finally, make sure it's actually done rolling out:
 
 [source,sh,role="copypaste"]
 ----
-oc rollout status -w dc/cart-service
+oc rollout status -w dc/cart
 ----
 
-Wait for that command to report *replication controller cart-service-1_ successfully rolled out* before continuing.
+Wait for that command to report *replication controller _cart-1_ successfully rolled out* before continuing.
 
 And label the items with proper icons:
 
 [source,sh,role="copypaste"]
 ----
-oc label dc/cart-service app.kubernetes.io/part-of=cart app.openshift.io/runtime=quarkus --overwrite && \
+oc label dc/cart app.kubernetes.io/part-of=cart app.openshift.io/runtime=quarkus --overwrite && \
 oc label dc/datagrid-service app.kubernetes.io/part-of=cart app.openshift.io/runtime=datagrid --overwrite && \
-oc annotate dc/cart-service app.openshift.io/connects-to=catalog,datagrid-service --overwrite && \
-oc annotate dc/cart-service app.openshift.io/vcs-ref=ocp-4.4 --overwrite
+oc annotate dc/cart app.openshift.io/connects-to=catalog,datagrid-service --overwrite && \
+oc annotate dc/cart app.openshift.io/vcs-ref=ocp-4.4 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles!
 
 image::cart-topology.png[catalog, 700]
 
-And then access the http://cart-service-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}/swagger-ui[Cart Swagger UI^]:
+And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}/swagger-ui[Cart Swagger UI^]:
 
 image::cart-swagger-ui.png[cart, 700]
 
@@ -960,7 +960,7 @@ Finally, make sure it's actually done rolling out:
 oc rollout status -w dc/order
 ----
 
-Wait for that command to report *replication controller order-1_ successfully rolled out* before continuing.
+Wait for that command to report *replication controller _order-1_ successfully rolled out* before continuing.
 
 And label the items with proper icons:
 

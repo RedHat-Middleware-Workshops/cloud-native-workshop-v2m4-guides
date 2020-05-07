@@ -112,7 +112,7 @@ __  ____  __  _____   ___  __ ____  ______
 2020-04-06 13:48:33,523 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
 ----
 
-That’s *22 milliseconds* to start up. The start-up time might be different in your environment.
+That’s *18 milliseconds* to start up. The start-up time might be different in your environment.
 
 And extremely low memory usage as reported by the Linux `ps` utility. While the app is running, run the following command in another Terminal:
 
@@ -126,7 +126,7 @@ You should see something like:
 [source,shell]
 ----
     PID   RSS COMMAND
-   2828 49716 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
+   4711 57436 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
 ----
 
 This shows that our process is taking around `50 MB` of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
@@ -213,24 +213,33 @@ Comment out the `onMessage()` method via kbd:[CTRL+/] (or kbd:[Command+/] on Mac
 //    }
 ----
 
-And delete the configuration for the incoming stream. In `application.properties`, comment out the following lines for the _Incoming_ stream via kbd:[CTRL+/] (or kbd:[Command+/] on Mac OS):
+And delete the configuration for the incoming stream. In `application.properties`, comment out the following lines for the _Incoming_ stream and _OpenShift extension_ via kbd:[CTRL+/] (or kbd:[Command+/] on Mac OS):
 
 [source,none]
 ----
+# OpenShift extension
+# quarkus.kubernetes-client.trust-certs=true
+# quarkus.container-image.build=true
+# quarkus.kubernetes.deploy=true
+# quarkus.kubernetes.deployment-target=openshift
+# quarkus.openshift.expose=true
+
+...
+
 # Incoming stream (unneeded when using Knative events)
-; mp.messaging.incoming.orders.connector=smallrye-kafka
-; mp.messaging.incoming.orders.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
-; mp.messaging.incoming.orders.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
-; mp.messaging.incoming.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092
-; mp.messaging.incoming.orders.group.id=payment-order-service
-; mp.messaging.incoming.orders.auto.offset.reset=earliest
-; mp.messaging.incoming.orders.enable.auto.commit=true
-; mp.messaging.incoming.orders.request.timeout.ms=30000
+# mp.messaging.incoming.orders.connector=smallrye-kafka
+# mp.messaging.incoming.orders.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+# mp.messaging.incoming.orders.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+# mp.messaging.incoming.orders.bootstrap.servers=my-cluster-kafka-bootstrap:9092
+# mp.messaging.incoming.orders.group.id=payment-order-service
+# mp.messaging.incoming.orders.auto.offset.reset=earliest
+# mp.messaging.incoming.orders.enable.auto.commit=true
+# mp.messaging.incoming.orders.request.timeout.ms=30000
 ----
 
 [WARNING]
 ====
-Make sure you only comment out or delete the lines starting with `mp.messaging.incoming` and leave the rest!
+Make sure you only comment out or delete the lines starting with `mp.messaging.incoming`, `OpenShift extension` and leave the rest!
 ====
 
 Rebuild and re-deploy new payment service via running the following maven plugin in CodeReady Workspaces Terminal:
@@ -245,7 +254,7 @@ compiled Quarkus app. Create a new build config with this command:
 
 [source,sh,role="copypaste"]
 ----
-oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:20.0.0 --binary --name=payment -l app=payment
+oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:1.0 --binary --name=payment -l app=payment
 ----
 
 Start and watch the build, which will take about 3-4 minutes to complete:
@@ -257,26 +266,24 @@ oc start-build payment --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4
 
 This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
 
-To create a _Knative Service_ in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View], click on `+` icon on the right top corner:
+Go to the {{ CONSOLE_URL }}/add/ns/{{ USER_ID }}-cloudnativeapps[+Add] to create a _Knative Service_ and click on *Container Image*:
 
-image::plus-icon.png[serverless, 500]
+image::add-icon.png[serverless, 700]
 
-Copy the following _Service_ in `YAML` editor then click on *Create*:
+Fill out the following variables to deploy _Payment Image_ that you just built then click on *Create*:
 
-[source,yaml,role="copypaste"]
-----
-apiVersion: serving.knative.dev/v1alpha1
-kind: Service
-metadata:
-  name: payment
-spec:
-  template:
-    metadata:
-      name: payment-v1
-    spec:
-      containers:
-      - image: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnativeapps/payment:latest
-----
+* Image stream tag from internal registry: *Checked*
+* Projects: *{{ USER_ID }}-cloudnativeapps*
+* ImageStreams: *payment*
+* Tag: *latest*
+
+* Application: *Create Application*
+* Application Name: *payment*
+* Name: *payment*
+
+* Knative Service: *Checked*
+
+image::deploy-payment-image.png[serverless, 700]
 
 After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
 
@@ -285,7 +292,22 @@ After successful creation of the service we should see a *Knative Service*(_KSVC
 It will take a few moments (up to 2 minutes) to fully render while the networking is setup properly. Try reloading the browser page if all you see is an empty box!
 ====
 
+Let's edit labels to add _Quarkus_ icon. Click on payment *REV* then select *Edit Labels* in _Actions_ drop box:
+
 image::kservice-up.png[serverless, 700]
+
+Add this label and click on *Save*:
+
+[source,sh,role="copypaste"]
+----
+app.openshift.io/runtime=quarkus
+----
+
+image::quarkus-label.png[serverless, 500]
+
+Now you see Quarkus icon in _Payment Service_ on topology:
+
+image::kservice-up-quarkus.png[serverless, 700]
 
 In the lab environment, _OpenShift Serverless_ will automatically scale services down to zero instances when the service(i.e. payment) has no request after *30 seconds* which means the payment service pod will unavailable in 30 seconds. Visit again the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^]. Ensure there's no *blue circle* in the payment service!
 
@@ -321,9 +343,10 @@ spec:
   bootstrapServers: my-cluster-kafka-bootstrap:9092
   topics: orders
   sink:
-    apiVersion: serving.knative.dev/v1alpha1
-    kind: Service
-    name: payment
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: payment
 ----
 
 You can see a new connection between Kafka and our *payments* service:
@@ -334,25 +357,6 @@ Serverless is an advanced and still evolving feature, and in this case you may n
 ====
 
 image::kafka-event-source-link.png[serverless, 700]
-
-Create a *NetworkPolicy* to access normal, non-istioified sidecar applications(i.e. inventory). Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], click on `+` icon on the right top corner. Copy the following `NetworkPolicy` in `YAML` editor then click on *Create*:
-
-[source,yaml,role="copypaste"]
-----
-apiVersion: extensions/v1beta1
-kind: NetworkPolicy
-metadata:
-  name: knative-serving-allow-all
-spec:
-  egress:
-  - {}
-  ingress:
-  - {}
-  podSelector: {}
-  policyTypes:
-  - Ingress
-  - Egress
-----
 
 *Great job!* Let’s make sure if the payment service works properly with _Serverless_ features via Coolstore Web UI.
 
@@ -641,11 +645,7 @@ Pipelines abstract away the specifics of the Git source repository and image to 
 
 The execution order of _tasks_ is determined by dependencies that are defined between the tasks via *inputs* and *outputs* as well as explicit orders that are defined via *runAfter*.
 
-Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Pipelines > Topology View^], click on *Create Pipeline*:
-
-image::console-import-yaml-1.png[serverless, 800]
-
-Replace the following YAML into the textfield, and click on *Create*:
+Copy the following `petclinic-deploy-pipeline` Pipeline in `YAML` editor then click on *Create*:
 
 [source,yaml,role="copypaste"]
 ----

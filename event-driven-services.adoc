@@ -47,17 +47,17 @@ Click on *Create* and you will enter YAML editor that defines a *Kafka* Cluster.
 
 image::kafka-create-detail.png[kafka, 700]
 
-Next, we will create Kafka _Topic_. Move to *Kafka Topic* tab then click on *Create Kafka Topic* on the botton:
+Next, we will create Kafka _Topic_. Type in `kafka topic` in the search box, and click on the *Kafka Topic*:
 
 image::kafka-topic-catalog.png[kafka, 700]
 
-You will enter YAML editor that defines a *KafkaTopic* object. Change the name to `orders` as shown then click on *Create* on the bottom:
+Click on *Create* and you will enter YAML editor that defines a *KafkaTopic* object. Change the name to `orders` as shown then click on *Create* on the bottom:
 
 image::kafka-topic-orders-create.png[kafka, 700]
 
 Create another topic using the same process as above, but called `payments`:
 
-image::kafka-another-topic-create.png[kafka, 700]
+image::kafka-topic-catalog.png[kafka, 700]
 
 Change the name to `payments` then click on *Create* on the bottom.
 
@@ -66,16 +66,6 @@ image::kafka-topic-payments-create.png[kafka, 700]
 *Well done!* You now have a running Kafka cluster with two Kafka Topics called `payments` and `orders`.
 
 image::kafka-topics-created.png[kafka, 700]
-
-Label them for easy visualizing using the AMQ Streams icon:
-
-[source,sh,role="copypaste"]
-----
-oc label kafka/my-cluster app.openshift.io/runtime=amq --overwrite && \
-oc label kafkatopic/payments app.openshift.io/runtime=amq --overwrite && \
-oc label kafkatopic/orders app.openshift.io/runtime=amq --overwrite
-----
-
 
 === 2. Develop and Deploy Payment Service
 
@@ -277,16 +267,15 @@ Make sure it's actually done rolling out:
 oc rollout status -w dc/payment
 ----
 
-Wait for that command to report *replication controller payment-1_ successfully rolled out* before continuing.
+Wait for that command to report *replication controller _payment-1_ successfully rolled out* before continuing.
 
 And label the items with proper icons:
 
 [source,sh,role="copypaste"]
 ----
 oc label dc/payment app.kubernetes.io/part-of=payment --overwrite && \
-oc annotate dc/payment app.openshift.io/connects-to=my-cluster-kafka --overwrite && \
-oc annotate dc/payment app.openshift.io/vcs-ref=ocp-4.4 --overwrite && \
-oc annotate statefulset my-cluster-kafka app.openshift.io/connects-to=my-cluster-zookeeper --overwrite
+oc annotate dc/payment app.openshift.io/connects-to=my-cluster --overwrite && \
+oc annotate dc/payment app.openshift.io/vcs-ref=ocp-4.4 --overwrite 
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the orders. Ensure you get the blue circles!
@@ -449,7 +438,8 @@ Re-package the _cart service_ using the following command, which will use the ma
 [source,sh,role="copypaste"]
 ----
 mvn clean package -DskipTests -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service && \
-oc annotate dc/cart app.openshift.io/connects-to=my-cluster-kafka,datagrid-service --overwrite
+oc label dc/cart app.kubernetes.io/part-of=cart --overwrite &&  \
+oc annotate dc/cart app.openshift.io/connects-to=my-cluster,datagrid-service --overwrite
 ----
 
 === 4. Adding Kafka Client to Order Service
@@ -567,10 +557,13 @@ Re-package the order service using the following command, which will use the mav
 [source,sh,role="copypaste"]
 ----
 mvn clean package -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service && \
-oc annotate dc/order app.openshift.io/connects-to=my-cluster-kafka,order-database --overwrite
+oc label dc/order app.kubernetes.io/part-of=order --overwrite &&  \
+oc annotate dc/order app.openshift.io/connects-to=my-cluster,order-database --overwrite
 ----
 
 Wait for all of the rebuilds and redeployments to complete, and you have all your blue circles!
+
+image::coolstore-ui_event-topology.png[coolstore-ui, 700]
 
 Let’s confirm if the all services works correctly using `Kafka` messaging via coolstore GUI test.
 
