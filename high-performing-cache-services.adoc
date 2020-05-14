@@ -351,7 +351,7 @@ Start and watch the build, which will take about minutes to complete:
 oc start-build catalog --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/catalog-service/target/catalog-1.0.0-SNAPSHOT.jar --follow
 ----
 
-Once the build is done, we’ll deploy it as an OpenShift application and override the spring profile to use our _production_ values:
+Once the build is done, we’ll deploy it as an OpenShift application and override the spring profile to use our _production_ values. We will also give it some labels to make it look nice. Run this command:
 
 [source,sh,role="copypaste"]
 ----
@@ -367,12 +367,7 @@ Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}
 
 image::inventory-catalog-topology.png[catalog, 700]
 
-And then access the http://catalog-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Catalog Web frontend^] and ensure you get the expected inventory quantity (and not `-1`):
-
-[NOTE]
-====
-Even if the rollout command reports success the application may not be ready yet and the reason for that is that we currently don’t have any liveness check configured, but we will add that in the next steps.
-====
+And then access the http://catalog-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Catalog Web frontend^] and ensure you get the expected inventory quantity (and not `-1`), you may need to reload the page if the app isn't initialized yet:
 
 image::catalog.png[catalog, 700]
 
@@ -428,14 +423,14 @@ message ShoppingCart {
   required double cartTotal = 5;
   required string cartId = 6;
 
-  repeated ShoppingCartItem shoppingCartItemList = 7;
+  repeated ShoppingCartItem shoppingCartItemList = 7; // <1>
 }
 
 message ShoppingCartItem {
   required double price = 1;
   required int32 quantity = 2;
   required double promoSavings = 3;
-  required Product product = 4;
+  required Product product = 4; // <2>
 }
 
 // TODO ADD Product
@@ -444,11 +439,10 @@ message Promotion {
   required double percentOff = 2;
 }
 ----
+<1> So our `ShoppingCart` has a list (`repeated`) of `ShoppingCartItem`s
+<2> Each `ShoppingCartItem` has a `Product`
 
-* So our ShoppingCart has ShoppingCartItem
-* ShoppingCartItem has Product
-
-But we haven't defined the `Product` yet. Add this code to the `//TODO ADD Product` marker:
+But we haven't defined the `Product` yet. Add this code below the `//TODO ADD Product` marker:
 
 [source,java,role="copypaste"]
 ----
@@ -651,7 +645,7 @@ quarkus.container-image.build=true
 quarkus.kubernetes.deploy=true
 quarkus.kubernetes.deployment-target=openshift
 quarkus.openshift.expose=true
-quarkus.openshift.labels.app.openshift.io/runtime=quarkus 
+quarkus.openshift.labels.app.openshift.io/runtime=quarkus
 ----
 
 For more details of the above options:
