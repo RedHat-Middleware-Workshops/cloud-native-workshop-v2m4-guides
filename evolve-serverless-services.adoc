@@ -126,10 +126,11 @@ You should see something like:
 [source,shell]
 ----
     PID   RSS COMMAND
-   4711 57436 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
+   PID   RSS COMMAND
+   2710 60424 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
 ----
 
-This shows that our process is taking around `50 MB` of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
+This shows that our process is taking around `60 MB` of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
 Size^], or RSS). Pretty compact!
 
 [NOTE]
@@ -283,7 +284,7 @@ Fill out the following variables to deploy _Payment Image_ that you just built t
 
 * Knative Service: *Checked*
 
-image::deploy-payment-image.png[serverless, 700]
+image::deploy-payment-image.png[serverless, 900]
 
 After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
 

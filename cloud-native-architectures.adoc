@@ -41,6 +41,8 @@ https://Quarkus.io/[Qurakus] offers 4 major benefits to build cloud-native, micr
 * _Functions as a Service and Serverless_ - Superfast startup and low memory utilization. With Quarkus, you can embrace this new world without having to change your programming language.
 * _Best of Breed Frameworks & Standards_ - CodeReady Workspaces Vert.x, Hibernate, RESTEasy, Apache Camel, CodeReady Workspaces MicroProfile, Netty, Kubernetes, OpenShift, Jaeger, Prometheus, Apacke Kafka, Infinispan, and more.
 
+*Red Hat* offers https://access.redhat.com/products/quarkus[Red Hat build of Quarkus(RHBQ)^] to support and maintenance over stated time periods for the major versions of Quarkus. In this workhop, we will use RHBQ to develop cloud-native microservices. https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus[Learn more about RHBQ^]. This is one of the cloud-native runtimes included in https://www.redhat.com/en/products/runtimes[Red Hat Runtimes^].
+
 === Getting Ready for the labs
 
 [NOTE]
