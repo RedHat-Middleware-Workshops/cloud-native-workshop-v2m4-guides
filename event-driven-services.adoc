@@ -47,7 +47,7 @@ Click on *Create* and you will enter YAML editor that defines a *Kafka* Cluster.
 
 image::kafka-create-detail.png[kafka, 700]
 
-Next, we will create Kafka _Topic_. Type in `kafka topic` in the search box, and click on the *Kafka Topic*:
+Next, we will create Kafka _Topic_. Click _Add > From Catalog_ again, type in `kafka topic` in the search box, and click on the *Kafka Topic*:
 
 image::kafka-topic-catalog.png[kafka, 700]
 
@@ -275,7 +275,7 @@ And label the items with proper icons:
 ----
 oc label dc/payment app.kubernetes.io/part-of=payment --overwrite && \
 oc annotate dc/payment app.openshift.io/connects-to=my-cluster --overwrite && \
-oc annotate dc/payment app.openshift.io/vcs-ref=ocp-4.4 --overwrite 
+oc annotate dc/payment app.openshift.io/vcs-ref=ocp-4.4 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the orders. Ensure you get the blue circles!

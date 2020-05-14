@@ -439,7 +439,7 @@ message Promotion {
   required double percentOff = 2;
 }
 ----
-<1> So our `ShoppingCart` has a list (`repeated`) of `ShoppingCartItem`s
+<1> So our `ShoppingCart` has a list (`repeated`) of `ShoppingCartItem`
 <2> Each `ShoppingCartItem` has a `Product`
 
 But we haven't defined the `Product` yet. Add this code below the `//TODO ADD Product` marker:
@@ -1005,7 +1005,12 @@ Install Nodeshift via the CodeReady Workspaces Terminal:
 cd $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/coolstore-ui && npm install --save-dev nodeshift
 ----
 
-Deploy the coolstore-ui service using `Nodeshift` in a CodeReady Workspaces Terminal. It will take a minute to complete the deployment:
+[NOTE]
+====
+You may see warnings from _npm_ about known vulnerabilities. The _npm_ ecosystem is huge and our app pulls in many dependencies which are constantly finding new issues. In a real production system you should pay attention to these, but for this workshop you can ignore them (your friendly workshop developers fix them as time permits when we're not supporting our customers!).
+====
+
+Next, deploy the _coolstore-ui_ service using `Nodeshift` in a CodeReady Workspaces Terminal. It will take a minute to complete the deployment:
 
 [source,sh,role="copypaste"]
 ----
