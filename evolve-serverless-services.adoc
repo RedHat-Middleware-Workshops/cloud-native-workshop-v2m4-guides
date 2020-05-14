@@ -224,6 +224,7 @@ And delete the configuration for the incoming stream. In `application.properties
 # quarkus.kubernetes.deploy=true
 # quarkus.kubernetes.deployment-target=openshift
 # quarkus.openshift.expose=true
+# quarkus.openshift.labels.app.openshift.io/runtime=quarkus
 
 ...
 
