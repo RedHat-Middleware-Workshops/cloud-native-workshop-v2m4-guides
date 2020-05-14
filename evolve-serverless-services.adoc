@@ -366,7 +366,7 @@ image::kafka-event-source-link.png[serverless, 700]
 
 Before getting started, we need to make sure if _payment service_ is scaled down to _zero_ again in {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^]:
 
-image::payment-down-again.png[serverless, 1000]
+image::payment-down-again.png[serverless, 700]
 
 Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store^]!
 
