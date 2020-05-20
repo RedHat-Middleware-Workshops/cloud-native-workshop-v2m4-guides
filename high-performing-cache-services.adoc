@@ -640,22 +640,20 @@ Let’s `add` the following variables at the `# TODO: Add for OpenShift extensio
 
 [source,shell,role="copypaste"]
 ----
-quarkus.kubernetes-client.trust-certs=true
-quarkus.container-image.build=true
-quarkus.kubernetes.deploy=true
-quarkus.kubernetes.deployment-target=openshift
-quarkus.openshift.expose=true
-quarkus.openshift.labels.app.openshift.io/runtime=quarkus
+quarkus.kubernetes-client.trust-certs=true<1>
+quarkus.container-image.build=true<2>
+quarkus.kubernetes.deploy=true<3>
+quarkus.kubernetes.deployment-target=openshift<4>
+quarkus.openshift.expose=true<5>
+quarkus.openshift.labels.app.openshift.io/runtime=quarkus<6>
 ----
 
-For more details of the above options:
-
-* `quarkus.kubernetes-client.trust-certs=true` - We are using self-signed certs in this simple example, so this simply says to the extension to trust them.
-* `quarkus.container-image.build=true` - Instructs the extension to build a container image
-* `quarkus.kubernetes.deploy=true` - Instructs the extension to deploy to OpenShift after the container image is built
-* `quarkus.kubernetes.deployment-target=openshift` - Instructs the extension to generate and create the OpenShift resources (like `DeploymentConfig`s and `Service`s) after building the container
-* `quarkus.openshift.expose=true` - Instructs the extension to generate an OpenShift `Route`.
-* `quarkus.openshift.labels.app.openshift.io/runtime=java` - Adds a nice-looking icon to the app when viewing the OpenShift Developer Toplogy
+<1> We are using self-signed certs in this simple example, so this simply says to the extension to trust them.
+<2> Instructs the extension to build a container image
+<3> Instructs the extension to deploy to OpenShift after the container image is built
+<4> Instructs the extension to generate and create the OpenShift resources (like `DeploymentConfig` and `Service`) after building the container
+<5> Instructs the extension to generate an OpenShift `Route`.
+<6> Adds a nice-looking icon to the app when viewing the OpenShift Developer Toplogy
 
 Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
 
