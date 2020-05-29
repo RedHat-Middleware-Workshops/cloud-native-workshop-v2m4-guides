@@ -125,11 +125,11 @@ You should see something like:
 
 [source,shell]
 ----
-   PID   RSS COMMAND
-   2710 60424 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
+    PID   RSS COMMAND
+   2438 27268 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
 ----
 
-This shows that our process is taking around `60 MB` of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
+This shows that our process is taking around `27 MB` of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
 Size^], or RSS). Pretty compact!
 
 [NOTE]
@@ -224,6 +224,7 @@ And delete the configuration for the incoming stream. In `application.properties
 # quarkus.kubernetes.deployment-target=openshift
 # quarkus.openshift.expose=true
 # quarkus.openshift.labels.app.openshift.io/runtime=quarkus
+# quarkus.s2i.base-jvm-image=registry.access.redhat.com/ubi8/openjdk-11
 
 ...
 
@@ -340,9 +341,10 @@ kind: KafkaSource
 metadata:
   name: kafka-source
 spec:
-  consumerGroup: payment-consumer-group
-  bootstrapServers: my-cluster-kafka-bootstrap:9092
-  topics: orders
+  bootstrapServers: 
+   - my-cluster-kafka-bootstrap:9092
+  topics: 
+   - orders
   sink:
     ref:
       apiVersion: serving.knative.dev/v1
@@ -590,7 +592,7 @@ Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topol
 
 image::petclinic-deployed-1.png[serverless, 500]
 
-*Tasks* consist of a number of steps that are executed sequentially. Each _task_ is executed in a separate container within the same pod. They can also have inputs and outputs in order to interact with other tasks in the pipeline.
+*Tasks* consist of a number of steps that are executed sequentially. _Tasks_ are executed/run by creating TaskRuns. A TaskRun will schedule a Pod. Each step is executed in a separate container within the same pod. They can also have inputs and outputs in order to interact with other tasks in the pipeline.
 
 When a _task_ starts running, it starts a pod and runs each *step* sequentially in a separate container on the same pod. This task happens to have a single step, but tasks can have multiple steps, and, since they run within the same pod, they have access to the same volumes in order to cache files, access configmaps, secrets, etc. `Tasks` can also receive inputs (e.g., a git repository) and outputs (e.g., an image in a registry) in order to interact with each other.
 
