@@ -78,7 +78,7 @@ But a major shift happened. The one model rules them all age is over. A new rang
 and architecture styles has emerged and impacts how code is written and how applications are deployed and executed.
 HTTP microservices, reactive applications, message-driven microservices and serverless are now central players in modern systems.
 
-[Qurakus](https://Quarkus.io/) offers 4 major benefits to build cloud-native, microservices, and serverless Java applicaitons:
+[Quarkus](https://Quarkus.io/) offers 4 major benefits to build cloud-native, microservices, and serverless Java applications:
 
 * *Developer Joy* - Cohesive platform for optimized developer joy through unified configuration, Zero config with live reload in the blink of an eye,
    streamlined code for the 80% common usages with flexible for the 20%, and no hassle native executable generation.
