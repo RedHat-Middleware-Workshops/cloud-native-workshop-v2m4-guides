@@ -983,7 +983,7 @@ and expand `coolstore-ui` directory.
 
 ![coolstore-ui]({% image_path codeready-workspace-coolstore-ui.png %}){:width="500px"}
 
-You will see javascripts for specific cloud-native services such as cart, catatlog, and order service as above.
+You will see javascripts for specific cloud-native services such as cart, catalog, and order service as above.
 
 Now, we will deploy a presentation layer to OpenShift cluster using [`Nodeshift`](https://nodeshift.dev) command line tool, a programmable API that you can use to deploy Node.js projects to `OpenShift`.
 
