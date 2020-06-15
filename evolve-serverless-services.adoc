@@ -155,7 +155,7 @@ Content-Type: text/plain;charset=UTF-8
 hello
 ----
 
-*Congratuations!* You’ve now built a Java application as a native executable JAR and a Linux native binary. We’ll explore the benefits of native binaries later in when we start deploying to Kubernetes.
+*Congratulations!* You’ve now built a Java application as a native executable JAR and a Linux native binary. We’ll explore the benefits of native binaries later in when we start deploying to Kubernetes.
 
 Be sure to terminate the running Quarkus development via kbd:[CTRL+C]).
 
