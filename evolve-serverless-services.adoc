@@ -708,6 +708,8 @@ spec:
   params:
   - name: url
     value: https://github.com/spring-projects/spring-petclinic
+  - name: revision
+    value: main
 ----
 
 And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Again, click on the `+` icon on the right top corner. Copy the following `petclinic-image` pipelineResource in `YAML` editor then click on *Create*:
