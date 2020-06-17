@@ -655,6 +655,8 @@ spec:
   params:
   - name: url
     value: https://github.com/spring-projects/spring-petclinic
+  - name: revision
+    value: main
 ~~~
 
 And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Create the following pipeline resources via the [OpenShift web console]({{ CONSOLE_URL}}){:target="_blank"} via `Add → Import YAML`. Replace your username with `userXX`:
@@ -669,6 +671,8 @@ spec:
   params:
   - name: url
     value: image-registry.openshift-image-registry.svc:5000/userXX-cloudnative-pipeline/spring-petclinic
+  - name: revision
+    value: main
 ~~~
 
 Create the above pipeline resources via the [OpenShift web console]({{ CONSOLE_URL}}){:target="_blank"} via `Add → Import YAML`.
