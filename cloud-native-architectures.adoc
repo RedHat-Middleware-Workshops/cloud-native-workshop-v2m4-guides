@@ -111,7 +111,7 @@ cd $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs && git checkout ocp-4.4
 
 === Remove other projects
 
-If you've completed other modules today (such as `cloud-native-workshop-v2m2-labs`), remove them from your workspace by right-clicking on the project name in the explorer and choose *Remove from Workspace* and accept the warning. Be sure not to delete the new project you just imported for this lab!
+If you've completed other modules today (such as `cloud-native-workshop-v2m1-labs`), remove them from your workspace by right-clicking on the project name in the explorer and choose *Delete* and accept the warning. Be sure not to delete the new project you just imported for this lab!
 
 image::remove-workspace.png[remove, 700]
 
