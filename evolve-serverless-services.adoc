@@ -107,12 +107,12 @@ __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/
-2020-04-06 13:48:33,523 INFO  [io.quarkus] (main) getting-started 1.0-SNAPSHOT (powered by Quarkus xx.xx.xx) started in 0.018s. Listening on: http://0.0.0.0:8080
-2020-04-06 13:48:33,523 INFO  [io.quarkus] (main) Profile prod activated.
-2020-04-06 13:48:33,523 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
+2020-07-24 21:58:25,057 INFO  [io.quarkus] (main) getting-started 1.0-SNAPSHOT (powered by Quarkus xx.xx.xx) started in 0.009s. Listening on: http://0.0.0.0:8080
+2020-07-24 21:58:25,057 INFO  [io.quarkus] (main) Profile prod activated. 
+2020-07-24 21:58:25,057 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
 ----
 
-That’s *18 milliseconds* to start up. The start-up time might be different in your environment.
+That’s *9 milliseconds* to start up. The start-up time might be different in your environment.
 
 And extremely low memory usage as reported by the Linux `ps` utility. While the app is running, run the following command in another Terminal:
 
@@ -126,10 +126,10 @@ You should see something like:
 [source,shell]
 ----
     PID   RSS COMMAND
-   2438 27268 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
+  12872 29944 /tmp/hello/getting-started/target/getting-started-1.0-SNAPSHOT-runner
 ----
 
-This shows that our process is taking around `27 MB` of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
+This shows that our process is taking around `29 MB` of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
 Size^], or RSS). Pretty compact!
 
 [NOTE]
@@ -413,20 +413,22 @@ This is the same result as before, but using Knative eventing to make a more pow
 
 === 5. Creating Cloud-Native CI/CD Pipelines using Tekton
 
-There’re lots of open source CI/CD tools to build, test, deploy, and manage cloud-native applications/microservices: from on-premise to private, public, and hybrid cloud. Each tool provides different features to integrate with existing
-platforms/systems. This sometimes makes it more complex for DevOps teams to be able to create the CI/CD pipelines and maintain them on Kubernetes clusters. The *Cloud-Native CI/CD Pipeline* should be defined and executed in the Kubernetes native way. For example, the pipeline can be specified as Kubernetes resources using YAML format.
+There’re lots of open source CI/CD tools to build, test, deploy, and manage cloud-native applications/microservices: from on-premise to private, public, and hybrid cloud. Each tool provides different features to integrate with existing platforms/systems. This sometimes makes it more complex for DevOps teams to be able to create the CI/CD pipelines and maintain them on Kubernetes clusters. The *Cloud-Native CI/CD Pipeline* should be defined and executed in the Kubernetes native way. For example, the pipeline can be specified as Kubernetes resources using YAML format.
 
-*OpenShift Pipelines* is a Kubernetes-style CI/CD solution based on _Tekton_. It builds on the Tekton building blocks and provides a CI/CD experience through tight integration with OpenShift and Red Hat developer tools. OpenShift Pipelines is designed to run each step of the CI/CD pipeline in its own container, allowing each step to scale independently to meet the demands of the pipeline with the below features:
+*OpenShift Pipelines* is a cloud-native, continuous integration and delivery (CI/CD) solution for building pipelines using Tekton. Tekton is a flexible, Kubernetes-native, open-source CI/CD framework that enables automating deployments across multiple platforms (Kubernetes, serverless, VMs, etc) by abstracting away the underlying details with the below features:
 
-* Use standard Tekton CRDs to define pipelines that run as containers and scale on-demand.
-* Full control over team’s delivery pipelines, plugins and access control with no central CI/CD server to manage.
-* A streamlined user experience through the OpenShift Console developer perspective, CLIs, and IDEs.
-
-image::pipeline-features.png[pipeline, 800]
+* Standard CI/CD pipeline definition based on Tekton
+* Build images with Kubernetes tools such as S2I, Buildah, Buildpacks, Kaniko, etc
+* Deploy applications to multiple platforms such as Kubernetes, serverless and VMs
+* Easy to extend and integrate with existing tools
+* Scale pipelines on-demand
+* Portable across any Kubernetes platform
+* Designed for microservices and decentralized teams
+* Integrated with the OpenShift Developer Console
 
 [NOTE]
 ====
-OpenShift Pipelines project is as a Developer Preview release. Developer Preview releases have features and functionality that might not be fully tested. Customers are encouraged to use and provide feedback on Developer Preview releases. Red Hat does not commit to fixing any reported issues and the provided features may not be available in future releases.
+OpenShift Pipelines project is as a Developer Preview release. Developer Preview releases have features and functionality that might not be fully tested. Customers are encouraged to use and provide feedback on Technical Preview releases. Red Hat does not commit to fixing any reported issues and the provided features may not be available in future releases.
 ====
 
 In the lab, OpenShift Pipelines is already installed on OpenShift 4 cluster but if you want to install OpenShift Pipelines on your own OpenShift cluster, OpenShift Pipelines is provided as an add-on on top of OpenShift that can be installed via an operator available in the OpenShift OperatorHub.
@@ -443,154 +445,18 @@ image::tekton-arch.png[severless, 800]
 
 For further details on pipeline concepts, refer to the https://github.com/tektoncd/pipeline/tree/master/docs#learn-more[Tekton documentation^] that provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
 
+The Tekton API enables functionality to be separated from configuration (e.g. Pipelines vs PipelineRuns) such that steps can be reusable, but it does not provide a mechanism to generate the resources (notably, PipelineRuns and PipelineResources) that encapsulate these configurations dynamically. Triggers extends the Tekton architecture with the following CRDs:
+
+* TriggerTemplate - Templates resources to be created (e.g. Create PipelineResources and PipelineRun that uses them)
+* TriggerBinding - Validates events and extracts payload fields
+* EventListener - Connects TriggerBindings and TriggerTemplates into an addressable endpoint (the event sink). It uses the extracted event parameters from each TriggerBinding (and any supplied static parameters) to create the resources specified in the corresponding TriggerTemplate. It also optionally allows an external service to pre-process the event payload via the interceptor field.
+* ClusterTriggerBinding - A cluster-scoped TriggerBinding
+
+Using _tektoncd/triggers_ in conjunction with tektoncd/pipeline enables you to easily create full-fledged CI/CD systems where the execution is defined entirely through Kubernetes resources.
+
 In this lab, we will walk you through pipeline concepts and how to create and run a CI/CD pipeline for building and deploying microservices on OpenShift Serverless platform.
 
-Let's deploy a https://github.com/spring-projects/spring-petclinic[Spring PetClinic^] microservices app using the Spring Boot framework to `{{ USER_ID }}-cloudnative-pipeline` project.
-
-Create the Kubernetes objects for deploying the _PetClinic_ app on OpenShift. The deployment will not complete since there are no container images built for the PetClinic application yet. That you will do in the following sections through a CI/CD pipeline.
-
-Open *petclinic.yaml* in _knative/pipeline_ of *payment-service* project and copy the following code into the YAML file:
-
-[source,yaml,role="copypaste"]
-----
----
-apiVersion: image.openshift.io/v1
-kind: ImageStream
-metadata:
-  labels:
-    app: spring-petclinic
-  name: spring-petclinic
----
-apiVersion: apps.openshift.io/v1
-kind: DeploymentConfig
-metadata:
-  labels:
-    app: spring-petclinic
-    app.openshift.io/runtime: spring
-  name: spring-petclinic
-spec:
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    app: spring-petclinic
-    deploymentconfig: spring-petclinic
-  strategy:
-    activeDeadlineSeconds: 21600
-    resources: {}
-    rollingParams:
-      intervalSeconds: 1
-      maxSurge: 25%
-      maxUnavailable: 25%
-      timeoutSeconds: 600
-      updatePeriodSeconds: 1
-    type: Rolling
-  template:
-    metadata:
-      labels:
-        app: spring-petclinic
-        deploymentconfig: spring-petclinic
-    spec:
-      containers:
-      - image: spring-petclinic:latest
-        imagePullPolicy: Always
-        livenessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 45
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        name: spring-petclinic
-        ports:
-        - containerPort: 8080
-          protocol: TCP
-        - containerPort: 8443
-          protocol: TCP
-        - containerPort: 8778
-          protocol: TCP
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 45
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 5
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
-  test: false
-  triggers:
-  - imageChangeParams:
-      containerNames:
-      - spring-petclinic
-      from:
-        kind: ImageStreamTag
-        name: spring-petclinic:latest
-        namespace: {{ USER_ID }}-cloudnative-pipeline
-    type: ImageChange
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: spring-petclinic
-  name: spring-petclinic
-spec:
-  ports:
-  - name: 8080-tcp
-    port: 8080
-    protocol: TCP
-    targetPort: 8080
-  - name: 8443-tcp
-    port: 8443
-    protocol: TCP
-    targetPort: 8443
-  - name: 8778-tcp
-    port: 8778
-    protocol: TCP
-    targetPort: 8778
-  selector:
-    app: spring-petclinic
-    deploymentconfig: spring-petclinic
-  sessionAffinity: None
-  type: ClusterIP
----
-apiVersion: route.openshift.io/v1
-kind: Route
-metadata:
-  labels:
-    app: spring-petclinic
-  name: spring-petclinic
-spec:
-  port:
-    targetPort: 8080-tcp
-  to:
-    kind: Service
-    name: spring-petclinic
-    weight: 100
-----
-
-Then create the object in Kubernetes:
-
-[source,sh,role="copypaste"]
-----
-oc project {{ USER_ID }}-cloudnative-pipeline && oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/petclinic.yaml
-----
-
-Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View^] for the pipeline, and ensure you *don't* get the blue circles yet!
-
-image::petclinic-deployed-1.png[serverless, 500]
+Let's deploy a https://github.com/openshift-pipelines/vote-ui[frontend] and https://github.com/openshift-pipelines/vote-api[backend] to `{{ USER_ID }}-cloudnative-pipeline` project.
 
 *Tasks* consist of a number of steps that are executed sequentially. _Tasks_ are executed/run by creating TaskRuns. A TaskRun will schedule a Pod. Each step is executed in a separate container within the same pod. They can also have inputs and outputs in order to interact with other tasks in the pipeline.
 
@@ -602,11 +468,11 @@ Only the requirement for a git repository is declared on the task and not a spec
 https://github.com/openshift/pipelines-catalog[OpenShift Catalog^] repositories.
 ====
 
-We will need to create two pre-defined Tekton Tasks that we'll use in our pipeline that know how to compile Java apps and deploy them. Install the `openshift-client` and `s2i-java` Tekton tasks using the following command:
+We will need to create two pre-defined Tekton Tasks that we'll use in our pipeline that know how to compile Java apps and deploy them. Install the `apply-manifests` and `update-deployment` Tekton tasks using the following command:
 
 [source,sh,role="copypaste"]
 ----
-oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/openshift-client-task.yaml && oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/s2i-java-8-task.yaml
+oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/apply_manifests_task.yaml && oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/update_deployment_task.yaml
 ----
 
 Let’s confirm if the *tasks* are installed properly using https://github.com/tektoncd/cli/releases[Tekton CLI^] that already installed in CodeReady Workspaces:
@@ -621,30 +487,38 @@ You will see the following 2 tasks:
 [source,sh]
 ----
 NAME               AGE
-openshift-client   27 seconds ago
-s2i-java-8         27 seconds ago
+apply-manifests   10 seconds ago
+update-deployment 10 seconds ago
 ----
 
 A pipeline defines a number of tasks that should be executed and how they interact with each other via their inputs and outputs.
 
-In this lab, we will create a pipeline that takes the source code of PetClinic application from GitHub and then builds and deploys it on OpenShift using
-https://docs.openshift.com/container-platform/latest/builds/understanding-image-builds.html#build-strategy-s2i_understanding-image-builds[Source-to-Image(S2I)^].
+In this lab, we will create a pipeline that takes the source code of the application from GitHub and then builds and deploys it on OpenShift.
 
 image::pipeline-diagram.png[serverless, 700]
 
-This pipeline performs the following:
+This pipeline helps you to build and deploy backend/frontend, by configuring right resources to pipeline:
 
-* Clones the source code of the application from a Git repository (_app-git_ resource)
-* Builds the container image using the s2i-java-8 task that generates a Dockerfile for the application and uses https://buildah.io/[Buildah^] to build the image
-* The application image is pushed to an image registry (_app-image_ resource)
-* The new application image is deployed on OpenShift using the _openshift-cli_
+*Backend:*
+
+<1> Clones the source code of the backend application from a git repository when (_git-repo_ git resource) refered to _api-repo_
+<2> Builds the container image of backend using the _buildah_ clustertask that uses https://buildah.io/[Buildah] to build the image
+<3> The application image is pushed to an image registry by refering (_image_ image resource) to _api-image_
+<4> The new backend application image is deployed on OpenShift using the _apply-manifests_ and _update-deployment_ tasks.
+
+*Frontend:*
+
+<1> Clones the source code of the backend application from a git repository when (_git-repo_ git resource) refered to _ui-repo_
+<2> Builds the container image of backend using the  _buildah_ clustertask that uses https://buildah.io/[Buildah] to build the image
+<3> The application image is pushed to an image registry by refering (_image_ image resource) to _ui-image_
+<4> The new backend application image is deployed on OpenShift using the _apply-manifests_ and _update-deployment_ tasks.
 
 [NOTE]
 ====
-You might have noticed that there are no references to the PetClinic Git repository and its image in the registry. That’s because _Pipelines_ in Tekton are designed to be generic and re-usable across environments and stages through the application’s lifecycle.
+You might have noticed that there are no references to the git repository or the image registry it will be pushed to in pipeline. That's because pipeline in Tekton are designed to be generic and re-usable across environments and stages through the application's lifecycle.
 ====
 
-Pipelines abstract away the specifics of the Git source repository and image to be produced as *resources*. When triggering a pipeline, you can provide different Git repositories and image registries to be used during pipeline execution. Be patient! You will do that in a little bit in the next section.
+Pipelines abstract away the specifics of the git source repository and image to be produced as _PipelineResources_. When triggering a pipeline, you can provide different git repositories and image registries to be used during pipeline execution. Be patient! You will do that in a little bit in the next section.
 
 The execution order of _tasks_ is determined by dependencies that are defined between the tasks via *inputs* and *outputs* as well as explicit orders that are defined via *runAfter*.
 
@@ -652,41 +526,56 @@ In the OpenShift console, click the `+` button at the upper right, and paste in 
 
 [source,yaml,role="copypaste"]
 ----
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: petclinic-deploy-pipeline
+  name: build-and-deploy
 spec:
   resources:
-  - name: app-git
+  - name: git-repo
     type: git
-  - name: app-image
+  - name: image
     type: image
+  params:
+  - name: deployment-name
+    type: string
+    description: name of the deployment to be patched
   tasks:
-  - name: build
+  - name: build-image
     taskRef:
-      name: s2i-java-8
-    params:
-      - name: TLSVERIFY
-        value: "false"
+      name: buildah
+      kind: ClusterTask
     resources:
       inputs:
       - name: source
-        resource: app-git
+        resource: git-repo
       outputs:
       - name: image
-        resource: app-image
-  - name: deploy
-    taskRef:
-      name: openshift-client
-    runAfter:
-      - build
+        resource: image
     params:
-    - name: ARGS
-      value:
-        - rollout
-        - latest
-        - spring-petclinic
+    - name: TLSVERIFY
+      value: "false"
+  - name: apply-manifests
+    taskRef:
+      name: apply-manifests
+    resources:
+      inputs:
+      - name: source
+        resource: git-repo
+    runAfter:
+    - build-image
+  - name: update-deployment
+    taskRef:
+      name: update-deployment
+    resources:
+      inputs:
+      - name: image
+        resource: image
+    params:
+    - name: deployment
+      value: $(params.deployment-name)
+    runAfter:
+    - apply-manifests
 ----
 
 You will see the pipeline you have created:
@@ -695,36 +584,64 @@ image::console-import-yaml-2.png[serverless, 800]
 
 Now that the pipeline is created, you can trigger it to execute the tasks specified in the pipeline. First, you should create a number of *PipelineResources* that contain the specifics of the Git repository and image registry to be used in the pipeline during execution. Expectedly, these are also reusable across multiple pipelines.
 
-The following *PipelineResource* defines the Git repository and reference for the PetClinic application. Click on `+` icon on the right top corner of the OpenShift console. Copy the following `petclinic-git` pipelineResource in `YAML` editor then click on *Create*:
+The following *PipelineResource* the git repository for the frontend application. Click on `+` icon on the right top corner of the OpenShift console. Copy the following `ui-repo` pipelineResource in `YAML` editor then click on *Create*:
 
 [source,yaml,role="copypaste"]
 ----
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
-  name: petclinic-git
+  name: ui-repo
 spec:
   type: git
   params:
   - name: url
-    value: https://github.com/spring-projects/spring-petclinic
-  - name: revision
-    value: main
+    value: http://github.com/openshift-pipelines/vote-ui.git
 ----
 
-And the following defines the OpenShift internal registry for the PetClinic image to be pushed to. Again, click on the `+` icon on the right top corner. Copy the following `petclinic-image` pipelineResource in `YAML` editor then click on *Create*:
+And the following defines the OpenShift internal image registry for the frontend image to be pushed to. Again, click on the `+` icon on the right top corner. Copy the following `ui-image` pipelineResource in `YAML` editor then click on *Create*:
 
 [source,yaml,role="copypaste"]
 ----
 apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
-  name: petclinic-image
+  name: ui-image
 spec:
   type: image
   params:
   - name: url
-    value: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/spring-petclinic
+    value: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-ui:latest
+----
+
+And the following `api-repo` PipelineResource defines the git repository for the backend application in `YAML` editor:
+
+[source,yaml,role="copypaste"]
+----
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: api-repo
+spec:
+  type: git
+  params:
+  - name: url
+    value: http://github.com/openshift-pipelines/vote-api.git
+----
+
+And the following `api-image` PipelineResource defines the OpenShift internal image registry for the backend image to be pushed to in `YAML` editor:
+
+[source,yaml,role="copypaste"]
+----
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: api-image
+spec:
+  type: image
+  params:
+  - name: url
+    value: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-api:latest
 ----
 
 To confirm they're created properly, execute the following _Tekton CLI_ in CodeReady Workspaces Terminal:
@@ -738,9 +655,11 @@ You can see the list of resources created:
 
 [source,shell]
 ----
-NAME              TYPE    DETAILS
-petclinic-git     git     url: https://github.com/spring-projects/spring-petclinic
-petclinic-image   image   url: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/spring-petclinic
+NAME        TYPE    DETAILS
+api-repo    git     url: http://github.com/openshift-pipelines/vote-api.git
+ui-repo     git     url: http://github.com/openshift-pipelines/vote-ui.git
+api-image   image   url: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-api:latest
+ui-image    image   url: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-ui:latest
 ----
 
 A *PipelineRun* is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. Let's go to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev\~v1alpha1~Pipeline[OpenShift Pipelines^] and click on *Start*:
