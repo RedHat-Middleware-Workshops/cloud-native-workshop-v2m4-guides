@@ -447,16 +447,16 @@ For further details on pipeline concepts, refer to the https://github.com/tekton
 
 The Tekton API enables functionality to be separated from configuration (e.g. Pipelines vs PipelineRuns) such that steps can be reusable, but it does not provide a mechanism to generate the resources (notably, PipelineRuns and PipelineResources) that encapsulate these configurations dynamically. Triggers extends the Tekton architecture with the following CRDs:
 
-* TriggerTemplate - Templates resources to be created (e.g. Create PipelineResources and PipelineRun that uses them)
-* TriggerBinding - Validates events and extracts payload fields
-* EventListener - Connects TriggerBindings and TriggerTemplates into an addressable endpoint (the event sink). It uses the extracted event parameters from each TriggerBinding (and any supplied static parameters) to create the resources specified in the corresponding TriggerTemplate. It also optionally allows an external service to pre-process the event payload via the interceptor field.
-* ClusterTriggerBinding - A cluster-scoped TriggerBinding
+* *TriggerTemplate* - Templates resources to be created (e.g. Create PipelineResources and PipelineRun that uses them)
+* *TriggerBinding* - Validates events and extracts payload fields
+* *EventListener* - Connects TriggerBindings and TriggerTemplates into an addressable endpoint (the event sink). It uses the extracted event parameters from each TriggerBinding (and any supplied static parameters) to create the resources specified in the corresponding TriggerTemplate. It also optionally allows an external service to pre-process the event payload via the interceptor field.
+* *ClusterTriggerBinding* - A cluster-scoped TriggerBinding
 
 Using _tektoncd/triggers_ in conjunction with tektoncd/pipeline enables you to easily create full-fledged CI/CD systems where the execution is defined entirely through Kubernetes resources.
 
 In this lab, we will walk you through pipeline concepts and how to create and run a CI/CD pipeline for building and deploying microservices on OpenShift Serverless platform.
 
-Let's deploy a https://github.com/openshift-pipelines/vote-ui[frontend] and https://github.com/openshift-pipelines/vote-api[backend] to `{{ USER_ID }}-cloudnative-pipeline` project.
+Let's deploy a https://github.com/openshift-pipelines/vote-ui[frontend^] and https://github.com/openshift-pipelines/vote-api[backend^] to `{{ USER_ID }}-cloudnative-pipeline` project.
 
 *Tasks* consist of a number of steps that are executed sequentially. _Tasks_ are executed/run by creating TaskRuns. A TaskRun will schedule a Pod. Each step is executed in a separate container within the same pod. They can also have inputs and outputs in order to interact with other tasks in the pipeline.
 
@@ -472,6 +472,7 @@ We will need to create two pre-defined Tekton Tasks that we'll use in our pipeli
 
 [source,sh,role="copypaste"]
 ----
+oc project {{ USER_ID }}-cloudnative-pipeline && 
 oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/apply_manifests_task.yaml && oc create -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/update_deployment_task.yaml
 ----
 
@@ -495,21 +496,21 @@ A pipeline defines a number of tasks that should be executed and how they intera
 
 In this lab, we will create a pipeline that takes the source code of the application from GitHub and then builds and deploys it on OpenShift.
 
-image::pipeline-diagram.png[serverless, 700]
+image::pipeline-diagram.png[serverless, 800]
 
 This pipeline helps you to build and deploy backend/frontend, by configuring right resources to pipeline:
 
 *Backend:*
 
 <1> Clones the source code of the backend application from a git repository when (_git-repo_ git resource) refered to _api-repo_
-<2> Builds the container image of backend using the _buildah_ clustertask that uses https://buildah.io/[Buildah] to build the image
+<2> Builds the container image of backend using the _buildah_ clustertask that uses https://buildah.io/[Buildah^] to build the image
 <3> The application image is pushed to an image registry by refering (_image_ image resource) to _api-image_
 <4> The new backend application image is deployed on OpenShift using the _apply-manifests_ and _update-deployment_ tasks.
 
 *Frontend:*
 
 <1> Clones the source code of the backend application from a git repository when (_git-repo_ git resource) refered to _ui-repo_
-<2> Builds the container image of backend using the  _buildah_ clustertask that uses https://buildah.io/[Buildah] to build the image
+<2> Builds the container image of backend using the  _buildah_ clustertask that uses https://buildah.io/[Buildah^] to build the image
 <3> The application image is pushed to an image registry by refering (_image_ image resource) to _ui-image_
 <4> The new backend application image is deployed on OpenShift using the _apply-manifests_ and _update-deployment_ tasks.
 
@@ -662,21 +663,33 @@ api-image   image   url: image-registry.openshift-image-registry.svc:5000/{{ USE
 ui-image    image   url: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-ui:latest
 ----
 
-A *PipelineRun* is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. Let's go to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev\~v1alpha1~Pipeline[OpenShift Pipelines^] and click on *Start*:
+A *PipelineRun* is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. Let's go to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev~v1beta1~Pipeline[OpenShift Pipelines^] and click on *Start*:
 
 image::pipeline-start.png[serverless, 800]
 
-This dialog box is where you bind the final target values for the source repo of the _build_ step, and the name of the image to deploy in the _deploy_ step. You can see default values, so just click on *Start*:
+This dialog box is where you bind the final target values for the source repo of the _build_ step, and the name of the image to deploy in the _deploy_ step. Input the parameter and select resources as below then Click on *Start*:
+
+ * deployment-name: `vote-api`
+ * git-repo: http://github.com/openshift-pipelines/vote-api.git (api-repo)
+ * image: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-api:latest (api-image)
 
 image::pipeline-start-popup.png[serverless, 700]
 
-As soon as you started the *petclinic-deploy-pipeline*, a pipelinerun is instantiated and pods are created to execute the tasks that are defined in the pipeline. After a few minutes, the pipeline should finish successfully. You can hover over the steps to get a quick snapshot of the step's progress, or click on the steps to see detailed logs of the steps.
+As soon as you started the *build-and-deploy* pipeline, a pipelinerun is instantiated and pods are created to execute the tasks that are defined in the pipeline. After a few minutes, the pipeline should finish successfully. You can hover over the steps to get a quick snapshot of the step's progress, or click on the steps to see detailed logs of the steps.
 
 image::pipeline-complete.png[serverless, 800]
 
-Once the build completes, on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View^], and click on *Open URL*. You should see that the PetClinic image is successfully built and deployed.
+Let's run the pipeline to deploy `vote-ui` application. Go back to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev~v1beta1~Pipeline[OpenShift Pipelines^] and click on *Start*. Then input the parameter and select resources as below then Click on *Start*:
 
-image::petclinic-openurl.png[serverless, 800]
+ * deployment-name: `vote-ui`
+ * git-repo: http://github.com/openshift-pipelines/vote-ui.git (api-repo)
+ * image: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-ui:latest (api-image)
+
+image::pipeline-start-popup2.png[serverless, 700]
+
+Once the build completes, on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnative-pipeline[Topology View^], and click on *Open URL*. You should see that the Vote UI is successfully built and deployed.
+
+image::voteui-openurl.png[serverless, 800]
 
 === Summary
 
@@ -686,7 +699,7 @@ In this module, we learned how to develop cloud-native applications using multip
 
 ==== Additional Resources:
 
-* https://learn.openshift.com/middleware/courses/middleware-quarkus/[Quarkus Tutorials Right in Your Browser^]
+* https://learn.openshift.com/developing-with-quarkus/[Quarkus Tutorials Right in Your Browser^]
 * https://developers.redhat.com/articles/quarkus-quick-start-guide-kubernetes-native-java-stack/[Quarkus Quickstart Guide]
 * https://docs.openshift.com/container-platform/latest/serverless/serverless-getting-started.html[Getting started with OpenShift Serverless^]
 * https://www.openshift.com/learn/topics/pipelines[Cloud-native CI/CD on OpenShift^]
