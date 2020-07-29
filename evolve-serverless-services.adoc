@@ -268,7 +268,7 @@ oc start-build payment --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4
 
 This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
 
-Go to the {{ CONSOLE_URL }}/add/ns/{{ USER_ID }}-cloudnativeapps[+Add] to create a _Knative Service_ and click on *Container Image*:
+Go to the {{ CONSOLE_URL }}/add/ns/{{ USER_ID }}-cloudnativeapps[+Add^] to create a _Knative Service_ and click on *Container Image*:
 
 image::add-icon.png[serverless, 700]
 

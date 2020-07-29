@@ -350,11 +350,11 @@ Once the build is done, we’ll deploy it as an OpenShift application and overri
 [source,sh,role="copypaste"]
 ----
 oc new-app catalog -e JAVA_OPTS_APPEND='-Dspring.profiles.active=openshift' && oc expose service catalog && \
-oc label dc/catalog app.kubernetes.io/part-of=catalog app.openshift.io/runtime=spring --overwrite && \
+oc label deployments/catalog app.kubernetes.io/part-of=catalog app.openshift.io/runtime=spring --overwrite && \
 oc label dc/catalog-database app.kubernetes.io/part-of=catalog app.openshift.io/runtime=postgresql --overwrite && \
-oc annotate dc/catalog app.openshift.io/connects-to=inventory,catalog-database --overwrite && \
-oc annotate dc/catalog app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
-oc annotate dc/catalog app.openshift.io/vcs-ref=ocp-4.5 --overwrite
+oc annotate deployments/catalog app.openshift.io/connects-to=inventory,catalog-database --overwrite && \
+oc annotate deployments/catalog app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
+oc annotate deployments/catalog app.openshift.io/vcs-ref=ocp-4.5 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles!
@@ -672,7 +672,7 @@ And label the items with proper icons:
 [source,sh,role="copypaste"]
 ----
 oc label dc/cart app.kubernetes.io/part-of=cart app.openshift.io/runtime=quarkus --overwrite && \
-oc label dc/datagrid-service app.kubernetes.io/part-of=cart app.openshift.io/runtime=datagrid --overwrite && \
+oc label deployments/datagrid-service app.kubernetes.io/part-of=cart app.openshift.io/runtime=datagrid --overwrite && \
 oc annotate dc/cart app.openshift.io/connects-to=catalog,datagrid-service --overwrite && \
 oc annotate dc/cart app.openshift.io/vcs-ref=ocp-4.5 --overwrite
 ----
@@ -953,7 +953,7 @@ And label the items with proper icons:
 [source,sh,role="copypaste"]
 ----
 oc label dc/order app.kubernetes.io/part-of=order --overwrite && \
-oc label dc/order-database app.kubernetes.io/part-of=order app.openshift.io/runtime=mongodb --overwrite && \
+oc label deployments/order-database app.kubernetes.io/part-of=order app.openshift.io/runtime=mongodb --overwrite && \
 oc annotate dc/order app.openshift.io/connects-to=order-database --overwrite && \
 oc annotate dc/order app.openshift.io/vcs-ref=ocp-4.5 --overwrite
 ----
