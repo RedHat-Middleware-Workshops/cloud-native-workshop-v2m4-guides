@@ -615,7 +615,7 @@ spec:
     value: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-ui:latest
 ----
 
-And the following `api-repo` PipelineResource defines the git repository for the backend application in `YAML` editor:
+And the following `api-repo` PipelineResource defines the git repository for the backend application in `YAML` editor then click on *Create*:
 
 [source,yaml,role="copypaste"]
 ----
@@ -630,7 +630,7 @@ spec:
     value: http://github.com/openshift-pipelines/vote-api.git
 ----
 
-And the following `api-image` PipelineResource defines the OpenShift internal image registry for the backend image to be pushed to in `YAML` editor:
+And the following `api-image` PipelineResource defines the OpenShift internal image registry for the backend image to be pushed to in `YAML` editor then click on *Create*:
 
 [source,yaml,role="copypaste"]
 ----
@@ -663,15 +663,15 @@ api-image   image   url: image-registry.openshift-image-registry.svc:5000/{{ USE
 ui-image    image   url: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-ui:latest
 ----
 
-A *PipelineRun* is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. Let's go to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev~v1beta1~Pipeline[OpenShift Pipelines^] and click on *Start*:
+A *PipelineRun* is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. Let's go to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev%7Ev1beta1%7EPipeline[OpenShift Pipelines^] and click on *Start*:
 
 image::pipeline-start.png[serverless, 800]
 
 This dialog box is where you bind the final target values for the source repo of the _build_ step, and the name of the image to deploy in the _deploy_ step. Input the parameter and select resources as below then Click on *Start*:
 
  * deployment-name: `vote-api`
- * git-repo: http://github.com/openshift-pipelines/vote-api.git (api-repo)
- * image: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-api:latest (api-image)
+ * git-repo: `http://github.com/openshift-pipelines/vote-api.git (api-repo)`
+ * image: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-api:latest (api-image)`
 
 image::pipeline-start-popup.png[serverless, 700]
 
@@ -679,11 +679,11 @@ As soon as you started the *build-and-deploy* pipeline, a pipelinerun is instant
 
 image::pipeline-complete.png[serverless, 800]
 
-Let's run the pipeline to deploy `vote-ui` application. Go back to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev~v1beta1~Pipeline[OpenShift Pipelines^] and click on *Start*. Then input the parameter and select resources as below then Click on *Start*:
+Let's run the pipeline to deploy `vote-ui` application. Go back to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev~%7E1beta1%7EPipeline[OpenShift Pipelines^] and click on *Start*. Then input the parameter and select resources as below then Click on *Start*:
 
  * deployment-name: `vote-ui`
- * git-repo: http://github.com/openshift-pipelines/vote-ui.git (api-repo)
- * image: image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-ui:latest (api-image)
+ * git-repo: `http://github.com/openshift-pipelines/vote-ui.git (api-repo)`
+ * image: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-ui:latest (api-image)`
 
 image::pipeline-start-popup2.png[serverless, 700]
 
