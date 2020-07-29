@@ -679,7 +679,7 @@ As soon as you started the *build-and-deploy* pipeline, a pipelinerun is instant
 
 image::pipeline-complete.png[serverless, 800]
 
-Let's run the pipeline to deploy `vote-ui` application. Go back to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev%7E1beta1%7EPipeline[OpenShift Pipelines^] and click on *Start*. Then input the parameter and select resources as below then Click on *Start*:
+Let's run the pipeline to deploy `vote-ui` application. Go back to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev%7Ev1beta1%7EPipeline[OpenShift Pipelines^] and click on *Start*. Then input the parameter and select resources as below then Click on *Start*:
 
  * deployment-name: `vote-ui`
  * git-repo: `http://github.com/openshift-pipelines/vote-ui.git (api-repo)`
