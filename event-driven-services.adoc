@@ -464,7 +464,7 @@ You should see in the output:
 
 This command generates a Maven project, importing the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with Kafka and subscribe to the _payments_ and _orders_ topic.
 
-To process the incoming and outgoing messages, Create a new Java class named `KafkaOrders.java` in the `src/main/java/com/redhat/cloudnative` directory to consume messages from the Kafka _orders_ and _payments_ topic. Copy the following entire code into _KafkaOrders.java_.
+In the Order service, to process the incoming and outgoing messages, Create a new Java class named `KafkaOrders.java` in the `order-service/src/main/java/com/redhat/cloudnative` directory to consume messages from the Kafka _orders_ and _payments_ topic. Copy the following entire code into _KafkaOrders.java_.
 
 [source,java,role="copypaste"]
 ----
