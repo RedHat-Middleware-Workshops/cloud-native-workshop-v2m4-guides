@@ -81,7 +81,7 @@ Let's add Maven Dependencies using Quarkus Kafka extensions in CodeReady Workspa
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
+mvn -q quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
 ----
 
 You should see in the output:
@@ -341,7 +341,7 @@ Add Maven Dependencies using Quarkus *Kafka* Extensions:
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
+mvn -q quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
 ----
 
 You should see in the output:
@@ -452,7 +452,7 @@ Add Maven Dependencies using Quarkus *Kafka* Extensions:
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
+mvn -q quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
 ----
 
 You should see in the output:

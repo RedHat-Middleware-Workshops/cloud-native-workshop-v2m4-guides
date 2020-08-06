@@ -145,7 +145,7 @@ maven plugin:
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="jdbc-postgresql" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
+mvn -q quarkus:add-extension -Dextensions="jdbc-postgresql" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
 ----
 
 You should see in the output:
@@ -620,7 +620,7 @@ Add _openshift_ extension via CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="openshift" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
+mvn -q quarkus:add-extension -Dextensions="openshift" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
 ----
 
 you will see:
@@ -702,7 +702,7 @@ Execute the following command for adding Maven Dependencies using Quarkus Extens
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
+mvn -q quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
 ----
 
 You should see in the output:
