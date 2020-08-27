@@ -573,15 +573,15 @@ Let’s confirm if the all services works correctly using `Kafka` messaging via 
 
 Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN}}[Red Hat Cool Store^]!
 
-Add some cool items to your shopping cart in the following shopping scenarios:
+Add some cool items to your cart in the following shopping scenarios:
 
 [arabic]
-. Add a _Red Hat Fedora_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top menu.
+. Add a _Quarkus T-shirt_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top menu.
 
 image::add-to-cart.png[serverless, 1000]
 
 [arabic, start=2]
-. Go to the *Your Shopping Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should be 16 digits and begin with the digit `4`. For example `4123987754646678`.
+. Go to the *Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should be 16 digits and begin with the digit `4`. For example `4123987754646678`.
 
 [NOTE]
 ====
@@ -596,12 +596,12 @@ image::checkout.png[serverless, 1000]
 image::input-cc-info.png[serverless, 1000]
 
 [arabic, start=4]
-. Confirm the _Payment Status_ of the your shopping items in the *All Orders* tab. It should be `Processing`.
+. Confirm the _Payment Status_ of the your shopping items in the *Orders* tab. It should be `Processing`.
 
 image::payment-processing.png[serverless, 1000]
 
 [arabic, start=5]
-. After a few moments, reload the *All Orders* page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
+. After a few moments, reload the *Orders* page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
 
 [NOTE]
 ====

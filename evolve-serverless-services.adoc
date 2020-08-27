@@ -400,12 +400,12 @@ Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapp
 Add some cool items to your shopping cart in the following shopping scenarios:
 
 [arabic]
-. Add a _Forge Laptop Sticker_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top menu.
+. Add a _Pronounced Kubernetes_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top menu.
 
 image::add-to-cart-serverless.png[serverless, 1000]
 
 [arabic, start=2]
-. Go to the *Your Shopping Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should be 16 digits and begin with the digit `4`. For example `4123987754646678`.
+. Go to the *Cart* tab and click on the *Checkout* button . Input the credit card information. The Card Info should be 16 digits and begin with the digit `4`. For example `4123987754646678`.
 
 image::checkout-serverless.png[serverless, 1000]
 
@@ -426,7 +426,7 @@ image::payment-processing-serverless.png[serverless, 1000]
 
 
 [arabic, start=5]
-. After a few moments, reload the *All Orders* page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
+. After a few moments, reload the *Orders* page to confirm that the Payment Status changed to `COMPLETED` or `FAILED`.
 
 [NOTE]
 ====
