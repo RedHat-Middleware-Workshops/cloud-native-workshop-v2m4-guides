@@ -362,14 +362,16 @@ Copy the following `KafkaSource` in `YAML` editor then click on *Create*:
 
 [source,yaml,role="copypaste"]
 ----
-apiVersion: sources.knative.dev/v1alpha1
+apiVersion: sources.knative.dev/v1beta1
 kind: KafkaSource
 metadata:
   name: kafka-source
 spec:
   consumerGroup: knative-group
-  bootstrapServers: my-cluster-kafka-bootstrap:9092
-  topics: orders
+  bootstrapServers:
+  - my-cluster-kafka-bootstrap.{{ USER_ID }}-cloudnativeapps:9092
+  topics:
+  - orders
   sink:
     ref:
       apiVersion: serving.knative.dev/v1
