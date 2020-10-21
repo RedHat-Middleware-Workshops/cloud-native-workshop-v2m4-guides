@@ -60,11 +60,11 @@ Let’s find out why Quarkus calls itself _SuperSonic Subatomic Subatomic Java_.
 [source,sh,role="copypaste"]
 ----
 mkdir /tmp/hello && cd /tmp/hello && \
-mvn io.quarkus:quarkus-maven-plugin:1.3.4.Final-redhat-00001:create \
+mvn io.quarkus:quarkus-maven-plugin:1.7.5.Final-redhat-00007:create \
     -DprojectGroupId=org.acme \
     -DprojectArtifactId=getting-started \
     -DplatformGroupId=com.redhat.quarkus \
-    -DplatformVersion=1.3.4.Final-redhat-00001 \
+    -DplatformVersion=1.7.5.Final-redhat-00007 \
     -DclassName="org.acme.quickstart.GreetingResource" \
     -Dpath="/hello"
 ----
@@ -75,7 +75,7 @@ Next, create a `native executable` with this command:
 
 [source,sh,role="copypaste"]
 ----
-mvn -f /tmp/hello/getting-started/pom.xml clean package -Pnative -DskipTests
+mvn -f /tmp/hello/getting-started/pom.xml clean package -Pnative -DskipTests -Dquarkus.native.native-image-xmx=2G
 ----
 
 This may take a minute or two to run. One of the benefits of Quarkus is amazingly fast startup time, at the expense of a longer build time to optimize and remove dead code, process annotations, etc. This is only incurred once, at build time rather than _every_ startup!
@@ -270,6 +270,32 @@ And delete the configuration for the incoming stream. In `application.properties
 Make sure you only comment out or delete the lines starting with `mp.messaging.incoming`, `OpenShift extension` and leave the rest!
 ====
 
+Then append the following configuration for native compilation using `Mandrel` builder image:
+
+[source,properties,role="copypaste"]
+----
+quarkus.container-image.group={{ USER_ID }}-cloudnativeapps // <1>
+quarkus.container-image.registry=image-registry.openshift-image-registry.svc:5000
+quarkus.kubernetes-client.trust-certs=true
+quarkus.kubernetes.deployment-target=knative // <2>
+quarkus.kubernetes.deploy=true
+quarkus.native.native-image-xmx=2G // <3>
+quarkus.openshift.expose=true
+----
+
+<1> Define a project name where you deploy a serverless application
+<2> Enable the generation of Knative resources
+<3> Mximum Java heap to be used during the native image generation
+
+[NOTE]
+====
+Mandrel is a downstream distribution of the GraalVM community edition. Mandrel's main goal is to provide a native-image release specifically to support https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus[Quarkus^]. The aim is to align the native-image capabilities from GraalVM with OpenJDK and Red Hat Enterprise Linux libraries to improve maintainability for native Quarkus applications.
+====
+
+In order to complie a native binary, Let's remove a specified package type(i.e. uberJar) configuration in `pom.xml`. Open the _pom.xml_ then remove or comment the following configuration option:
+
+image::remove-uberjar.png[serverless, 900]
+
 Rebuild and re-deploy new payment service via running the following maven plugin in CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
@@ -277,47 +303,11 @@ Rebuild and re-deploy new payment service via running the following maven plugin
 mvn clean package -Pnative -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
 ----
 
-The _-Pnative_ argument selects the native maven profile which invokes the _Graal compiler_. We’ve deleted our old build configuration that took a JAR file. We need a new build configuration that can take our new native
-compiled Quarkus app. Create a new build config with this command:
-
-[source,sh,role="copypaste"]
-----
-oc new-build quay.io/quarkus/ubi-quarkus-native-binary-s2i:1.0 --binary --name=payment -l app=payment
-----
-
-Start and watch the build, which will take about 3-4 minutes to complete:
-
-[source,sh,role="copypaste"]
-----
-oc start-build payment --from-file=$CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service/target/payment-1.0-SNAPSHOT-runner --follow
-----
-
-This step will combine the native binary with a base OS image, create a new container image, and push it to an internal image registry.
-
-Go to the {{ CONSOLE_URL }}/add/ns/{{ USER_ID }}-cloudnativeapps[+Add^] to create a _Knative Service_ and click on *Container Image*:
-
-image::add-icon.png[serverless, 700]
-
-Fill out the following variables to deploy _Payment Image_ that you just built then click on *Create*:
-
-* Image stream tag from internal registry: *Checked*
-* Projects: *{{ USER_ID }}-cloudnativeapps*
-* ImageStreams: *payment*
-* Tag: *latest*
-
-* Application: *Create Application*
-* Application Name: *payment*
-* Name: *payment*
-
-* Knative Service: *Checked*
-
-image::deploy-payment-image.png[serverless, 900]
-
-After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
+The _-Pnative_ argument selects the native maven profile which invokes the _Graal compiler_. After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
 
 [NOTE]
 ====
-It will take a few moments (up to 2 minutes) to fully render while the networking is setup properly. Try reloading the browser page if all you see is an empty box!
+It will take a few moments (up to 30 seconds) to fully render while the networking is setup properly. Try reloading the browser page if all you see is an empty box!
 ====
 
 Let's edit labels to add _Quarkus_ icon. Previously you did this with a series of `oc label` commands, but let's do it once manually just for fun. Click on payment *REV* then select *Edit Labels* in _Actions_ drop box:

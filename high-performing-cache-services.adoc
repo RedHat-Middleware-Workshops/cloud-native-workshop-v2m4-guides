@@ -152,7 +152,7 @@ You should see in the output:
 
 [source,console]
 ----
-✅ Adding extension io.quarkus:quarkus-jdbc-postgresql
+✅ Extension io.quarkus:quarkus-jdbc-postgresql has been installed
 ----
 
 First, open a new brower with the {{ CONSOLE_URL }}[OpenShift web console^]:
@@ -625,7 +625,7 @@ mvn -q quarkus:add-extension -Dextensions="openshift" -f $CHE_PROJECTS_ROOT/clou
 
 you will see:
 
-✅ Adding extension io.quarkus:quarkus-openshift
+✅ Extension io.quarkus:quarkus-openshift has been installed
 
 Quarkus supports the notion of _configuration profiles_. These allows you to have multiple configurations in the same file and
 select between then via a _profile name_.
@@ -709,8 +709,8 @@ You should see in the output:
 
 [source,console]
 ----
-✅ Adding extension io.quarkus:quarkus-resteasy-jsonb
-✅ Adding extension io.quarkus:quarkus-mongodb-client
+✅ Extension io.quarkus:quarkus-resteasy-jsonb has been installed
+✅ Extension io.quarkus:quarkus-mongodb-client has been installed
 ----
 
 This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, the quarkus-mongodb-client extension has been added to your *pom.xml*.

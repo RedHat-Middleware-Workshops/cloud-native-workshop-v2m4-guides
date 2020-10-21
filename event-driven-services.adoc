@@ -81,14 +81,14 @@ Let's add Maven Dependencies using Quarkus Kafka extensions in CodeReady Workspa
 
 [source,sh,role="copypaste"]
 ----
-mvn -q quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
+mvn -q quarkus:add-extension -Dextensions="messaging-kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
 ----
 
 You should see in the output:
 
 [source,console]
 ----
-✅ Adding extension io.quarkus:quarkus-smallrye-reactive-messaging-kafka
+✅ Extension io.quarkus:quarkus-smallrye-reactive-messaging-kafka has been installed
 ----
 
 This command imports the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with Kafka clusters. It adds this to `pom.xml` for you:
@@ -342,14 +342,14 @@ Add Maven Dependencies using Quarkus *Kafka* Extensions:
 
 [source,sh,role="copypaste"]
 ----
-mvn -q quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
+mvn -q quarkus:add-extension -Dextensions="messaging-kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
 ----
 
 You should see in the output:
 
 [source,console]
 ----
-✅ Adding extension io.quarkus:quarkus-smallrye-reactive-messaging-kafka
+✅ Extension io.quarkus:quarkus-smallrye-reactive-messaging-kafka has been installed
 ----
 
 This will add the Kafka extension and APIs to our Cart service app.
@@ -453,14 +453,14 @@ Add Maven Dependencies using Quarkus *Kafka* Extensions:
 
 [source,sh,role="copypaste"]
 ----
-mvn -q quarkus:add-extension -Dextensions="kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
+mvn -q quarkus:add-extension -Dextensions="messaging-kafka" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
 ----
 
 You should see in the output:
 
 [source,console]
 ----
-✅ Adding extension io.quarkus:quarkus-smallrye-reactive-messaging-kafka
+✅ Extension io.quarkus:quarkus-smallrye-reactive-messaging-kafka has been installed
 ----
 
 This command generates a Maven project, importing the Kafka extensions for Quarkus applications and provides all the necessary capabilities to integrate with Kafka and subscribe to the _payments_ and _orders_ topic.
