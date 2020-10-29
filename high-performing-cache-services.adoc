@@ -349,15 +349,15 @@ Once the build is done, we’ll deploy it as an OpenShift application and overri
 
 [source,sh,role="copypaste"]
 ----
-oc new-app catalog --as-deployment-config -e JAVA_OPTS_APPEND='-Dspring.profiles.active=openshift' && oc expose service catalog && \
-oc label dc/catalog app.kubernetes.io/part-of=catalog app.openshift.io/runtime=spring --overwrite && \
+oc new-app catalog -e JAVA_OPTS_APPEND='-Dspring.profiles.active=openshift' && oc expose service catalog && \
+oc label dc/catalog app.kubernetes.io/part-of=catalog app.openshift.io/runtime=rh-spring-boot --overwrite && \
 oc label dc/catalog-database app.kubernetes.io/part-of=catalog app.openshift.io/runtime=postgresql --overwrite && \
 oc annotate dc/catalog app.openshift.io/connects-to=inventory,catalog-database --overwrite && \
 oc annotate dc/catalog app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
 oc annotate dc/catalog app.openshift.io/vcs-ref=ocp-4.6 --overwrite
 ----
 
-Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles!
+Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles! You will also see the icon of the *Red Hat Support for Spring Boot*.
 
 image::inventory-catalog-topology.png[catalog, 700]
 
@@ -385,7 +385,7 @@ Let's create a simple version of the *cache service* in our cluster. Open the Te
 
 [source,sh,role="copypaste"]
 ----
-oc new-app --as-deployment-config jboss/infinispan-server:10.0.0.Beta3 --name=datagrid-service
+oc new-app jboss/infinispan-server:10.0.0.Beta3 --name=datagrid-service
 ----
 
 This will create a single instance of the Data Grid server to store our shopping carts.
@@ -927,7 +927,7 @@ Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady 
 
 [source,sh,role="copypaste"]
 ----
-oc new-app --as-deployment-config -n {{ USER_ID }}-cloudnativeapps --docker-image mongo:4.0 --name=order-database
+oc new-app -n {{ USER_ID }}-cloudnativeapps --docker-image mongo:4.0 --name=order-database
 ----
 
 Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
