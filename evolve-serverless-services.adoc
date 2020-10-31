@@ -279,7 +279,7 @@ quarkus.container-image.registry=image-registry.openshift-image-registry.svc:500
 quarkus.kubernetes-client.trust-certs=true
 quarkus.kubernetes.deployment-target=knative// <2>
 quarkus.kubernetes.deploy=true
-quarkus.native.native-image-xmx=4g// <3>
+quarkus.native.native-image-xmx=2g// <3>
 quarkus.openshift.expose=true
 ----
 
