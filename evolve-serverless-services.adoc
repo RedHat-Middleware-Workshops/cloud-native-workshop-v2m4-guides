@@ -133,12 +133,12 @@ __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-2020-10-22 01:57:51,424 INFO  [io.quarkus] (main) getting-started 1.0-SNAPSHOT native (powered by Quarkus x.x.x) started in 0.016s. Listening on: http://0.0.0.0:8080
+2020-10-22 01:57:51,424 INFO  [io.quarkus] (main) getting-started 1.0-SNAPSHOT native (powered by Quarkus x.x.x) started in 0.018s. Listening on: http://0.0.0.0:8080
 2020-10-22 01:57:51,424 INFO  [io.quarkus] (main) Profile prod activated. 
 2020-10-22 01:57:51,424 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
 ----
 
-That’s *16 milliseconds* to start up. The start-up time might be different in your environment.
+That’s *18 milliseconds* to start up. The start-up time might be different in your environment.
 
 And extremely low memory usage as reported by the Linux `ps` utility. While the app is running, run the following command in another Terminal:
 
@@ -299,7 +299,7 @@ Rebuild and re-deploy new payment service via running the following maven plugin
 mvn clean package -Pnative -DskipTests -Dquarkus.package.uber-jar=false -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
 ----
 
-The _-Pnative_ argument selects the native maven profile which invokes the _Graal compiler_. It will take a few minutes to complete a native binary build as well as deploying a new knative service. After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
+The _-Pnative_ argument selects the native maven profile which invokes the _Graal compiler_. It will take a few minutes(up to 7 mins) to complete a native binary build as well as deploying a new knative service. After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
 
 [NOTE]
 ====
