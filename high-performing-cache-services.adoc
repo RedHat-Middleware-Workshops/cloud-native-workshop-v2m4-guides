@@ -385,14 +385,14 @@ Let's create a simple version of the *cache service* in our cluster. Open the Te
 
 [source,sh,role="copypaste"]
 ----
-oc new-app jboss/infinispan-server:10.0.0.Beta3 --name=datagrid-service
+oc new-app infinispan/server --name=datagrid-service -e USER=user -e PASS=pass
 ----
 
 This will create a single instance of the Data Grid server to store our shopping carts.
 
 Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] to see it.
 
-Now that our cache service a.k.a datagrid-service is deployed. We want to ensure that everything in our cart is persisted in this blazing fast cache. It will help us when we have a few million users per second on a black Friday.
+Now that our cache service(a.k.a datagrid-service) is deployed. We want to ensure that everything in our cart is persisted in this blazing fast cache. It will help us when we have a few million users per second on a black Friday.
 
 Following is what we need to do:
 
@@ -401,163 +401,47 @@ Following is what we need to do:
 * Create a marshaller for our data
 * Inject our cache connection into the service
 
-We have made this choice easier for you. The default serialization is done using a library based on *protobuf*. We need to define the protobuf schema and a marshaller for each user type(s).
-
-Let’s take a look at our `cart.proto` file in `cart-service/src/main/resources/META-INF`:
+We have made this choice easier for you using an annotation based serialization. Let’s take a look at our `Product.java` class file in `cart-service/src/main/java/com/redhat/cloudnative/model`:
 
 [source,java]
 ----
-package coolstore;
+...
+    @ProtoFactory
+    public Product(String itemId, String name, String desc, double price) {
+        super();
+        this.itemId = itemId;
+        this.name = name;
+        this.desc = desc;
+        this.price = price;
+    }
 
-message ShoppingCart {
-  required double cartItemTotal = 1;
-  required double cartItemPromoSavings = 2;
-  required double shippingTotal = 3;
-  required double shippingPromoSavings = 4;
-  required double cartTotal = 5;
-  required string cartId = 6;
-
-  repeated ShoppingCartItem shoppingCartItemList = 7; // <1>
-}
-
-message ShoppingCartItem {
-  required double price = 1;
-  required int32 quantity = 2;
-  required double promoSavings = 3;
-  required Product product = 4; // <2>
-}
-
-// TODO ADD Product
-message Promotion {
-  required string itemId = 1;
-  required double percentOff = 2;
-}
-----
-<1> So our `ShoppingCart` has a list (`repeated`) of `ShoppingCartItem`
-<2> Each `ShoppingCartItem` has a `Product`
-
-But we haven't defined the `Product` yet. Add this code below the `//TODO ADD Product` marker:
-
-[source,java,role="copypaste"]
-----
-message Product {
-  required string itemId = 1;
-  required string name = 2;
-  required string desc = 3;
-  required double price = 4;
-}
+    @ProtoField(number = 1)
+    public String getItemId() {
+        return itemId;
+    }
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
+...
 ----
 
-*Great!* Now we have the Product defined in our proto model. We should also ensure that this model also exists as *POJO*(Plain Old Java Object), that way our *REST Endpoint*, or *Cache* will be able to directly serialize and desrialize the data.
+This can be done automatically by adding protostream annotations(*@ProtoFactory*, *@ProtoField*) to the _Product_ class. In addition a single _Initializer_ annotated interface is required which controls how the supporting classes are generated.
 
-Next, open `Product.java` in `cart-service/src/main/java/com/redhat/cloudnative/model`:
+Then all that is required is a very simple *SerializationContextInitializer* interface with an annotation on it to specify configuration settings.
 
-[source,java]
-----
-    private String itemId;
-    private String name;
-    private String desc;
-    private double price;
-----
-
-Notice that the entities match our proto file. The rest or Getters and Setters, so we can read and write data into them.
-
-Let's go ahead and create a *Marshaller* for our Product class which will do exactly what we intend, read and write to our cache.
-
-Create a new Java class called `ProductMarshaller.java` in `com.redhat.cloudnative.model` and copy the below code into the file:
+Create a new Java class called `CartContextInitializer.java` in `com.redhat.cloudnative.model` and copy the below code into the file:
 
 [source,java,role="copypaste"]
 ----
 package com.redhat.cloudnative.model;
 
-import org.infinispan.protostream.MessageMarshaller;
+import org.infinispan.protostream.SerializationContextInitializer;
+import org.infinispan.protostream.annotations.AutoProtoSchemaBuilder;
 
-import java.io.IOException;
-
-public class ProductMarshaller implements MessageMarshaller<Product> {
-
-    /*
-     * Proto file specimen
-     * message Product {
-     * required string itemId = 1;
-     * required string name = 2;
-     * required string desc = 3;
-     * required double price = 4;
-     * }
-     */
-
-    @Override
-    public Product readFrom(ProtoStreamReader reader) throws IOException {
-        String itemId = reader.readString("itemId");
-        String name = reader.readString("name");
-        String desc = reader.readString("desc");
-        double price = reader.readDouble("price");
-
-        return new Product(itemId, name, desc, price);
-    }
-
-    @Override
-    public void writeTo(ProtoStreamWriter writer, Product product) throws IOException {
-        writer.writeString("itemId", product.getItemId());
-        writer.writeString("name", product.getName());
-        writer.writeString("desc", product.getDesc());
-        writer.writeDouble("price", product.getPrice());
-    }
-
-    @Override
-    public Class<? extends Product> getJavaClass() {
-        return Product.class;
-    }
-
-    @Override
-    public String getTypeName() {
-        return "coolstore.Product";
-    }
+@AutoProtoSchemaBuilder (includeClasses = {ShoppingCart.class, ShoppingCartItem.class, Promotion.class, Product.class }, schemaPackageName = "coolstore")
+interface CartContextInitializer extends SerializationContextInitializer {
 
 }
-----
-
-So now we have the capability to read from a *ProtoStream* and *Write* to it. And this will be done directly into our cache. We have already created the other model classes and mashallers, feel free to look around.
-
-Now it's time to configure our *RemoteCache*, since its not embedded into our service. Open the `Producers.java` file in the `com.redhat.cloudnative` directory/package.
-
-We use the producer to ensure our RemoteCache gets instantiated. We create methods called getCache and getConfigBuilder
-
-* getConfigBuilder: sets up the basic cache config
-* getCache, sets up our marshallers and proto files
-* other config properties are injected at runtime
-
-Add this code below the `// TODO Add getCache` and `// TODO add getConfigBuilder` marker:
-
-[source,java,role="copypaste"]
-----
-    @Produces
-    RemoteCache<String, ShoppingCart> getCache() throws IOException {
-
-        RemoteCacheManager manager = new RemoteCacheManager(getConfigBuilder().build());
-
-        SerializationContext serCtx = ProtoStreamMarshaller.getSerializationContext(manager);
-        FileDescriptorSource fds = new FileDescriptorSource();
-        fds.addProtoFiles("META-INF/cart.proto");
-        serCtx.registerProtoFiles(fds);
-        serCtx.registerMarshaller(new ShoppingCartMarshaller());
-        serCtx.registerMarshaller(new ShoppingCartItemMarshaller());
-        serCtx.registerMarshaller(new ProductMarshaller());
-        serCtx.registerMarshaller(new PromotionMarhsaller());
-        return manager.getCache();
-    }
-
-    protected ConfigurationBuilder getConfigBuilder() {
-        ConfigurationBuilder cfg = null;
-        cfg = new ConfigurationBuilder().addServer()
-                .host(dgHost)
-                .port(dgPort)
-                .marshaller(new ProtoStreamMarshaller())
-                .clientIntelligence(ClientIntelligence.BASIC);
-
-        return cfg;
-
-    }
 ----
 
 *Perfect!* Now we have all the building blocks ready to use the cache. Let's start using our cache.
@@ -567,18 +451,18 @@ Next we need to make sure we will inject our cache in our service. Open `com.red
 [source,java,role="copypaste"]
 ----
     @Inject
-    @Remote("default")
+    @Remote(CacheService.CART_CACHE)
     RemoteCache<String, ShoppingCart> carts;
 ----
 
 The cart is quite simple; All the information from the browser i.e., via our *Angular App* is via _JSON_ at the _/api/cart_ endpoint:
 
-* `GET /{cartId}` gets the items in the cart, or creates a new unique ID if one is not present.
-* `POST /{cartId}/{itemId}/{quantity}` will add items to the cart.
-* `DELETE /{cartId}/{itemId}/{quantity}` will remove items from the cart.
-* `POST /checkout/{cartId}` will remove the items and invoke the checkout procedure.
+* `GET {cartId}` gets the items in the cart, or creates a new unique ID if one is not present.
+* `POST {cartId}/{itemId}/{quantity}` will add items to the cart.
+* `DELETE {cartId}/{itemId}/{quantity}` will remove items from the cart.
+* `POST checkout/{cartId}` will remove the items and invoke the checkout procedure.
 
-Let’s take a look at how we do this with Quarkus. In our *cart-service* project and in our main package i.e., `com.redhat.cloudnative` is the `CartResource`. Let’s take a look at the getCart method.
+Let’s take a look at how we do this with Quarkus. In our *cart-service* project and in our main package i.e., `com.redhat.cloudnative` is the `CartResource`.
 
 At the `// TODO ADD getCart method` marker, add this method:
 
