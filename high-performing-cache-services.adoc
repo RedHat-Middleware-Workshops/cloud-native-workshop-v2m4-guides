@@ -451,7 +451,7 @@ Next we need to make sure we will inject our cache in our service. Open `com.red
 [source,java,role="copypaste"]
 ----
     @Inject
-    @Remote("default")
+    @Remote(CacheService.CART_CACHE)
     RemoteCache<String, ShoppingCart> carts;
 ----
 
