@@ -660,7 +660,7 @@ This dialog box is where you bind the final target values for the source repo of
 
 * deployment-name: `vote-api`
  * git-url: `http://github.com/openshift-pipelines/vote-api.git`
- * git-revision: `master`
+ * git-revision: `release-tech-preview-3`
  * IMAGE: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-api`
  * shared-workspace: `source-pvc` in *PVC*
 
@@ -674,7 +674,7 @@ Let's run the pipeline to deploy `vote-ui` application. Go back to {{ CONSOLE_UR
 
  * deployment-name: `vote-ui`
  * git-url: `http://github.com/openshift-pipelines/vote-ui.git`
- * git-revision: `master`
+ * git-revision: `release-tech-preview-3`
  * IMAGE: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-ui`
  * shared-workspace: `source-pvc` in *PVC*
 
