@@ -125,10 +125,3 @@ image::codeready-workspace-terminal.png[codeready-workspace-terminal, 700]
 If you've completed other modules today (such as `cloud-native-workshop-v2m1-labs`), remove them from your workspace by right-clicking on the project name in the explorer and choose *Delete* and accept the warning. Be sure not to delete the new project you just imported for this lab!
 
 image::remove-workspace.png[remove, 700]
-
-[NOTE]
-====
-The Terminal window in CodeReady Workspaces. You can open a terminal window for any of the containers running in your Developer workspace. For the rest of these labs, anytime you need to run a command in a terminal, you can use the *>_ New Terminal* command on the right:
-====
-
-image::codeready-workspace-terminal.png[codeready-workspace-terminal, 700]
