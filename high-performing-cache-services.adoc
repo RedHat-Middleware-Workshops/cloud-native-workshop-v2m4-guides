@@ -484,9 +484,8 @@ Add the following code on top of the `getCart` method
 [source,java,role="copypaste"]
 ----
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("/{cartId}")
-    @Operation(summary = "get the contents of cart by cartId")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("{cartId}")
 ----
 
 We have now successfully stated that the method adheres to a GET request and accepts data in *plain text*. The path would be `/api/cart/{cartId}` finally, we add the `@Operation` annotation for some documentation, which is important for other developers using our service.
