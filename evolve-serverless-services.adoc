@@ -60,11 +60,11 @@ Let’s find out why Quarkus calls itself _SuperSonic Subatomic Subatomic Java_.
 [source,sh,role="copypaste"]
 ----
 mkdir /tmp/hello && cd /tmp/hello && \
-mvn io.quarkus:quarkus-maven-plugin:1.7.5.Final-redhat-00007:create \
+mvn io.quarkus:quarkus-maven-plugin:1.7.6.Final-redhat-00014:create \
     -DprojectGroupId=org.acme \
     -DprojectArtifactId=getting-started \
     -DplatformGroupId=com.redhat.quarkus \
-    -DplatformVersion=1.7.5.Final-redhat-00007 \
+    -DplatformVersion=1.7.6.Final-redhat-00014 \
     -DclassName="org.acme.quickstart.GreetingResource" \
     -Dpath="/hello"
 ----
