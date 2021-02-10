@@ -385,7 +385,7 @@ Let's create a simple version of the *cache service* in our cluster. Open the Te
 
 [source,sh,role="copypaste"]
 ----
-oc new-app infinispan/server --name=datagrid-service -e USER=user -e PASS=pass
+oc new-app --as-deployment-config infinispan/server:12.0.0.Final-1 --name=datagrid-service -e USER=user -e PASS=pass
 ----
 
 This will create a single instance of the Data Grid server to store our shopping carts.
