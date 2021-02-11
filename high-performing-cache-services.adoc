@@ -488,7 +488,7 @@ Add the following code on top of the `getCart` method
     @Path("{cartId}")
 ----
 
-We have now successfully stated that the method adheres to a GET request and accepts data in *plain text*. The path would be `/api/cart/{cartId}` finally, we add the `@Operation` annotation for some documentation, which is important for other developers using our service.
+We have now successfully stated that the method adheres to a GET request and accepts data in *plain text*. 
 
 Take this opportunity to look at some of the other methods. You will find `@POST` and `@DELETE` and also the paths they adhere to. This is how we can construct a simple endpoint for our application.
 
