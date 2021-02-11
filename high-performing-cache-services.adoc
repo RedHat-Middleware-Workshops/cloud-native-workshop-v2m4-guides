@@ -136,7 +136,7 @@ The output looks like:
   }
 ----
 
-Be sure to terminate the running Quarkus development via kbd:[CTRL+C] (or kbd:[Command+C] on Mac OS).
+Be sure to terminate the running Quarkus development via kbd:[CTRL+C].
 
 *In production*, the inventory service will connect to _PostgeSQL_ on OpenShift cluster.
 
