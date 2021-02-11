@@ -136,7 +136,7 @@ The output looks like:
   }
 ----
 
-Be sure to terminate the running Quarkus development via kbd:[CTRL+C] (or kbd:[Command+C] on Mac OS).
+Be sure to terminate the running Quarkus development via kbd:[CTRL+C].
 
 *In production*, the inventory service will connect to _PostgeSQL_ on OpenShift cluster.
 
@@ -295,7 +295,7 @@ This catalog service is not using the default BOM (Bill of material) that Spring
 image::catalog-pom.png[catalog, 700]
 
 Also, catalog service calls the inventory service that we deployed earlier using REST to retrieve the inventory status and include
-that in the response. Open `CatalogService.java` in `src/main/java/com/redhat/coolstore/service` directory via Project Explorer
+that in the response. Open `CatalogService.java` in `src/main/java/com/redhat/cloudnative/service` directory via Project Explorer
 and how `read()` and `readAll()` method work:
 
 image::catalog-service-codes.png[catalog, 700]
