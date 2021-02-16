@@ -285,7 +285,7 @@ quarkus.openshift.expose=true
 
 <1> Define a project name where you deploy a serverless application
 <2> Enable the generation of Knative resources
-<3> Mximum Java heap to be used during the native image generation
+<3> Maximum Java heap to be used during the native image generation
 
 [NOTE]
 ====
