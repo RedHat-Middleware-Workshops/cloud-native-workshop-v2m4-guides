@@ -112,7 +112,7 @@ and invoke the RESTful endpoint using the following CURL commands.
 
 [source,sh,role="copypaste"]
 ----
-curl http://localhost:8080/api/inventory | jq
+curl -s http://localhost:8080/api/inventory | jq
 ----
 
 The output looks like:
@@ -177,7 +177,7 @@ The project displayed in the landing page depends on which labs you will run tod
 Open the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^].
 
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new
-instance of PostgreSQL. Click *+Add* on the left, on the _Database_ box on the *{{ USER_ID }}-cloudnativeapps* project overview:
+instance of PostgreSQL. If the catalog is not displayed yet for you, click *+Add* on the left, finally click on the _Database_ box on the *{{ USER_ID }}-cloudnativeapps* project overview:
 
 image::db.png[db, 700]
 
@@ -486,9 +486,10 @@ Add the following code on top of the `getCart` method
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{cartId}")
+    @Operation(summary = "get the contents of cart by cartId")
 ----
 
-We have now successfully stated that the method adheres to a GET request and accepts data in *plain text*.
+We have now successfully stated that the method adheres to a GET request and accepts data in *plain text*. The path would be `/api/cart/{cartId}` finally, we add the `@Operation` annotation for some documentation, which is important for other developers using our service.
 
 Take this opportunity to look at some of the other methods. You will find `@POST` and `@DELETE` and also the paths they adhere to. This is how we can construct a simple endpoint for our application.
 

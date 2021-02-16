@@ -285,7 +285,7 @@ quarkus.openshift.expose=true
 
 <1> Define a project name where you deploy a serverless application
 <2> Enable the generation of Knative resources
-<3> Mximum Java heap to be used during the native image generation
+<3> Maximum Java heap to be used during the native image generation
 
 [NOTE]
 ====
@@ -344,7 +344,7 @@ image::payment-serving-magic.png[serverless, 700]
 
 Let's move on to create *KafkaSource* to enable *Knative Eventing*. In this lab, _Knative Eventing_ is already installed via the _Knative Eventing Operator_ in OpenShift 4 cluster.
 
-Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], click on `+` icon on the right top corner.
+Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], click on `+` icon on the right top corner and then on the _YAML_ box.
 
 image::plus-icon.png[serverless, 500]
 
@@ -554,7 +554,7 @@ In the OpenShift console, first be sure you're on the _Topology_ view, then use 
 
 image::pipeline-project-select.png[serverless, 800]
 
-Next, click the `+` button at the upper right, and paste in the following YAML and click *Create*:
+Next, click the `+` button at the upper right, then on the _YAML_ box and paste in the following YAML and click *Create*:
 
 [source,yaml,role="copypaste"]
 ----

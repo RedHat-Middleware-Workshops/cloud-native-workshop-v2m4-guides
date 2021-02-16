@@ -35,7 +35,7 @@ The basic architecture of operators in AMQ is seen below:
 
 image::kafka-operators-arch.png[amqstreams, 700]
 
-Let's create a **Kafka cluster**. Click *+Add* on the left, on the _From Catalog_ box on the project overview:
+Let's create a **Kafka cluster**. If the catalog is not displayed yet for you, click *+Add* on the left, finally click on the _From Catalog_ box on the project overview:
 
 image::kafka-catalog.png[kafka, 700]
 
