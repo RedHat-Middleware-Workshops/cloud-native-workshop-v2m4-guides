@@ -568,9 +568,7 @@ And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN
 
 image::cart-swagger-ui.png[cart, 700]
 
-Notice that the documentation after the methods, this is an excellent way for other service developers to know what you intend to
-do with each service method. You can try to invoke the methods and see the output from the service. Hence an excellent way to test
-quickly as well.
+You can try to invoke the methods and see the output from the service. Hence an excellent way to test quickly as well.
 
 === 4. Developing and Deploying Order Service
 
