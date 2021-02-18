@@ -8,7 +8,7 @@ In our cloud-native application architecture, We now have multiple microservices
 IT, along with cloud-native services and the https://enterprisersproject.com/hybrid-cloud[hybrid cloud^].
 * *Serverless platforms* provide APIs that allow users to run code snippets (functions, also called _actions_) and return the results of each function. Serverless platforms also provide endpoints to allow the developer to retrieve function results. These endpoints can be used as inputs for other functions, thereby providing a sequence (or chain) of related functions.
 
-The severless application enables DevOps teams to enjoy benefits like:
+The serverless application enables DevOps teams to enjoy benefits like:
 
 * Optimizing computing resources(i.e CPU, Memory)
 * Autoscaling

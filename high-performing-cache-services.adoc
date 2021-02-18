@@ -1,11 +1,11 @@
 = Lab1 - Creating High-performing Cacheable Service
 :experimental:
 
-In this lab, we’ll develop 5 microservices into the cloud-native appliation architecture. These cloud-native applications will have transactions with multiple datasources such as *PostgreSQL* and *MongoDB*. Especially, we will learn how to configure datasources easily using *Quarkus Extensions*. In the end, we will optimize *data transaction performance* of the shopping cart service thru integrating with a *Cache(Data Grid) server* to increase end users’(customers) satification. And there’s more fun facts how easy it is to deploy applications on OpenShift 4 via *oc* command line tool.
+In this lab, we’ll develop 5 microservices into the cloud-native application architecture. These cloud-native applications will have transactions with multiple datasources such as *PostgreSQL* and *MongoDB*. Especially, we will learn how to configure datasources easily using *Quarkus Extensions*. In the end, we will optimize *data transaction performance* of the shopping cart service thru integrating with a *Cache(Data Grid) server* to increase end users’(customers) satisfaction. And there’s more fun facts how easy it is to deploy applications on OpenShift 4 via *oc* command line tool.
 
 === Goals of this lab
 
-The goal is to develop advanced cloud-native applications on *Red Hat Runtimes* and deploy them on *OpenShift 4* including _single sign-on access management_ and _distributed cache manageemnt_. After this lab, you should end up with something like:
+The goal is to develop advanced cloud-native applications on *Red Hat Runtimes* enabled with _distributed cache management_ and deploy them to *OpenShift 4*. After this lab, you should end up with something like:
 
 image::lab1-goal.png[goal, 700]
 
@@ -171,7 +171,7 @@ image::openshift_landing.png[openshift_landing, 700]
 [NOTE]
 ====
 The project displayed in the landing page depends on which labs you will run today. If you will develop
-`Service Mesh and Identity` then you will see pre-created projects as the above screeenshot.
+`Service Mesh and Identity` then you will see pre-created projects as the above screenshot.
 ====
 
 Open the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^].
@@ -272,11 +272,11 @@ So now `Inventory` service is deployed to OpenShift. You can also see it in the 
 
 === 2. Deploying Catalog Service
 
-_Catalog Service_ serves products and prices for retail products. Lets’s go through quickly how the catalog service works and built on *Spring Boot* Java runtimes. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand *catalog-service* directory.
+_Catalog Service_ serves products and prices for retail products. Let’s go through quickly how the catalog service works and built on *Spring Boot* Java runtimes. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand *catalog-service* directory.
 
 image::codeready-workspace-catalog-project.png[catalog, 700]
 
-First of all, we won’t implement the catalog application to retrieve data because of all funtions are already built when we imported this project from Git server. There’re a few interesting things what we need to take a look at this Spring Boot
+First of all, we won’t implement the catalog application to retrieve data because all functions are already built when we imported this project from Git server. There’re a few interesting things what we need to take a look at from this Spring Boot app.
 application before we will deploy it to OpenShift cluster.
 
 This catalog service is not using the default BOM (Bill of material) that Spring Boot projects typically use. Instead, we are using a BOM provided by Red Hat as part of the http://snowdrop.me/[Snowdrop^] project.

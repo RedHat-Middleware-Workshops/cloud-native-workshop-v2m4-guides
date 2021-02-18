@@ -5,7 +5,7 @@ Traditional microservice architectures are typically composed of many individual
 
 In an event-driven architecture, we can treat data streams as *events* using reactive programming and distributed messaging. *Reactive programming* is an asynchronous programming paradigm concerned with data streams and the propagation of change. In the previous lab, we developed Inventory, Catalog, Shopping Cart and Order services with obvious interactions.
 
-In this lab, we’ll change our shopping cart and order implementation and add a payment service as an Event-Driven/Reactive application in our cloud-native appliation architecture. These cloud-native applications will use AMQ Streams (based on Apache Kafka) as a messaging/streaming backbome. AMQ Streams makes it easy to run Apache Kafka on OpenShift with key features:
+In this lab, we’ll change our shopping cart and order implementation and add a payment service as an Event-Driven/Reactive application in our cloud-native application architecture. These cloud-native applications will use AMQ Streams (based on Apache Kafka) as a messaging/streaming backbone. AMQ Streams makes it easy to run Apache Kafka on OpenShift with key features:
 
 * Designed for horizontal scalability
 * Message ordering guarantee at the partition level
@@ -13,7 +13,7 @@ In this lab, we’ll change our shopping cart and order implementation and add a
 
 === Goals of this lab
 
-The goal is to develop advanced cloud-native applications on *Red Hat Runtimes* and deploy them on *OpenShift 4* including *AMQ Streams* for distributed messaing capabilities. After this lab, you should end up with something like:
+The goal is to develop advanced cloud-native applications on *Red Hat Runtimes* and deploy them on *OpenShift 4* including *AMQ Streams* for distributed messaging capabilities. After this lab, you should end up with something like:
 
 image::lab2-goal.png[goal, 700]
 
@@ -576,7 +576,7 @@ Let’s go shopping! Access the http://coolstore-ui-{{ USER_ID }}-cloudnativeapp
 Add some cool items to your cart in the following shopping scenarios:
 
 [arabic]
-. Add a _Quarkus T-shirt_ to your cart by click on *Add to Cart*. You will see the `Success! Added!` message under the top menu.
+. Add a _Quarkus T-shirt_ to your cart by clicking on *Add to Cart*. You will see the `Success! Added!` message under the top menu.
 
 image::add-to-cart.png[serverless, 1000]
 
@@ -612,6 +612,6 @@ image::payment-completedorfailed.png[serverless, 1000]
 
 === Summary
 
-In this scenario we developed an _Event-Driven/Reactive_ cloud-native appliction to deal with data streams from the shopping cart service to the order service and payment service using _Apache Kafka_. We also used Quarkus and its _Kafka extension_ to integrate the app with Kafka. _AMQ Streams_, a fully supported Kafka solution from Red Hat, enables you to create Apache Kafka clusters very easily via the OpenShift developer catalog.
+In this scenario we developed an _Event-Driven/Reactive_ cloud-native application to deal with data streams from the shopping cart service to the order service and payment service using _Apache Kafka_. We also used Quarkus and its _Kafka extension_ to integrate the app with Kafka. _AMQ Streams_, a fully supported Kafka solution from Red Hat, enables you to create Apache Kafka clusters very easily via the OpenShift developer catalog.
 
 We now have message-driven microservices for implementing reactive systems, where all the components interact using asynchronous message passing for greater reliability, scalability, and faster time to market. Most importantly, Quarkus is perfectly suited to implement event-driven microservices and reactive systems. *Congratulations!*
