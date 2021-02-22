@@ -171,7 +171,7 @@ image::openshift_landing.png[openshift_landing, 700]
 [NOTE]
 ====
 The project displayed in the landing page depends on which labs you will run today. If you will develop
-`Service Mesh and Identity` then you will see pre-created projects as the above screeenshot.
+`Service Mesh and Identity` then you will see pre-created projects as the above screenshot.
 ====
 
 Open the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^].
