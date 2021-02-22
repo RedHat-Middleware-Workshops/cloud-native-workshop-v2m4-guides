@@ -458,7 +458,7 @@ In order to define a pipeline, you need to create _custom resources_ as listed b
 * *TaskRun*: the execution and result (i.e. success or failure) of running an instance of task
 * *PipelineRun*: the execution and result (i.e. success or failure) of running a pipeline
 
-image::tekton-arch.png[severless, 800]
+image::tekton-arch.png[serverless, 800]
 
 For further details on pipeline concepts, refer to the https://github.com/tektoncd/pipeline/tree/master/docs#learn-more[Tekton documentation^] that provides an excellent guide for understanding various parameters and attributes available for defining pipelines.
 
