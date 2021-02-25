@@ -348,7 +348,7 @@ Once the build is done, we’ll deploy it as an OpenShift application and overri
 
 [source,sh,role="copypaste"]
 ----
-oc new-app catalog -e JAVA_OPTS_APPEND='-Dspring.profiles.active=openshift' && oc expose service catalog && \
+oc new-app catalog  --as-deployment-config -e JAVA_OPTS_APPEND='-Dspring.profiles.active=openshift' && oc expose service catalog && \
 oc label dc/catalog app.kubernetes.io/part-of=catalog app.openshift.io/runtime=rh-spring-boot --overwrite && \
 oc label dc/catalog-database app.kubernetes.io/part-of=catalog app.openshift.io/runtime=postgresql --overwrite && \
 oc annotate dc/catalog app.openshift.io/connects-to=inventory,catalog-database --overwrite && \
@@ -807,7 +807,7 @@ Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady 
 
 [source,sh,role="copypaste"]
 ----
-oc new-app -n {{ USER_ID }}-cloudnativeapps --docker-image mongo:4.0 --name=order-database
+oc new-app -n {{ USER_ID }}-cloudnativeapps  --as-deployment-config --docker-image mongo:4.0 --name=order-database
 ----
 
 Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
