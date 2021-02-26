@@ -199,7 +199,6 @@ This will deploy the database to our new project. Click on the {{ CONSOLE_URL }}
 
 image::inventory-database-deployment.png[inventory_db_deployments, 700]
 
-
 Although your CodeReady workspace is running on the Kubernetes cluster, it’s running with a default restricted _Service Account_ that prevents you from creating most resource types. If you’ve completed other modules, you’re probably already logged in, but let’s login again: click on *Login to OpenShift*, and enter your given credentials:
 
 * Username: `{{ USER_ID }}`
@@ -521,7 +520,6 @@ quarkus.container-image.build=true<2>
 quarkus.kubernetes.deploy=true<3>
 quarkus.kubernetes.deployment-target=openshift<4>
 quarkus.openshift.expose=true<5>
-quarkus.openshift.labels.app.openshift.io/runtime=quarkus<6>
 ----
 
 <1> We are using self-signed certs in this simple example, so this simply says to the extension to trust them.
@@ -529,7 +527,6 @@ quarkus.openshift.labels.app.openshift.io/runtime=quarkus<6>
 <3> Instructs the extension to deploy to OpenShift after the container image is built
 <4> Instructs the extension to generate and create the OpenShift resources (like `DeploymentConfig` and `Service`) after building the container
 <5> Instructs the extension to generate an OpenShift `Route`.
-<6> Adds a nice-looking icon to the app when viewing the OpenShift Developer Toplogy
 
 Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
 
