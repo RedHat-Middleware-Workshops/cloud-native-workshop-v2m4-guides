@@ -104,11 +104,7 @@ You should see the inventory web frontend directly in CodeReady (you may need to
 
 image::inventory-codeready.png[Inventory RESTful Service, 700]
 
-Open a *new* CodeReady Workspaces Terminal:
-
-image::codeready-workspace-terminal.png[Inventory RESTful Service, 700]
-
-and invoke the RESTful endpoint using the following CURL commands.
+Open a *new* CodeReady Workspaces Terminal and invoke the RESTful endpoint using the following CURL command:
 
 [source,sh,role="copypaste"]
 ----
