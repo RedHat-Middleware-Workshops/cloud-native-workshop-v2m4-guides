@@ -1,3 +1,5 @@
+:imagesdir: images
+
 = Lab3 - Evolving services with Serverless
 :experimental:
 
