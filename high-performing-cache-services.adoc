@@ -1,3 +1,5 @@
+:imagesdir: images
+
 = Lab1 - Creating High-performing Cacheable Service
 :experimental:
 

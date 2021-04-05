@@ -1,3 +1,5 @@
+:imagesdir: images
+
 = Lab2 - Creating Event-Driven/Reactive Services
 :experimental:
 
