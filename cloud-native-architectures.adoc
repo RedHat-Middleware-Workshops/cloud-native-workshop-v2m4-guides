@@ -97,7 +97,7 @@ https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.g
 
 image::crw-clone-repo.png[crw,900]
 
-Click on *Select Repository Location* then click on *Open in New Window*. It will reload your web browser immediately:
+Click on *Select Repository Location* then click on *Open in New Window*. It will open a new web browser immediately:
 
 image::crw-add-workspace.png[crw, 900]
 
