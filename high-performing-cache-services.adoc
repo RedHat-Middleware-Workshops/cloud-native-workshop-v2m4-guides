@@ -67,8 +67,9 @@ image::inventoryResource.png[inventory_service, 700]
 
 [source,none]
 ----
-%dev.quarkus.datasource.url=jdbc:h2:mem:inventory
-%dev.quarkus.datasource.driver=org.h2.Driver
+%dev.quarkus.datasource.db-kind=h2
+%dev.quarkus.datasource.jdbc.url=jdbc:h2:mem:person
+%dev.quarkus.datasource.jdbc.driver=org.h2.Driver
 %dev.quarkus.datasource.username=inventory
 %dev.quarkus.datasource.password=mysecretpassword
 %dev.quarkus.datasource.max-size=8
@@ -81,17 +82,17 @@ Let’s run the inventory application locally using `maven plugin command` via C
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:dev -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
+mvn quarkus:dev -Dquarkus.http.host=0.0.0.0 -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
 ----
 
 You should see a bunch of log output that ends with:
 
 [source,console]
 ----
-2020-03-19 00:55:12,598 INFO  [io.agr.pool] (main) Datasource '<default>': Initial size smaller than min. Connections will be created when necessary
-2020-03-19 00:55:12,887 INFO  [io.quarkus] (main) inventory 1.0-SNAPSHOT (running on Quarkus xx.xx.xx) started in 3.166s. Listening on: http://0.0.0.0:8080
-2020-03-19 00:55:12,890 INFO  [io.quarkus] (main) Profile dev activated. Live Coding activated.
-2020-03-19 00:55:12,890 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, narayana-jta, resteasy, resteasy-jsonb, smallrye-health]
+INFO  [io.agr.pool] (main) Datasource '<default>': Initial size smaller than min. Connections will be created when necessary
+INFO  [io.quarkus] (main) inventory 1.0-SNAPSHOT (running on Quarkus xx.xx.xx) started in 3.166s. Listening on: http://0.0.0.0:8080
+INFO  [io.quarkus] (main) Profile dev activated. Live Coding activated.
+INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, narayana-jta, resteasy, resteasy-jsonb, smallrye-health]
 ----
 
 CodeReady will also detect that the Quarkus app opens port `5005` (for debugging) and `8080` (for web requests). Do not open port 5005, but when prompted, open the port `8080`, which opens a small web browser in CodeReady:
@@ -520,17 +521,19 @@ Let’s `add` the following variables at the `# TODO: Add for OpenShift extensio
 [source,shell,role="copypaste"]
 ----
 quarkus.kubernetes-client.trust-certs=true<1>
-quarkus.container-image.build=true<2>
-quarkus.kubernetes.deploy=true<3>
-quarkus.kubernetes.deployment-target=openshift<4>
+quarkus.kubernetes.deploy=true<2>
+quarkus.kubernetes.deployment-target=openshift<3>
+quarkus.openshift.build-strategy=docker<4>
 quarkus.openshift.expose=true<5>
 ----
 
 <1> We are using self-signed certs in this simple example, so this simply says to the extension to trust them.
-<2> Instructs the extension to build a container image
-<3> Instructs the extension to deploy to OpenShift after the container image is built
-<4> Instructs the extension to generate and create the OpenShift resources (like `DeploymentConfig` and `Service`) after building the container
-<5> Instructs the extension to generate an OpenShift `Route`.
+<2> Instructs the extension to deploy to OpenShift after the container image is built
+<3> Instructs the extension to generate and create the OpenShift resources (like `DeploymentConfig` and `Service`) after building the container
+<4> Set the Docker build strategy
+<5> Instructs the extension to generate an OpenShift `Route`
+
+*Docker build* strategy builds the artifacts (JAR files or a native executable) outside the OpenShift cluster, either locally or in a CI environment, and then provides them to the OpenShift build system together with a Dockerfile. The container is built inside the OpenShift cluster and provided as an image stream.
 
 Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
 

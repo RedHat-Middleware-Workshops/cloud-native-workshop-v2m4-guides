@@ -61,11 +61,11 @@ Let’s find out why Quarkus calls itself _SuperSonic Subatomic Subatomic Java_.
 [source,sh,role="copypaste"]
 ----
 mkdir /tmp/hello && cd /tmp/hello && \
-mvn io.quarkus:quarkus-maven-plugin:1.7.6.Final-redhat-00014:create \
+mvn io.quarkus:quarkus-maven-plugin:1.11.6.Final-redhat-00001:create \
     -DprojectGroupId=org.acme \
     -DprojectArtifactId=getting-started \
     -DplatformGroupId=com.redhat.quarkus \
-    -DplatformVersion=1.7.6.Final-redhat-00014 \
+    -DplatformVersion=1.11.6.Final-redhat-00001 \
     -DclassName="org.acme.quickstart.GreetingResource" \
     -Dpath="/hello"
 ----
@@ -134,9 +134,9 @@ __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-2021-02-25 23:30:36,128 INFO  [io.quarkus] (main) getting-started 1.0-SNAPSHOT native (powered by Quarkus 1.7.6.Final-redhat-00014) started in 0.016s. Listening on: http://0.0.0.0:8080
-2021-02-25 23:30:36,128 INFO  [io.quarkus] (main) Profile prod activated. 
-2021-02-25 23:30:36,128 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
+INFO  [io.quarkus] (main) getting-started 1.0-SNAPSHOT native (powered by Quarkus xx.xx.xx) started in 0.016s. Listening on: http://0.0.0.0:8080
+INFO  [io.quarkus] (main) Profile prod activated. 
+INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
 ----
 
 That’s *16 milliseconds* to start up. The start-up time might be different in your environment.
@@ -246,12 +246,9 @@ And delete the configuration for the incoming stream. In `application.properties
 ----
 # OpenShift extension
 # quarkus.kubernetes-client.trust-certs=true
-# quarkus.container-image.build=true
 # quarkus.kubernetes.deploy=true
 # quarkus.kubernetes.deployment-target=openshift
 # quarkus.openshift.expose=true
-# quarkus.openshift.labels.app.openshift.io/runtime=quarkus
-# quarkus.s2i.base-jvm-image=registry.access.redhat.com/ubi8/openjdk-11
 
 ...
 
@@ -297,7 +294,7 @@ Rebuild and re-deploy new payment service via running the following maven plugin
 
 [source,sh,role="copypaste"]
 ----
-mvn clean package -Pnative -DskipTests -Dquarkus.package.uber-jar=false -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
+mvn clean package -Pnative -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
 ----
 
 The _-Pnative_ argument selects the native maven profile which invokes the _Graal compiler_. It will take a few minutes(up to 7 mins) to complete a native binary build as well as deploying a new knative service. After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
