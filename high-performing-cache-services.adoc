@@ -289,7 +289,7 @@ This catalog service is not using the default BOM (Bill of material) that Spring
 <dependency>
     <groupId>dev.snowdrop</groupId>
     <artifactId>snowdrop-dependencies</artifactId>
-    <version>2.3.4.Final-redhat-00001</version>
+    <version>2.3.6.Final-redhat-00001</version>
     <type>pom</type>
     <scope>import</scope>
 </dependency>
@@ -567,7 +567,7 @@ Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}
 
 image::cart-topology.png[catalog, 700]
 
-And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}/swagger-ui[Cart Swagger UI^]:
+And then access the http://cart-{{ USER_ID }}-cloudnativeapps.{{ ROUTE_SUBDOMAIN }}/q/swagger-ui[Cart Swagger UI^]:
 
 image::cart-swagger-ui.png[cart, 700]
 
