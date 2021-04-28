@@ -297,12 +297,6 @@ https://github.com/graalvm/mandrel[Mandrel^] is a downstream distribution of the
 You might have _OutofMemory_ error during the native compilation. For that case, you need to append *quarkus.native.native-image-xmx=2g* for setting the maximum Java heap in application.properties.
 ====
 
-
-[NOTE]
-====
-You might have _OutofMemory_ error during the native compilation. For that case, you need to append *-Dquarkus.native.native-image-xmx=2g* option to the maven command.
-====
-
 Rebuild and re-deploy new payment service via running the following maven plugin in CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
