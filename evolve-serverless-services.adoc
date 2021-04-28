@@ -76,8 +76,13 @@ Next, create a `native executable` with this command:
 
 [source,sh,role="copypaste"]
 ----
-mvn -f /tmp/hello/getting-started/pom.xml clean package -Pnative -DskipTests -Dquarkus.native.native-image-xmx=2g
+mvn -f /tmp/hello/getting-started/pom.xml clean package -Pnative -DskipTests
 ----
+
+[NOTE]
+====
+You might have _OutofMemory_ error during the native compilation. For that case, you need to append *-Dquarkus.native.native-image-xmx=2g* option to the maven command.
+====
 
 This may take a minute or two to run. One of the benefits of Quarkus is amazingly fast startup time, at the expense of a longer build time to optimize and remove dead code, process annotations, etc. This is only incurred once, at build time rather than _every_ startup!
 
@@ -278,18 +283,24 @@ quarkus.container-image.registry=image-registry.openshift-image-registry.svc:500
 quarkus.kubernetes-client.trust-certs=true
 quarkus.kubernetes.deployment-target=knative// <2>
 quarkus.kubernetes.deploy=true
-quarkus.native.native-image-xmx=2g// <3>
 quarkus.openshift.build-strategy=docker
 quarkus.openshift.expose=true
 ----
 
 <1> Define a project name where you deploy a serverless application
 <2> Enable the generation of Knative resources
-<3> Maximum Java heap to be used during the native image generation
 
 [NOTE]
 ====
 https://github.com/graalvm/mandrel[Mandrel^] is a downstream distribution of the GraalVM community edition. Mandrel's main goal is to provide a native-image release specifically to support https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus[Quarkus^]. The aim is to align the native-image capabilities from GraalVM with OpenJDK and Red Hat Enterprise Linux libraries to improve maintainability for native Quarkus applications.
+
+You might have _OutofMemory_ error during the native compilation. For that case, you need to append *quarkus.native.native-image-xmx=2g* for setting the maximum Java heap in application.properties.
+====
+
+
+[NOTE]
+====
+You might have _OutofMemory_ error during the native compilation. For that case, you need to append *-Dquarkus.native.native-image-xmx=2g* option to the maven command.
 ====
 
 Rebuild and re-deploy new payment service via running the following maven plugin in CodeReady Workspaces Terminal:
