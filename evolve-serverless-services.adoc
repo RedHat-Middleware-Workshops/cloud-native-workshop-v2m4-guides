@@ -304,7 +304,7 @@ Rebuild and re-deploy new payment service via running the following maven plugin
 mvn clean package -Pnative -DskipTests -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/payment-service
 ----
 
-The _-Pnative_ argument selects the native maven profile which invokes the _Graal compiler_. It will take a few minutes(up to 10 mins) to complete a native binary build as well as deploying a new knative service. After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
+The _-Pnative_ argument selects the native maven profile which invokes the _Graal compiler_. It will take a few minutes(up to 7 mins) to complete a native binary build as well as deploying a new knative service. After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
 
 [NOTE]
 ====
