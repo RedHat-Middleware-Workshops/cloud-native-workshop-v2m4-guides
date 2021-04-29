@@ -524,10 +524,8 @@ You will see the following clustertasks:
 
 [source,sh]
 ----
-buildah                    Buildah task builds...   5 hours ago
-buildah-pr                 Buildah task builds...   5 hours ago
-buildah-pr-v0-14-3         Buildah task builds...   5 hours ago
-buildah-v0-14-3            Buildah task builds...   5 hours ago
+buildah                    Buildah task builds...   3 hours ago
+buildah-v0-22-0            Buildah task builds...   3 hours ago
 ----
 
 A pipeline defines a number of tasks that should be executed and how they interact with each other via their inputs and outputs.
@@ -579,7 +577,7 @@ spec:
   - name: git-revision
     type: string
     description: revision to be used from repo of the code for deployment
-    default: "master"
+    default: "pipelines-1.4"
   - name: IMAGE
     type: string
     description: image to be build from the code
@@ -666,10 +664,10 @@ image::pipeline-start.png[serverless, 800]
 
 This dialog box is where you bind the final target values for the source repo of the _build_ step, and the name of the image to deploy in the _deploy_ step. Input the parameter and select resources as below then Click on *Start*:
 
-* deployment-name: `vote-api`
- * git-url: `http://github.com/openshift-pipelines/vote-api.git`
- * git-revision: `release-tech-preview-2`
- * IMAGE: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-api`
+* deployment-name: `pipelines-vote-api`
+ * git-url: `https://github.com/openshift/pipelines-vote-api.git`
+ * git-revision: `pipelines-1.4`
+ * IMAGE: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/pipelines-vote-api`
  * shared-workspace: `source-pvc` in *PVC*
 
 image::pipeline-start-popup.png[serverless, 700]
@@ -680,10 +678,10 @@ image::pipeline-complete.png[serverless, 800]
 
 Let's run the pipeline to deploy `vote-ui` application. Go back to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev%7Ev1beta1%7EPipeline[OpenShift Pipelines^] and click on *Start*. Then input the parameter and select resources as below then Click on *Start*:
 
- * deployment-name: `vote-ui`
- * git-url: `http://github.com/openshift-pipelines/vote-ui.git`
- * git-revision: `release-tech-preview-2`
- * IMAGE: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/vote-ui`
+ * deployment-name: `pipelines-vote-ui`
+ * git-url: `https://github.com/openshift/pipelines-vote-ui.git`
+ * git-revision: `pipelines-1.4`
+ * IMAGE: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/pipelines-vote-ui`
  * shared-workspace: `source-pvc` in *PVC*
 
 image::pipeline-start-popup2.png[serverless, 700]
