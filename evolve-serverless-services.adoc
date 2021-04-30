@@ -296,10 +296,6 @@ Mandrel is a downstream distribution of the GraalVM community edition. Mandrel's
 You might have _OutofMemory_ error during the native compilation. For that case, you need to append *quarkus.native.native-image-xmx=2g* for setting the maximum Java heap in application.properties.
 ====
 
-In order to compile a native binary, Let's remove a specified package type(i.e. uberJar) configuration in `pom.xml`. Open the _pom.xml_ then remove or comment the following configuration option:
-
-image::remove-uberjar.png[serverless, 900]
-
 Rebuild and re-deploy new payment service via running the following maven plugin in CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
