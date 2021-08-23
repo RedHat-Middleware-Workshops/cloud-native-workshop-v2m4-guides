@@ -36,23 +36,19 @@ The basic architecture of operators in AMQ is seen below:
 
 image::kafka-operators-arch.png[amqstreams, 700]
 
-Let's create a **Kafka cluster**. Click *+Add* on the left, on the _From Catalog_ box on the project overview:
+Let's create a **Kafka cluster**. Click on *+Add to Project* icon in the _Topology_ view. Then, type in `kafka` in the search box. Click on *Create*:
 
 image::kafka-catalog.png[kafka, 700]
 
-Type in `kafka` in the search box, and click on the *Kafka*:
-
-image::kafka-create.png[kafka, 700]
-
-Click on *Create* and you will enter YAML editor that defines a *Kafka* Cluster. Keep the all values as-is then click on *Create* on the botton:
+ You will enter the _Form view_ that defines a *Kafka* Cluster. Keep the all values as-is then click on *Create*:
 
 image::kafka-create-detail.png[kafka, 700]
 
-Next, we will create Kafka _Topic_. Click _Add > From Catalog_ again, type in `topic` in the search box, and click on the *Kafka Topic*:
+Next, we will create _Kafka Topic_. Click _+Add to Project_ icon again, type in `topic` in the search box. Click on *Create*:
 
 image::kafka-topic-catalog.png[kafka, 700]
 
-Click on *Create* and you will enter YAML editor that defines a *KafkaTopic* object. Change the name to `orders` as shown then click on *Create* on the bottom:
+You will enter YAML editor that defines a *KafkaTopic* object. Change the name to `orders` as shown then click on *Create* on the bottom:
 
 image::kafka-topic-orders-create.png[kafka, 700]
 

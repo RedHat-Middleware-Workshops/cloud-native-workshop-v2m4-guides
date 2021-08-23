@@ -179,7 +179,7 @@ The project displayed in the landing page depends on which labs you will run tod
 Open the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^].
 
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new
-instance of PostgreSQL. Click *+Add* on the left, on the _Database_ box on the *{{ USER_ID }}-cloudnativeapps* project overview:
+instance of PostgreSQL. *Right-Click* on the _Topology_ view. Then, click on _Database_ in the *Add to Project* popup menu in *{ USER_ID }}-cloudnativeapps* project:
 
 image::db.png[db, 700]
 
@@ -314,7 +314,7 @@ The build and deploy may take a minute or two. Wait for it to complete. You shou
 
 Our `production` catalog microservice will use an external database (PostgreSQL) to house inventory data. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^].
 
-Click *+Add* on the left, on the _Database_ box on the project overview:
+instance of PostgreSQL. *Right-Click* on the _Topology_ view. Then, click on _Database_ in the *Add to Project* popup menu:
 
 image::db.png[db, 700]
 
