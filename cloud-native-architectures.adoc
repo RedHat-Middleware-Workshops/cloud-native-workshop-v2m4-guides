@@ -101,11 +101,13 @@ https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.g
 
 image::crw-clone-repo.png[crw,900]
 
-Click on *Select Repository Location* then click on *Open in New Window*. It will open a new web browser immediately:
+Ensure `projects/` is selected, then click on *Select Repository Location* then click on *Open*:
 
-image::crw-add-workspace.png[crw, 900]
+image::crw-add-workspace-2.png[crw, 900]
 
-The project is imported into your workspace and is visible in the project explorer:
+Note that you probably need to reload your web browser to load the new workspace.
+
+The project is imported into your workspace and is visible in the project explorer (collapse the *OPEN EDITORS*):
 
 image::crw-clone-explorer.png[crw,900]
 

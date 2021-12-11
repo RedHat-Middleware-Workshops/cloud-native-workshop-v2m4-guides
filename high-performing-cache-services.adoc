@@ -147,14 +147,14 @@ maven plugin:
 
 [source,sh,role="copypaste"]
 ----
-mvn -q quarkus:add-extension -Dextensions="jdbc-postgresql" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
+mvn quarkus:add-extension -Dextensions="jdbc-postgresql" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/inventory-service
 ----
 
 You should see in the output:
 
 [source,console]
 ----
-✅ Extension io.quarkus:quarkus-jdbc-postgresql has been installed
+[INFO] [SUCCESS] ✅  Extension io.quarkus:quarkus-jdbc-postgresql has been installed
 ----
 
 First, open a new brower with the {{ CONSOLE_URL }}[OpenShift web console^]:
@@ -506,12 +506,12 @@ Add _openshift_ extension via CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
 ----
-mvn -q quarkus:add-extension -Dextensions="openshift" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
+mvn quarkus:add-extension -Dextensions="openshift" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/cart-service
 ----
 
 you will see:
 
-✅ Extension io.quarkus:quarkus-openshift has been installed
+[INFO] [SUCCESS] ✅  Extension io.quarkus:quarkus-openshift has been installed
 
 Quarkus supports the notion of _configuration profiles_. These allows you to have multiple configurations in the same file and
 select between then via a _profile name_.
@@ -586,15 +586,15 @@ Execute the following command for adding Maven Dependencies using Quarkus Extens
 
 [source,sh,role="copypaste"]
 ----
-mvn -q quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
+mvn quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
 ----
 
 You should see in the output:
 
 [source,console]
 ----
-✅ Extension io.quarkus:quarkus-resteasy-jsonb has been installed
-✅ Extension io.quarkus:quarkus-mongodb-client has been installed
+[INFO] [SUCCESS] ✅  Extension io.quarkus:quarkus-resteasy-jsonb has been installed
+[INFO] [SUCCESS] ✅  Extension io.quarkus:quarkus-mongodb-client has been installed
 ----
 
 This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, the quarkus-mongodb-client extension has been added to your *pom.xml*.
