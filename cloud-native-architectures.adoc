@@ -131,4 +131,7 @@ image::codeready-workspace-terminal.png[codeready-workspace-terminal, 700]
 
 If you've completed other modules today (such as `cloud-native-workshop-v2m1-labs`), remove them from your workspace by right-clicking on the project name in the explorer and choose *Delete* and accept the warning. Be sure not to delete the new project you just imported for this lab!
 
-image::remove-workspace.png[remove, 700]
+[source,sh,role="copypaste"]
+----
+rm -rf $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m1-labs
+----
