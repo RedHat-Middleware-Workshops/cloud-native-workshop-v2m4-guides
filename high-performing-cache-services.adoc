@@ -89,22 +89,25 @@ You should see a bunch of log output that ends with:
 
 [source,console]
 ----
-INFO  [io.agr.pool] (main) Datasource '<default>': Initial size smaller than min. Connections will be created when necessary
-INFO  [io.quarkus] (main) inventory 1.0-SNAPSHOT (running on Quarkus xx.xx.xx) started in 3.166s. Listening on: http://0.0.0.0:8080
-INFO  [io.quarkus] (main) Profile dev activated. Live Coding activated.
-INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, narayana-jta, resteasy, resteasy-jsonb, smallrye-health]
+__  ____  __  _____   ___  __ ____  ______ 
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
+ -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
+Powered by Quarkus 2.2.3.Final-redhat-00013
+INFO  [io.quarkus] (Quarkus Main Thread) inventory 1.0-SNAPSHOT on JVM (powered by Quarkus 2.2.3.Final-redhat-00013) started in 14.001s. Listening on: http://0.0.0.0:8080
+INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, jdbc-postgresql, kubernetes, narayana-jta, resteasy, resteasy-jsonb, smallrye-context-propagation, smallrye-health]
+
+--
+Tests paused
+Press [r] to resume testing, [o] Toggle test output, [h] for more options>
 ----
 
-CodeReady will also detect that the Quarkus app opens port `5005` (for debugging) and `8080` (for web requests). Do not open port 5005, but when prompted, open the port `8080`, which opens a small web browser in CodeReady:
+You can see *Tests paused* by default when a Quarkus application gets started.
 
-You should see a bunch of log output and CodeReady popup windows that show the endpoints for your local application. Close the popup window for debug port `5005` and accept the popup for `8080`
+CodeReady will also detect that the Quarkus app opens port `5005` (for debugging) and `8080` (for web requests). Do not open port 5005, but open in the new tab for port `8080`, which opens a small web browser in CodeReady:
 
 image::open-port-1.png[Inventory RESTful Service, 700]
-
-Click on `Open Link` 
-
-image::open-port-2.png[Inventory RESTful Service, 700]
-
 
 You should see the inventory web frontend directly in CodeReady (you may need to click the _reload_ icon):
 
@@ -137,6 +140,32 @@ The output looks like:
     "quantity": 230
   }
 ----
+
+===== Controlling Continuous Testing
+
+There are various hotkeys you can use to control continuous testing. Pressing `h` will display the following list of commands in the terminal:
+
+[source, none]
+----
+== Continuous Testing
+
+[r] - Re-run all tests
+[f] - Re-run failed tests
+[b] - Toggle 'broken only' mode, where only failing tests are run (disabled)
+[v] - Print failures from the last test run
+[p] - Pause tests
+[o] - Toggle test output (disabled)
+----
+
+Quarkus also provides a new experimental Dev UI, which is available in dev mode (when you start quarkus with mvn quarkus:dev) at `/q/dev` by default. It allows you to quickly visualize all the extensions currently loaded, see their status and go directly to their documentation.
+
+Click on `quarkus-devui` endpoint:
+
+image::devui-endpoint.png[devui-endpoint, 700]
+
+A new web browser will open automatically then it will show you something like this:
+
+image::quarkus-devui.png[devui-endpoint, 800]
 
 Be sure to terminate the running Quarkus development via kbd:[CTRL+C].
 
@@ -179,7 +208,7 @@ The project displayed in the landing page depends on which labs you will run tod
 Open the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^].
 
 Our production inventory microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new
-instance of PostgreSQL. *Right-Click* on the _Topology_ view. Then, click on _Database_ in the *Add to Project* popup menu in *{ USER_ID }}-cloudnativeapps* project:
+instance of PostgreSQL. *Right-Click* on the _Topology_ view. Then, click on _Database_ in the *Add to Project* popup menu in *{{ USER_ID }}-cloudnativeapps* project:
 
 image::db.png[db, 700]
 
@@ -374,7 +403,7 @@ So now `Catalog` service is deployed to OpenShift. You can also see it in the Pr
 
 By now, you have deployed some of the essential elements for the Coolstore application. However, an online shop without a cart means no checkout experience. In this section, we are going to implement the Shopping Cart; in our Microservice world, we are going to call it the *cart service* and our java artifact/repo is called the *cart-service*.
 
-The Cart service is RESTful and built with Quarkus using Red Hat’s Distributed _Data Grid_ technology. It stores all shopping cart data and assigns a unique id to each. It uses the Quarkus _Infinispan client_ to do this (_Infinispan_ is the name of the upstream project that Red Hat Data Grid is based on). The Shopping cart makes a call via the Quarkus REST client to fetch all items in the Catalog. In the end, Shopping cart also pushes messages to a _Kafka_ for each order, when the user is checking out. For that, we use the Quarkus Kafka client.
+The Cart service is *Reactive RESTful* and built with Quarkus using Red Hat’s Distributed _Data Grid_ technology. It stores all shopping cart data and assigns a unique id to each. It uses the Quarkus _Infinispan client_ to do this (_Infinispan_ is the name of the upstream project that Red Hat Data Grid is based on). The Shopping cart makes a call via the Quarkus reactive REST client to fetch all items in the Catalog. In the end, Shopping cart also pushes messages to a _Kafka_ for each order, when the user is checking out. For that, we use the Quarkus Kafka client.
 
 What is a _Shopping Cart_ in our context? A Shopping cart has a list of Shopping Items. Each item has a _quantity_, and other fields like discounts and promotional details. We will see these in more detail when we look at our model.
 
@@ -576,86 +605,42 @@ You can try to invoke the methods and see the output from the service. Hence an 
 === 4. Developing and Deploying Order Service
 
 The Order Service manages all orders when customers checkout items in the shopping cart. Let’s go through quickly how the order
-service get REST services to use the *MongoDB* database with *Quarkus* Java runtimes. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand *order-service* directory.
+service get reactive REST services to use the *MongoDB* database with *Panache* on *Quarkus* Java runtime. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand *order-service* directory.
 
 image::codeready-workspace-order-project.png[order, 700]
 
-The application built in _Quarkus_ is quite simple: the user can add elements in a list using _RESTful APIs_ and the list is updated. All the information between the client and the server are formatted as *JSON*. The elements are stored in _MongoDB_.
+The application built in _Quarkus_ is quite simple: the user can add elements in a list using _reactive RESTful APIs_ and the list is updated. All the information between the client and the server are formatted as *JSON*. The elements are stored in _MongoDB_.
+
+Developers might have hard time to use raw APIs that query entities int the MongoDB https://mongodb.github.io/mongo-java-driver/4.2/bson/documents/#document[Document^]. 
+
+MongoDB with Panache provides active record style entities (and repositories) for developers to have in https://quarkus.io/guides/hibernate-orm-panache[Hibernate ORM^] with Panache and focuses on making your entities trivial and fun to write in Quarkus.
 
 Execute the following command for adding Maven Dependencies using Quarkus Extensions via CodeReady Workspaces Terminal:
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="resteasy-jsonb,mongodb-client" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
+mvn quarkus:add-extension -Dextensions="mongodb-panache,resteasy-reactive-jackson" -f $CHE_PROJECTS_ROOT/cloud-native-workshop-v2m4-labs/order-service
 ----
 
 You should see in the output:
 
 [source,console]
 ----
-[INFO] [SUCCESS] ✅  Extension io.quarkus:quarkus-resteasy-jsonb has been installed
-[INFO] [SUCCESS] ✅  Extension io.quarkus:quarkus-mongodb-client has been installed
+[INFO] [SUCCESS] ✅  Extension io.quarkus:quarkus-mongodb-panache has been installed
+[INFO] [SUCCESS] ✅  Extension io.quarkus:quarkus-resteasy-reactive-jackson has been installed
 ----
 
-This command generates a Maven structure importing the RESTEasy/JAX-RS, JSON-B and MongoDB Client extensions. After this, the quarkus-mongodb-client extension has been added to your *pom.xml*.
+This command generates a Maven structure importing the RESTEasy Reactive/Jackson and MongoDB Panache extensions. After this, the quarkus-mongodb-panache extension has been added to your *pom.xml*.
 
 image::order-pom-dependency.png[order, 700]
+
+Note that you can use a https://quarkus.io/guides/mongodb[MongoDB Client^] extension to implement entities from MongoDB documents with a Bson Codec.
 
 Before we create the order service using JSON REST service, let's have a look at the `Order` bean in `src/main/java/com/redhat/cloudnative/` as follows:
 
 image::order_bean.png[order, 700]
 
-Nothing fancy. One important thing to note is that having a default constructor is required by the *JSON serialization layer*.
-
-Now, open the `com.redhat.cloudnative.OrderService` class -- it will be the business layer of our application and _store/load_ the orders from the MongoDB database. Add the following java code at each marker.
-
-`// TODO: Inject MongoClient here` marker:
-
-[source,java,role="copypaste"]
-----
-    @Inject MongoClient mongoClient;
-----
-
-Next, add this code below the `// TODO: Add a while loop to make an order lists using MongoCursor here` marker (in the `list()` method).
-
-[source,java,role="copypaste"]
-----
-        MongoCursor<Document> cursor = getCollection().find().iterator();
-
-        try {
-            while (cursor.hasNext()) {
-                Document document = cursor.next();
-                Order order = new Order();
-                order.setOrderId(document.getString("orderId"));
-                order.setName(document.getString("name"));
-                order.setTotal(document.getString("total"));
-                order.setCcNumber(document.getString("ccNumber"));
-                order.setCcExp(document.getString("ccExp"));
-                order.setBillingAddress(document.getString("billingAddress"));
-                order.setStatus(document.getString("status"));
-                list.add(order);
-            }
-        } finally {
-            cursor.close();
-        }
-----
-
-Next, add this code below the `// TODO: Add to create a Document based order here` marker in `add(Order order)` method:
-
-[source,java,role="copypaste"]
-----
-        Document document = new Document()
-                .append("orderId", order.getOrderId())
-                .append("name", order.getName())
-                .append("total", order.getTotal())
-                .append("ccNumber", order.getCcNumber())
-                .append("ccExp", order.getCcExp())
-                .append("billingAddress", order.getBillingAddress())
-                .append("status", order.getStatus());
-        getCollection().insertOne(document);
-----
-
-These two methods convert between a `Document` object suitable for use with MongoDB and the `Order` document which is our business value object.
+To define a Panache entity, simply extend PanacheMongoEntity and add your columns as public fields. You can add the @MongoEntity annotation to your entity if you need to customize the name of the collection, the database, or the client.
 
 Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each marker:
 
@@ -664,15 +649,6 @@ Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each ma
 [source,java,role="copypaste"]
 ----
 @Path("/api/orders")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-----
-
-`// TODO: Inject OrderService here` marker:
-
-[source,java,role="copypaste"]
-----
-    @Inject OrderService orderService;
 ----
 
 `// TODO: Add list(), add(), updateStatus() methods here` marker:
@@ -681,130 +657,36 @@ Now, edit the `com.redhat.cloudnative.OrderResource` class as follows in each ma
 ----
     @GET
     public List<Order> list() {
-        return orderService.list();
+        return Order.listAll();
     }
 
     @POST
     public List<Order> add(Order order) {
-        orderService.add(order);
+        order.persist();
         return list();
     }
 
     @GET
     @Path("/{orderId}/{status}")
-    public List<Order> updateStatus(@PathParam("orderId") String orderId, @PathParam("status") String status) {
-        orderService.updateStatus(orderId, status);
-        return list();
+    public Order updateStatus(String orderId, String status) {
+        Order newOrder = Order.findByOrderId(orderId);
+        newOrder.status = status;
+        newOrder.update();
+        return newOrder;
+
     }
 ----
 
-The implementation is pretty straightforward and you just need to define your endpoints using the *JAX-RS annotations* and use the _OrderService_ to list/add new orders.
+The implementation is pretty straightforward and you just need to define your endpoints, for example, add the io.quarkus:quarkus-resteasy-reactive-jackson dependency for JAX-RS and JSON support.
 
-The main property to configure is the URL to access to *MongoDB*, almost all configuration can be included in the connection URI
-so we advise you to do so, you can find more information in the
-https://docs.mongodb.com/manual/reference/connection-string/[MongoDB documentation^]
+The main property to configure is the URL to access to *MongoDB*, almost all configuration can be included in the connection URI so we advise you to do so, you can find more information in the https://docs.mongodb.com/manual/reference/connection-string/[MongoDB documentation^]
 
 Open `application.properties` in `src/main/resources/` and add the following configuration at the `# TODO: Add for MongoDB configuration` marker:
 
 [source,sh,role="copypaste"]
 ----
-quarkus.mongodb.connection-string = mongodb://order-database:27017
-----
-
-By using a Bson *Codec*, the MongoDB Client will take care of the transformation of your domain object to/from a MongoDB *Document* automatically.
-
-First you need to create a Bson Codec that will tell Bson how to transform your entity to/from a MongoDB Document. Here we use a _CollectibleCodec_ as our object is retrievable from the database (it has a MongoDB identifier), if not we would have used a _Codec_ instead. More information in the https://mongodb.github.io/mongo-java-driver/3.10/bson/codecs[codec
-documentation^].
-
-Edit the `com.redhat.cloudnative.codec.OrderCodec` class as follows:
-
-`// TODO: Add Encode & Decode contexts here` marker:
-
-[source,java,role="copypaste"]
-----
-    @Override
-    public void encode(BsonWriter writer, Order Order, EncoderContext encoderContext) {
-        Document doc = new Document();
-        doc.put("orderId", Order.getOrderId());
-        doc.put("name", Order.getName());
-        doc.put("total", Order.getTotal());
-        doc.put("ccNumber", Order.getCcNumber());
-        doc.put("ccExp", Order.getCcExp());
-        doc.put("billingAddress", Order.getBillingAddress());
-        doc.put("status", Order.getStatus());
-        documentCodec.encode(writer, doc, encoderContext);
-    }
-
-    @Override
-    public Class<Order> getEncoderClass() {
-        return Order.class;
-    }
-
-    @Override
-    public Order generateIdIfAbsentFromDocument(Order document) {
-        if (!documentHasId(document)) {
-            document.setOrderId(UUID.randomUUID().toString());
-        }
-        return document;
-    }
-
-    @Override
-    public boolean documentHasId(Order document) {
-        return document.getOrderId() != null;
-    }
-
-    @Override
-    public BsonValue getDocumentId(Order document) {
-        return new BsonString(document.getOrderId());
-    }
-
-    @Override
-    public Order decode(BsonReader reader, DecoderContext decoderContext) {
-        Document document = documentCodec.decode(reader, decoderContext);
-        Order order = new Order();
-        if (document.getString("orderId") != null) {
-            order.setOrderId(document.getString("orderId"));
-        }
-        order.setName(document.getString("name"));
-        order.setTotal(document.getString("total"));
-        order.setCcNumber(document.getString("ccNumber"));
-        order.setCcExp(document.getString("ccExp"));
-        order.setBillingAddress(document.getString("billingAddress"));
-        order.setStatus(document.getString("status"));
-        return order;
-    }
-----
-
-Then you need to create a `CodecProvider` to link this `Codec` to the Order class.
-
-Edit the `com.redhat.cloudnative.codec.OrderCodecProvider` class as follows:
-
-`// TODO: Add Codec get method here` marker:
-
-[source,java,role="copypaste"]
-----
-    @Override
-    public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
-        if (clazz == Order.class) {
-            return (Codec<T>) new OrderCodec();
-        }
-        return null;
-    }
-----
-
-_Quarkus_ will register the _CodecProvider_ for you.
-
-Finally, when getting the _MongoCollection_ from the database you can use directly the Order class instead of the Document one, the codec will automatically map the Document to/from your Order class.
-
-Edit the `com.redhat.cloudnative.CodecOrderService` class as follows:
-
-`// TODO: Add MongoCollection method here` marker:
-
-[source,java,role="copypaste"]
-----
-    private MongoCollection<Order> getCollection(){
-        return mongoClient.getDatabase("order").getCollection("order", Order.class);
-    }
+quarkus.mongodb.connection-string=mongodb://order-database:27017
+quarkus.mongodb.database=order
 ----
 
 Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady Workspaces Terminal:

@@ -40,7 +40,7 @@ Let's create a **Kafka cluster**. Click on *+Add to Project* icon in the _Topolo
 
 image::kafka-catalog.png[kafka, 700]
 
- You will enter the _Form view_ that defines a *Kafka* Cluster. Keep the all values as-is then click on *Create*:
+You will enter the _Form view_ that defines a *Kafka* Cluster. Keep the all values as-is then click on *Create*:
 
 image::kafka-create-detail.png[kafka, 700]
 
@@ -96,7 +96,6 @@ This command imports the Kafka extensions for Quarkus applications and provides 
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
-      <version>${quarkus.version}</version>
     </dependency>
     ...
 ----
@@ -131,8 +130,6 @@ Add this code at the `// TODO: Add handleCloudEvent method here` marker:
 [source,java,role="copypaste"]
 ----
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public void handleCloudEvent(String cloudEventJson) {
         String orderId = "unknown";
         String paymentId = "" + ((int)(Math.floor(Math.random() * 100000)));
@@ -248,6 +245,7 @@ mp.messaging.incoming.orders.group.id=payment-order-service
 mp.messaging.incoming.orders.auto.offset.reset=earliest
 mp.messaging.incoming.orders.enable.auto.commit=true
 mp.messaging.incoming.orders.request.timeout.ms=30000
+quarkus.vertx.max-event-loop-execute-time=30000
 ----
 
 Build and deploy the project using using the OpenShift extension, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
@@ -485,25 +483,22 @@ public class KafkaOrders {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaOrders.class);
 
-    @Inject
-    OrderService orderService;
-
     @Incoming("orders")
     public CompletionStage<Void> onMessage(KafkaRecord<String, String> message)
             throws IOException {
 
         LOG.info("Kafka order message with value = {} arrived", message.getPayload());
 
-        JsonObject orders = new JsonObject(message.getPayload());
-        Order order = new Order();
-        order.setOrderId(orders.getString("orderId"));
-        order.setName(orders.getString("name"));
-        order.setTotal(orders.getString("total"));
-        order.setCcNumber(orders.getJsonObject("creditCard").getString("number"));
-        order.setCcExp(orders.getJsonObject("creditCard").getString("expiration"));
-        order.setBillingAddress(orders.getString("billingAddress"));
-        order.setStatus("PROCESSING");
-        orderService.add(order);
+        JsonObject payload = new JsonObject(message.getPayload());
+        Order newOrder = new Order();
+        newOrder.orderId = payload.getString("orderId");
+        newOrder.name = payload.getString("name");
+        newOrder.total = payload.getString("total");
+        newOrder.ccNumber = payload.getJsonObject("creditCard").getString("number");
+        newOrder.ccExp = payload.getJsonObject("creditCard").getString("expiration");
+        newOrder.billingAddress = payload.getString("billingAddress");
+        newOrder.status = "PROCESSING";
+        newOrder.persist();
 
         return message.ack();
     }
@@ -515,7 +510,10 @@ public class KafkaOrders {
         LOG.info("Kafka payment message with value = {} arrived", message.getPayload());
 
         JsonObject payments = new JsonObject(message.getPayload());
-        orderService.updateStatus(payments.getString("orderId"), payments.getString("status"));
+
+        Order newOrder = Order.findByOrderId(payments.getString("orderId"));
+        newOrder.status = payments.getString("status");
+        newOrder.update();
 
         return message.ack();
     }

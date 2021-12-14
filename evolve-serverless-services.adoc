@@ -61,11 +61,11 @@ Let’s find out why Quarkus calls itself _SuperSonic Subatomic Subatomic Java_.
 [source,sh,role="copypaste"]
 ----
 mkdir /tmp/hello && cd /tmp/hello && \
-mvn io.quarkus:quarkus-maven-plugin:1.11.6.Final-redhat-00001:create \
+mvn io.quarkus:quarkus-maven-plugin:2.2.3.Final-redhat-00013:create \
     -DprojectGroupId=org.acme \
     -DprojectArtifactId=getting-started \
     -DplatformGroupId=com.redhat.quarkus \
-    -DplatformVersion=1.11.6.Final-redhat-00001 \
+    -DplatformVersion=2.2.3.Final-redhat-00013 \
     -DclassName="org.acme.quickstart.GreetingResource" \
     -Dpath="/hello"
 ----
@@ -91,7 +91,25 @@ This may take a minute or two to run. One of the benefits of Quarkus is amazingl
 Since we are on Linux in this environment, and the OS that will eventually run our application is also Linux, we can use our local OS to build the native Quarkus app. If you need to build native Linux binaries when on other OS’s like Windows or Mac OS X, you’ll need to have Docker installed and then use `mvn clean package -Pnative -Dnative-image.docker-build=true -DskipTests=true`.
 ====
 
-image::payment-native-image-build.png[serverless, 700]
+[source,none]
+----
+[getting-started-1.0.0-SNAPSHOT-runner:2235]     (inline):  49,486.05 ms,  2.28 GB
+[getting-started-1.0.0-SNAPSHOT-runner:2235]    (compile): 364,993.56 ms,  2.40 GB
+[getting-started-1.0.0-SNAPSHOT-runner:2235]      compile: 522,794.83 ms,  2.40 GB
+[getting-started-1.0.0-SNAPSHOT-runner:2235]        image:  28,483.78 ms,  2.43 GB
+[getting-started-1.0.0-SNAPSHOT-runner:2235]        write:   2,939.11 ms,  2.43 GB
+[getting-started-1.0.0-SNAPSHOT-runner:2235]      [total]: 1,034,480.54 ms,  2.43 GB
+# Printing build artifacts to: /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-native-image-source-jar/getting-started-1.0.0-SNAPSHOT-runner.build_artifacts.txt
+[INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildRunner] objcopy --strip-debug getting-started-1.0.0-SNAPSHOT-runner
+[INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 1056916ms
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3:26 min
+[INFO] Finished at: 2021-12-14T03:46:57Z
+[INFO] ------------------------------------------------------------------------
+[jboss@workspaceqs6f4a11ah12c3wa hello]$ 
+----
 
 The output of the native build is a native Linux binary, which you can see using the `readelf` command. Run this in a Terminal:
 
@@ -139,12 +157,12 @@ __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-INFO  [io.quarkus] (main) getting-started 1.0-SNAPSHOT native (powered by Quarkus xx.xx.xx) started in 0.012s. Listening on: http://0.0.0.0:8080
+INFO  [io.quarkus] (main) getting-started 1.0.0-SNAPSHOT native (powered by Quarkus 2.5.2.Final) started in 0.023s. Listening on: http://0.0.0.0:8080
 INFO  [io.quarkus] (main) Profile prod activated. 
-INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
+INFO  [io.quarkus] (main) Installed features: [cdi, resteasy, smallrye-context-propagation, vertx]
 ----
 
-That’s *12 milliseconds* to start up. The start-up time might be different in your environment.
+That’s *23 milliseconds* to start up. The start-up time might be different in your environment.
 
 And extremely low memory usage as reported by the Linux `ps` utility. While the app is running, run the following command in another Terminal:
 
@@ -158,10 +176,10 @@ You should see something like:
 [source,shell]
 ----
     PID   RSS COMMAND
-   8208 35304 /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-runner
+   2320 41396 /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-runner
 ----
 
-This shows that our process is taking around 35MB of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
+This shows that our process is taking around 41MB of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
 Size^], or RSS). Pretty compact!
 
 [NOTE]
@@ -181,8 +199,8 @@ You should see the return:
 [source,console]
 ----
 HTTP/1.1 200 OK
-Content-Length: 14
 Content-Type: text/plain;charset=UTF-8
+content-length: 14
 
 Hello RESTEasy
 ----
