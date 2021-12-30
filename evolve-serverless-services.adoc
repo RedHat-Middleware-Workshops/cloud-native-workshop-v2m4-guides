@@ -95,7 +95,7 @@ Since we are on Linux in this environment, and the OS that will eventually run o
 ----
 [getting-started-1.0.0-SNAPSHOT-runner:2235]     (inline):  49,486.05 ms,  2.28 GB
 [getting-started-1.0.0-SNAPSHOT-runner:2235]    (compile): 364,993.56 ms,  2.40 GB
-[getting-started-1.0.0-SNAPSHOT-runner:2235]      compile: 522,794.83 ms,  2.40 GB
+[getting-started-1.0.0-SNAPSHOT-runner:2235]      compile: 522,794.93 ms,  2.40 GB
 [getting-started-1.0.0-SNAPSHOT-runner:2235]        image:  28,483.78 ms,  2.43 GB
 [getting-started-1.0.0-SNAPSHOT-runner:2235]        write:   2,939.11 ms,  2.43 GB
 [getting-started-1.0.0-SNAPSHOT-runner:2235]      [total]: 1,034,480.54 ms,  2.43 GB
