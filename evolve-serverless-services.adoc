@@ -540,7 +540,7 @@ You will see the following clustertasks:
 [source,sh]
 ----
 buildah                    Buildah task builds...   14 minutes ago
-buildah-1-5-0              Buildah task builds...   14 minutes ago
+buildah-1-6-0              Buildah task builds...   14 minutes ago
 ----
 
 A pipeline defines a number of tasks that should be executed and how they interact with each other via their inputs and outputs.
