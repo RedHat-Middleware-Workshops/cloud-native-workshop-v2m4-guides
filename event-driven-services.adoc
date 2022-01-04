@@ -245,6 +245,7 @@ mp.messaging.incoming.orders.group.id=payment-order-service
 mp.messaging.incoming.orders.auto.offset.reset=earliest
 mp.messaging.incoming.orders.enable.auto.commit=true
 mp.messaging.incoming.orders.request.timeout.ms=30000
+
 quarkus.vertx.max-event-loop-execute-time=30000
 ----
 
