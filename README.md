@@ -1,8 +1,8 @@
-The CCN Roadshow(Dev Track) Module 4 Guide 2021
+The CCN Roadshow(Dev Track) Module 4 Guide 2022
 ===
 
-This module enables developers not only to design event-driven services, cachable services but implement them on combined application runtimes and Kubernetes/OpenShift cluster.
-The developers also will learn how to run existing microserivce to serverless application via Knative, Quarkus, and OpenShift.
+This module enables developers not only to design event-driven services, cacheable services but implement them on combined application runtimes and Kubernetes/OpenShift cluster.
+The developers also will learn how to run existing microservices to serverless application via Knative, Quarkus, and OpenShift.
 
 Agenda
 ===
