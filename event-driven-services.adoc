@@ -412,8 +412,6 @@ Now that we have those methods, Let's add a call to our `sendOrder()` method whe
 ----
     @POST
     @Path("/checkout/{cartId}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public ShoppingCart checkout(@PathParam("cartId") String cartId, Order order) {
         sendOrder(order, cartId);
         return shoppingCartService.checkout(cartId);
