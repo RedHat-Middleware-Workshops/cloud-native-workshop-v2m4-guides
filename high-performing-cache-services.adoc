@@ -421,7 +421,7 @@ oc new-app --as-deployment-config quay.io/openshiftlabs/ccn-infinispan:12.0.0.Fi
 ----
 
 This will create a single instance of the Data Grid server to store our shopping carts.
-
+ 
 Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] to see it.
 
 Now that our cache service(a.k.a datagrid-service) is deployed. We want to ensure that everything in our cart is persisted in this blazing fast cache. It will help us when we have a few million users per second on a black Friday.
