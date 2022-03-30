@@ -427,7 +427,7 @@ Let's create a simple version of the *cache service* in our cluster. Open the Te
 
 [source,sh,role="copypaste"]
 ----
-oc new-app --as-deployment-config infinispan/server:12.0.0.Final-1 --name=datagrid-service -e USER=user -e PASS=pass
+oc new-app --as-deployment-config quay.io/openshiftlabs/ccn-infinispan:12.0.0.Final-1 --name=datagrid-service -e USER=user -e PASS=pass
 ----
 
 This will create a single instance of the Data Grid server to store our shopping carts.
@@ -702,7 +702,7 @@ Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady 
 
 [source,sh,role="copypaste"]
 ----
-oc new-app -n {{ USER_ID }}-cloudnativeapps  --as-deployment-config --docker-image mongo:4.0 --name=order-database
+oc new-app -n {{ USER_ID }}-cloudnativeapps  --as-deployment-config --docker-image quay.io/openshiftlabs/ccn-mongo:4.0 --name=order-database
 ----
 
 Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
