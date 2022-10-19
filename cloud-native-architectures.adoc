@@ -53,7 +53,7 @@ If you’ve already completed other labs today then you'll be familiar with the 
 
 ==== If this is the first module you are doing today
 
-You will be using Red Hat CodeReady Workspaces, an online IDE based on https://www.eclipse.org/che/[Eclipe Che^]. *Changes to files are auto-saved every few seconds*, so you don’t need to explicitly save changes.
+You will be using Red Hat CodeReady Workspaces, an online IDE based on https://www.eclipse.org/che/[Eclipse Che^]. *Changes to files are auto-saved every few seconds*, so you don’t need to explicitly save changes.
 
 To get started, {{ ECLIPSE_CHE_URL }}[access the CodeReady Workspaces instance^] and log in using the username and password you’ve been assigned (e.g. `{{ USER_ID }}/{{ CHE_USER_PASSWORD }}`):
 
