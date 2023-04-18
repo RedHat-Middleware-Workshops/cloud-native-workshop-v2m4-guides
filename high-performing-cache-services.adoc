@@ -377,7 +377,7 @@ Create a build configuration for your application using OpenJDK base container i
 
 [source, properties, role="copypaste"]
 ----
-oc new-build registry.access.redhat.com/ubi8/openjdk-11 --binary --name=catalog -l app=catalog
+oc new-build registry.access.redhat.com/ubi8/openjdk-17:latest --binary --name=catalog -l app=catalog
 ----
 
 Start and watch the build, which will take about minutes to complete:
