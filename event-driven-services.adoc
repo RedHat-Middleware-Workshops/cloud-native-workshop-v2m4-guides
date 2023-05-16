@@ -68,13 +68,13 @@ image::kafka-topics-created.png[kafka, 700]
 
 Our _Payment Service_ will offer online services for accepting electronic payments by a variety of payment methods including credit card or bank-based payments when orders are checked out in shopping cart. It doesn’t really do anything but will represent a payment microservice that will *process* online shopping orders as they are posted to our services.
 
-In CodeReady Workspaces, expand *payment-service* directory.
+In VS Code, expand *payment-service* directory.
 
 image::codeready-workspace-payment-project.png[catalog, 700]
 
 In this step, we will learn how our Quarkus-based payment service can use Kafka to receive order events and _react_ with payment events.
 
-Let's add Maven Dependencies using Quarkus Kafka extensions in CodeReady Workspaces Terminal:
+Let's add Maven Dependencies using Quarkus Kafka extensions in VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -249,7 +249,7 @@ mp.messaging.incoming.orders.request.timeout.ms=30000
 quarkus.vertx.max-event-loop-execute-time=30000
 ----
 
-Build and deploy the project using using the OpenShift extension, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
+Build and deploy the project using using the OpenShift extension, which will use the maven plugin to deploy via VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -283,7 +283,7 @@ In order to test the payment application, click on the `my-cluster-kafka-0` pod:
 
 image::my-cluster-kafka-0.png[payment, 700]
 
-We will watch the Kafka topic via a CLI to confirm the messages are being sent/received in Kafka. Click on the *Terminal* tab in OpenShift (not in CodeReady!) then execute the following command:
+We will watch the Kafka topic via a CLI to confirm the messages are being sent/received in Kafka. Click on the *Terminal* tab in OpenShift (not in VS Code!) then execute the following command:
 
 [source,sh,role="copypaste"]
 ----
@@ -294,7 +294,7 @@ image::kafka-console-consumer.png[payment, 900]
 
 Keep this tab open to act as a debugger for Kafka messages.
 
-Now, back in *CodeReady Workspaces*, open a new Terminal.
+Now, back in *VS Code*, open a new Terminal.
 
 Let’s produce a new topic message using `curl`:
 
@@ -429,7 +429,7 @@ mp.messaging.outgoing.orders.value.serializer=org.apache.kafka.common.serializat
 mp.messaging.outgoing.orders.key.serializer=org.apache.kafka.common.serialization.StringSerializer
 ----
 
-Re-package the _cart service_ using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
+Re-package the _cart service_ using the following command, which will use the maven plugin to deploy via VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -548,7 +548,7 @@ mp.messaging.incoming.orders.enable.auto.commit=true
 mp.messaging.incoming.orders.request.timeout.ms=30000
 ----
 
-Re-package the order service using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
+Re-package the order service using the following command, which will use the maven plugin to deploy via VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----

@@ -12,7 +12,7 @@ image::lab1-goal.png[goal, 700]
 
 === 1. Deploying Inventory Service
 
-_Inventory Service_ serves inventory and availability data for retail products. Let’s go through quickly how the inventory service works and built on *Quarkus* Java runtimes. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand *inventory-service* directory.
+_Inventory Service_ serves inventory and availability data for retail products. Let’s go through quickly how the inventory service works and built on *Quarkus* Java runtimes. Go to _Explorer: /projects_ in _VS Code_ Web IDE and expand *inventory-service* directory.
 
 image::codeready-workspace-inventory-project.png[inventory_service, 700]
 
@@ -78,7 +78,7 @@ image::inventoryResource.png[inventory_service, 700]
 %dev.quarkus.hibernate-orm.log.sql=false
 ----
 
-Let’s run the inventory application locally using `maven plugin command` via CodeReady Workspaces Terminal:
+Let’s run the inventory application locally using `maven plugin command` via VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -105,15 +105,15 @@ Press [r] to resume testing, [o] Toggle test output, [h] for more options>
 
 You can see *Tests paused* by default when a Quarkus application gets started.
 
-CodeReady will also detect that the Quarkus app opens port `5005` (for debugging) and `8080` (for web requests). Do not open port 5005, but open in the new tab for port `8080`, which opens a small web browser in CodeReady:
+VS Code will also detect that the Quarkus app opens port `5005` (for debugging) and `8080` (for web requests). Do not open port 5005, but open in the new tab for port `8080`, which opens a small web browser in VS Code:
 
 image::open-port-1.png[Inventory RESTful Service, 700]
 
-You should see the inventory web frontend directly in CodeReady (you may need to click the _reload_ icon):
+You should see the inventory web frontend directly in VS Code (you may need to click the _reload_ icon):
 
 image::inventory-codeready.png[Inventory RESTful Service, 700]
 
-Open a *new* CodeReady Workspaces Terminal and invoke the RESTful endpoint using the following CURL command:
+Open a *new* VS Code Terminal and invoke the RESTful endpoint using the following CURL command:
 
 [source,sh,role="copypaste"]
 ----
@@ -181,7 +181,7 @@ Be sure to terminate the running Quarkus development via kbd:[CTRL+C].
 
 *In production*, the inventory service will connect to _PostgeSQL_ on OpenShift cluster.
 
-We will use _Quarkus extension_ to add *PostgreSQL JDBC Driver*. Go back to CodeReady Workspaces Terminal and run the following
+We will use _Quarkus extension_ to add *PostgreSQL JDBC Driver*. Go back to VS Code Terminal and run the following
 maven plugin:
 
 [source,sh,role="copypaste"]
@@ -240,15 +240,12 @@ This will deploy the database to our new project. Click on the {{ CONSOLE_URL }}
 
 image::inventory-database-deployment.png[inventory_db_deployments, 700]
 
-Although your CodeReady workspace is running on the Kubernetes cluster, it’s running with a default restricted _Service Account_ that prevents you from creating most resource types. If you’ve completed other modules, you’re probably already logged in, but let’s login again: click on *Login to OpenShift*:
+Although your VS Code is running on the Kubernetes cluster, it's running with a default restricted _Service Account_ that prevents you from creating most resource types. So we'll log in with your workshop user. Execute the following command in the VS Code terminal:
 
-[NOTE]
-====
-When you click on this, CodeReady Workspaces executes the following command:
-*oc login https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT --insecure-skip-tls-verify=true --username={{ USER_ID }} --password={{ OPENSHIFT_USER_PASSWORD }}*
-====
-
-image::cmd-login.png[login,700]
+[source,sh,role="copypaste"]
+----
+oc login -u {{ USER_ID }} -p {{ OPENSHIFT_USER_PASSWORD }} https://openshift.default.svc:443
+----
 
 You should see something like this (the project names may be different):
 
@@ -315,7 +312,7 @@ So now `Inventory` service is deployed to OpenShift. You can also see it in the 
 
 === 2. Deploying Catalog Service
 
-_Catalog Service_ serves products and prices for retail products. Let’s go through quickly how the catalog service works and built on *Spring Boot* Java runtimes. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand *catalog-service* directory.
+_Catalog Service_ serves products and prices for retail products. Let’s go through quickly how the catalog service works and built on *Spring Boot* Java runtimes. Go to _Explorer: /projects_ in _VS Code_ Web IDE and expand *catalog-service* directory.
 
 image::codeready-workspace-catalog-project.png[catalog, 700]
 
@@ -342,7 +339,7 @@ and how `read()` and `readAll()` method work:
 
 image::catalog-service-codes.png[catalog, 700]
 
-Build and deploy the project using the following command, which will use the maven plugin to deploy via CodeReady Workspaces Terminal:
+Build and deploy the project using the following command, which will use the maven plugin to deploy via VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -417,13 +414,13 @@ The Cart service is *Reactive RESTful* and built with Quarkus using Red Hat’s 
 
 What is a _Shopping Cart_ in our context? A Shopping cart has a list of Shopping Items. Each item has a _quantity_, and other fields like discounts and promotional details. We will see these in more detail when we look at our model.
 
-For this lab, we are using CodeReady Workspaces. Make sure you have the following project open in your workspace. Let’s go through quickly how the cart service works and is built on _Quarkus_ Java runtimes. Go to _Explorer_ in CodeReady Workspaces and expand the *cart-service* directory.
+For this lab, we are using VS Code. Make sure you have the following project open in your workspace. Let’s go through quickly how the cart service works and is built on _Quarkus_ Java runtimes. Go to _Explorer_ in VS Code and expand the *cart-service* directory.
 
 image::codeready-workspace-cart-project.png[cart, 700]
 
 We are going to use the Red Hat Distributed _Data Grid_ for caching all the users' carts.
 
-Let's create a simple version of the *cache service* in our cluster. Open the Terminal in your CodeReady workspace and run the following command:
+Let's create a simple version of the *cache service* in our cluster. Open the Terminal in your VS Code and run the following command:
 
 [source,sh,role="copypaste"]
 ----
@@ -540,7 +537,7 @@ There are other *// TODO* markers and commented-out code we will use later. Leav
 
 Quarkus also offers the ability to automatically generate OpenShift resources based on sane default and user supplied configuration. The OpenShift extension is actually a wrapper extension that brings together the https://quarkus.io/guides/deploying-to-kubernetes[kubernetes^] and https://quarkus.io/guides/container-image#s2i[container-image-s2i^] extensions with defaults so that it’s easier for the user to get started with Quarkus on OpenShift.
 
-Add _openshift_ extension via CodeReady Workspaces Terminal:
+Add _openshift_ extension via VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -614,7 +611,7 @@ You can try to invoke the methods and see the output from the service. Hence an 
 === 4. Developing and Deploying Order Service
 
 The Order Service manages all orders when customers checkout items in the shopping cart. Let’s go through quickly how the order
-service get reactive REST services to use the *MongoDB* database with *Panache* on *Quarkus* Java runtime. Go to _Explorer: /projects_ in _CodeReady Workspaces_ Web IDE and expand *order-service* directory.
+service get reactive REST services to use the *MongoDB* database with *Panache* on *Quarkus* Java runtime. Go to _Explorer: /projects_ in _VS Code_ Web IDE and expand *order-service* directory.
 
 image::codeready-workspace-order-project.png[order, 700]
 
@@ -624,7 +621,7 @@ Developers might have hard time to use raw APIs that query entities int the Mong
 
 MongoDB with Panache provides active record style entities (and repositories) for developers to have in https://quarkus.io/guides/hibernate-orm-panache[Hibernate ORM^] with Panache and focuses on making your entities trivial and fun to write in Quarkus.
 
-Execute the following command for adding Maven Dependencies using Quarkus Extensions via CodeReady Workspaces Terminal:
+Execute the following command for adding Maven Dependencies using Quarkus Extensions via VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -698,7 +695,7 @@ quarkus.mongodb.connection-string=mongodb://order-database:27017
 quarkus.mongodb.database=order
 ----
 
-Run the following `oc` command to deploy a `MongoDB` to OpenShift via CodeReady Workspaces Terminal:
+Run the following `oc` command to deploy a `MongoDB` to OpenShift via VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -757,7 +754,7 @@ Which will also return an empty array `[]`.
 
 Our Web UI serves a frontend based on https://angularjs.org/[AngularJS^] and http://patternfly.org/[PatternFly^] running in a https://access.redhat.com/documentation/en/openshift-container-platform/3.3/paged/using-images/chapter-2-source-to-image-s2i[Node.js] container. https://www.redhat.com/en/products/runtimes[Red Hat Runtimes^] includes *Node.js* support along with other runtimes used for cloud native development.
 
-Let’s go through quickly how the frontend service works and is built on Node.js runtimes. Go to _Explorer: /projects_ in CodeReady Workspaces and expand the `coolstore-ui` directory.
+Let’s go through quickly how the frontend service works and is built on Node.js runtimes. Go to _Explorer: /projects_ in VS Code and expand the `coolstore-ui` directory.
 
 image::codeready-workspace-coolstore-ui.png[coolstore-ui, 700]
 
@@ -765,7 +762,7 @@ You will see javascript for specific cloud-native services such as the cart, cat
 
 Now, we will deploy a presentation layer to OpenShift cluster using https://www.npmjs.com/package/nodeshift[Nodeshift] command line tool, a programmable API that you can use to deploy Node.js projects to OpenShift.
 
-Install Nodeshift via the CodeReady Workspaces Terminal:
+Install Nodeshift via the VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -777,7 +774,7 @@ cd $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/coolstore-ui && npm install -
 You may see warnings from _npm_ about known vulnerabilities. The _npm_ ecosystem is huge and our app pulls in many dependencies which are constantly finding new issues. In a real production system you should pay attention to these, but for this workshop you can ignore them (your friendly workshop developers fix them as time permits when we're not supporting our customers!).
 ====
 
-Next, deploy the _coolstore-ui_ service using `Nodeshift` in a CodeReady Workspaces Terminal. It will take a minute to complete the deployment:
+Next, deploy the _coolstore-ui_ service using `Nodeshift` in a VS Code Terminal. It will take a minute to complete the deployment:
 
 [source,sh,role="copypaste"]
 ----

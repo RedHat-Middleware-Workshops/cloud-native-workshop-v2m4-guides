@@ -44,7 +44,7 @@ Let’s now produce a native executable for an example Quarkus application. It i
 
 image::native-image-process.png[serverless, 700]
 
-`GraalVM` is already installed for you. Inspect the value of the `GRAALVM_HOME` variable in the CodeReady Workspaces Terminal
+`GraalVM` is already installed for you. Inspect the value of the `GRAALVM_HOME` variable in the VS Code Terminal
 with:
 
 [source,sh,role="copypaste"]
@@ -56,7 +56,7 @@ In this step, we will learn how to compile the application to a native executabl
 
 Compiling a native image takes longer than a regular JAR file (bytecode) compilation. However, this compilation time is only incurred once, as opposed to every time the application starts, which is the case with other approaches for building and executing JARs.
 
-Let’s find out why Quarkus calls itself _SuperSonic Subatomic Subatomic Java_. Let’s build a sample app. In CodeReady Terminal, run this command:
+Let’s find out why Quarkus calls itself _SuperSonic Subatomic Subatomic Java_. Let’s build a sample app. In VS Code Terminal, run this command:
 
 [source,sh,role="copypaste"]
 ----
@@ -137,7 +137,7 @@ ELF Header:
 
 It's a binary that can only run on Linux, but as you'll see in a moment, this native executable starts up _very_ fast and takes up little memory.
 
-Since our environment here is Linux, you can just run it. In the CodeReady Workspaces Terminal, run:
+Since our environment here is Linux, you can just run it. In the VS Code Terminal, run:
 
 [source,sh,role="copypaste"]
 ----
@@ -146,7 +146,7 @@ Since our environment here is Linux, you can just run it. In the CodeReady Works
 
 [WARNING]
 ====
-If you still have a previous application running in a separate CodeReady Terminal, you may get an error like `java.net.BindException: Address already in use`. Go to that other tab and press kbd:[CTRL+C] to stop the previous application, then try to run the native application again!
+If you still have a previous application running in a separate VS Code Terminal, you may get an error like `java.net.BindException: Address already in use`. Go to that other tab and press kbd:[CTRL+C] to stop the previous application, then try to run the native application again!
 ====
 
 Notice the amazingly fast startup time:
@@ -187,7 +187,7 @@ Size^], or RSS). Pretty compact!
 The RSS and memory usage of any app, including Quarkus, will vary depending your specific environment, and will rise as the application experiences load.
 ====
 
-Make sure the app works. In a new CodeReady Workspaces Terminal run:
+Make sure the app works. In a new VS Code Terminal run:
 
 [source,sh,role="copypaste"]
 ----
@@ -315,7 +315,7 @@ https://github.com/graalvm/mandrel[Mandrel^] is a downstream distribution of the
 You might have _OutofMemory_ error during the native compilation. For that case, you need to append *quarkus.native.native-image-xmx=2g* for setting the maximum Java heap in application.properties.
 ====
 
-Rebuild and re-deploy new payment service via running the following maven plugin in CodeReady Workspaces Terminal:
+Rebuild and re-deploy new payment service via running the following maven plugin in VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
@@ -512,7 +512,7 @@ oc project {{ USER_ID }}-cloudnative-pipeline &&
 oc create -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/apply_manifests_task.yaml && oc create -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/update_deployment_task.yaml
 ----
 
-Let’s confirm if the *tasks* are installed properly using https://github.com/tektoncd/cli/releases[Tekton CLI^] that already installed in CodeReady Workspaces:
+Let’s confirm if the *tasks* are installed properly using https://github.com/tektoncd/cli/releases[Tekton CLI^] that already installed in VS Code:
 
 [source,sh,role="copypaste"]
 ----
@@ -651,7 +651,7 @@ You will see the pipeline you have created:
 
 image::console-import-yaml-2.png[serverless, 800]
 
-Now that the pipeline is created, check the list of pipelines you have created using the _Tekton CLI_ in CodeReady Workspaces Terminal:
+Now that the pipeline is created, check the list of pipelines you have created using the _Tekton CLI_ in VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----

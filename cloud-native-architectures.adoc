@@ -6,7 +6,7 @@ Developing applications that are reactive, imperative, event driven, and polyglo
 
 Moreover, applications require hybrid and multi cloud architecture to thrive in the digital economy. A unified cloud native application environment has become essential to developers because it enables higher productivity and innovation with a full, cohesive development platform. An application environment is equally critical to operations because of the rapid change and high demands for scalability, agility, and reliability.
 
-In this module, we will learn what cloud-native architecture we need to design for running containerized applications on DevOps/Cloud Native platform in scale and speed. Then we will also develop cloud native applications based on architecture patterns such as high-performing cache, event-driven/reactive, and serverless using https://www.redhat.com/en/technologies/cloud-computing/openshift/application-runtimes[Red Hat Runtimes], https://developers.redhat.com/products/codeready-workspaces/overview[Red Hat CodeReady Workspaces^] and https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift Container Platform].
+In this module, we will learn what cloud-native architecture we need to design for running containerized applications on DevOps/Cloud Native platform in scale and speed. Then we will also develop cloud native applications based on architecture patterns such as high-performing cache, event-driven/reactive, and serverless using https://www.redhat.com/en/technologies/cloud-computing/openshift/application-runtimes[Red Hat Runtimes], https://developers.redhat.com/products/codeready-workspaces/overview[Red Hat VS Code^] and https://www.redhat.com/en/technologies/cloud-computing/openshift[Red Hat OpenShift Container Platform].
 
 === Capabilities of a Cloud Native Application Architectures?
 
@@ -40,7 +40,7 @@ https://Quarkus.io/[Quarkus] offers 4 major benefits to build cloud-native, micr
 * _Developer Joy_ - Cohesive platform for optimized developer joy through unified configuration, Zero config with live reload in the blink of an eye, streamlined code for the 80% common usages with flexible for the 20%, and no hassle native executable generation.
 * _Unifies Imperative and Reactive_ - Inject the EventBus or the Vertx context for both Reactive and imperative development in the same application.
 * _Functions as a Service and Serverless_ - Superfast startup and low memory utilization. With Quarkus, you can embrace this new world without having to change your programming language.
-* _Best of Breed Frameworks & Standards_ - CodeReady Workspaces Vert.x, Hibernate, RESTEasy, Apache Camel, CodeReady Workspaces MicroProfile, Netty, Kubernetes, OpenShift, Jaeger, Prometheus, Apacke Kafka, Infinispan, and more.
+* _Best of Breed Frameworks & Standards_ - VS Code Vert.x, Hibernate, RESTEasy, Apache Camel, VS Code MicroProfile, Netty, Kubernetes, OpenShift, Jaeger, Prometheus, Apacke Kafka, Infinispan, and more.
 
 *Red Hat* offers the fully supported https://access.redhat.com/products/quarkus[Red Hat Build of Quarkus(RHBQ)^] with support and maintenance of Quarkus. In this workhop, you will use Quarkus to develop Kubernetes-native microservices and deploy them to OpenShift. Quarkus is one of the runtimes included in https://www.redhat.com/en/products/runtimes[Red Hat Runtimes^]. https://access.redhat.com/documentation/en-us/red_hat_build_of_quarkus[Learn more about RHBQ^].
 
@@ -48,90 +48,55 @@ https://Quarkus.io/[Quarkus] offers 4 major benefits to build cloud-native, micr
 
 [NOTE]
 ====
-If you’ve already completed other labs today then you'll be familiar with the CodeReady environment and can skip down to the *Import Project* section.
+If you’ve already created a workspace for the module then make sure to delete an existing workspace.
 ====
 
-==== If this is the first module you are doing today
+You will be using Visual Studio Code (VS Code) based on https://developers.redhat.com/products/openshift-dev-spaces/overview[Red Hat OpenShift Dev Spaces^]. **Changes to files are auto-saved every few seconds**, so you don't need to explicitly save changes.
 
-You will be using Red Hat CodeReady Workspaces, an online IDE based on https://www.eclipse.org/che/[Eclipe Che^]. *Changes to files are auto-saved every few seconds*, so you don’t need to explicitly save changes.
+To get started, {{ DS_URL }}[access the Red Hat OpenShift Dev Spaces instance^] and select *Log in with OpenShift* button:
 
-To get started, {{ ECLIPSE_CHE_URL }}[access the CodeReady Workspaces instance^] and log in using the username and password you’ve been assigned (e.g. `{{ USER_ID }}/{{ DS_USER_PASSWORD }}`):
+image::login_with_openshift.png[login,800]
 
-image::che-login.png[cdw, 700]
+Type in the following credentail:
 
-Once you log in, you’ll be placed on your personal dashboard. Click on the name of
-the pre-created workspace on the left, as shown below (the name will be different depending on your assigned number).
+* *Username*: `{{ USER_ID }}`
+* *Password*: `{{ DS_USER_PASSWORD }}`
 
-image::crw-landing.png[cdw, 700]
-
-You can also click on the name of the workspace in the center, and then click on the green {{ USER_ID}}-namespace that says _Open_ on the top right hand side of the screen:
-
-image::crw-landing-start.png[cdw, 700]
-
-After a minute or two, you’ll be placed in the workspace:
-
-image::che-workspace.png[cdw, 900]
-This IDE is based on Eclipse Che (which is in turn based on MicroSoft VS Code editor).
-
-You can see icons on the left for navigating between project explorer, search, version control (e.g. Git), debugging, and other plugins.  You’ll use these during the course of this workshop. Feel free to click on them and see what they do:
-
-image::crw-icons.png[cdw, 400]
+image::che-login.png[login,800]
 
 [NOTE]
 ====
-If things get weird or your browser appears, you can simply reload the browser tab to refresh the view.
+In case you see the *Authorize Access* page as below, select *Allow selected permissions* button.
+
+image::auth-access.png[auth-access, 800]
 ====
 
-Many features of CodeReady Workspaces are accessed via *Commands*. You can see a few of the commands listed with links on the home page (e.g. _New File.._, _Git Clone.._, and others).
+Once you log in, you’ll be placed on the *Create Workspace* dashboard. Copy the following `Git Repo URL` and select `Create & Open`.
 
-If you ever need to run commands that you don't see in a menu, you can press kbd:[F1] to open the command window, or the more traditional kbd:[Control+SHIFT+P] (or kbd:[Command+SHIFT+P] on Mac OS X).
+* *Git Repo URL*: `https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs/tree/ocp-4.12`
 
-==== Import Project
+image::ds-landing.png[ds, 800]
 
-Let's import our first project. Click on *Git Clone..* (or type kbd:[F1], enter 'git' and click on the auto-completed _Git Clone.._ )
+A new window or tab in your web browser will open automatically to showcase the progess about *Starting workspace quarkus-workshop*. It takes about *60* seconds to finish the process.
 
-image::che-workspace-gitclone.png[cdw, 900]
-
-Step through the prompts, using the following value for **Repository URL**. If you use *FireFox*, it may end up pasting extra spaces at the end, so just press backspace after pasting:
-
-[source,none,role="copypaste"]
-----
-https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git
-----
-
-image::crw-clone-repo.png[crw,900]
-
-Ensure `projects/` is selected, then click on *Select Repository Location* then click on *Open*:
-
-image::crw-add-workspace-2.png[crw, 900]
-
-Note that you probably need to reload your web browser to load the new workspace.
-
-The project is imported into your workspace and is visible in the project explorer (collapse the *OPEN EDITORS*):
-
-image::crw-clone-explorer.png[crw,900]
-
-==== IMPORTANT: Check out proper Git branch
-
-To make sure you're using the right version of the project files, run this command in a CodeReady Terminal:
-
-[source,sh,role="copypaste"]
-----
-cd $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs && git checkout ocp-4.10
-----
+image::starting-workspace.png[ds, 800]
 
 [NOTE]
 ====
-The Terminal window in CodeReady Workspaces. You can open a terminal window for any of the containers running in your Developer workspace. For the rest of these labs, anytime you need to run a command in a terminal, you can use the **>_ New Terminal** command on the right:
+In case you see this information page, select `Start your workspace` to continue  using your workspace.
 
-image::codeready-workspace-terminal.png[codeready-workspace-terminal, 700]
+image::starting-workspace-info.png[ds, 800]
 ====
 
-=== Remove other projects
+After a few seconds, you’ll be placed in the workspace.
 
-If you've completed other modules today (such as `cloud-native-workshop-v2m1-labs`), remove them from your workspace by right-clicking on the project name in the explorer and choose *Delete* and accept the warning. Be sure not to delete the new project you just imported for this lab!
+image::ds-workspace.png[ds, 800]
 
-[source,sh,role="copypaste"]
-----
-rm -rf $PROJECT_SOURCE/cloud-native-workshop-v2m1-labs
-----
+[NOTE]
+====
+In case you see this infomation page, check on `Trust the authors of all files in the parent folder 'projects'`. Then, select `Yes, I trust the authors. Trust folder and enable all features`.
+
+image::ds-trust-popup.png[ds, 800]
+====
+
+You'll use all of these during the course of this workshop, so keep this browser tab open throughout. **If things get weird, you can simply reload the browser tab to refresh the view.**
