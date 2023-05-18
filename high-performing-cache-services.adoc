@@ -82,7 +82,7 @@ Let’s run the inventory application locally using `maven plugin command` via V
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:dev -Dquarkus.http.host=0.0.0.0 -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/inventory-service
+mvn quarkus:dev -Dquarkus.http.host=0.0.0.0 -f $PROJECT_SOURCE/inventory-service
 ----
 
 You should see a bunch of log output that ends with:
@@ -186,7 +186,7 @@ maven plugin:
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="jdbc-postgresql" -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/inventory-service
+mvn quarkus:add-extension -Dextensions="jdbc-postgresql" -f $PROJECT_SOURCE/inventory-service
 ----
 
 You should see in the output:
@@ -276,7 +276,7 @@ Now let's deploy the application itself. Run the following command which will bu
 [source,sh,role="copypaste"]
 ----
 oc project {{ USER_ID }}-cloudnativeapps && \
-mvn clean compile package -DskipTests -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/inventory-service
+mvn clean compile package -DskipTests -f $PROJECT_SOURCE/inventory-service
 ----
 
 The output should end with `BUILD SUCCESS`.
@@ -343,7 +343,7 @@ Build and deploy the project using the following command, which will use the mav
 
 [source,sh,role="copypaste"]
 ----
-mvn clean package spring-boot:repackage -DskipTests -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/catalog-service
+mvn clean package spring-boot:repackage -DskipTests -f $PROJECT_SOURCE/catalog-service
 ----
 
 The build and deploy may take a minute or two. Wait for it to complete. You should see a `BUILD SUCCESS` at the end of the build output.
@@ -381,7 +381,7 @@ Start and watch the build, which will take about minutes to complete:
 
 [source,sh,role="copypaste"]
 ----
-oc start-build catalog --from-file=$PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/catalog-service/target/catalog-1.0.0-SNAPSHOT.jar --follow
+oc start-build catalog --from-file=$PROJECT_SOURCE/catalog-service/target/catalog-1.0.0-SNAPSHOT.jar --follow
 ----
 
 Once the build is done, we’ll deploy it as an OpenShift application and override the spring profile to use our _production_ values. We will also give it some labels to make it look nice. Run this command:
@@ -541,7 +541,7 @@ Add _openshift_ extension via VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="openshift" -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/cart-service
+mvn quarkus:add-extension -Dextensions="openshift" -f $PROJECT_SOURCE/cart-service
 ----
 
 you will see:
@@ -574,7 +574,7 @@ Now let's deploy the application itself. Run the following command which will bu
 
 [source,sh,role="copypaste"]
 ----
-mvn clean package -DskipTests -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/cart-service
+mvn clean package -DskipTests -f $PROJECT_SOURCE/cart-service
 ----
 
 The output should end with `BUILD SUCCESS`.
@@ -625,7 +625,7 @@ Execute the following command for adding Maven Dependencies using Quarkus Extens
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="mongodb-panache,resteasy-reactive-jackson" -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/order-service
+mvn quarkus:add-extension -Dextensions="mongodb-panache,resteasy-reactive-jackson" -f $PROJECT_SOURCE/order-service
 ----
 
 You should see in the output:
@@ -706,7 +706,7 @@ Now let's deploy the application itself. Run the following command which will bu
 
 [source,sh,role="copypaste"]
 ----
-mvn clean package -DskipTests -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/order-service
+mvn clean package -DskipTests -f $PROJECT_SOURCE/order-service
 ----
 
 The output should end with `BUILD SUCCESS`.
@@ -766,7 +766,7 @@ Install Nodeshift via the VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
-cd $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/coolstore-ui && npm install --save-dev nodeshift
+cd $PROJECT_SOURCE/coolstore-ui && npm install --save-dev nodeshift
 ----
 
 [NOTE]

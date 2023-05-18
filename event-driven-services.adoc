@@ -78,7 +78,7 @@ Let's add Maven Dependencies using Quarkus Kafka extensions in VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="messaging-kafka" -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/payment-service
+mvn quarkus:add-extension -Dextensions="messaging-kafka" -f $PROJECT_SOURCE/payment-service
 ----
 
 You should see in the output:
@@ -253,7 +253,7 @@ Build and deploy the project using using the OpenShift extension, which will use
 
 [source,sh,role="copypaste"]
 ----
-mvn clean package -DskipTests -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/payment-service
+mvn clean package -DskipTests -f $PROJECT_SOURCE/payment-service
 ----
 The output should end with `BUILD SUCCESS`.
 
@@ -338,7 +338,7 @@ Add Maven Dependencies using Quarkus *Kafka* Extensions:
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="messaging-kafka" -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/cart-service
+mvn quarkus:add-extension -Dextensions="messaging-kafka" -f $PROJECT_SOURCE/cart-service
 ----
 
 You should see in the output:
@@ -433,7 +433,7 @@ Re-package the _cart service_ using the following command, which will use the ma
 
 [source,sh,role="copypaste"]
 ----
-mvn clean package -DskipTests -DskipTests -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/cart-service && \
+mvn clean package -DskipTests -DskipTests -f $PROJECT_SOURCE/cart-service && \
 oc label dc/cart app.kubernetes.io/part-of=cart --overwrite &&  \
 oc annotate dc/cart app.openshift.io/connects-to=my-cluster,datagrid-service --overwrite
 ----
@@ -446,7 +446,7 @@ Add Maven Dependencies using Quarkus *Kafka* Extensions:
 
 [source,sh,role="copypaste"]
 ----
-mvn quarkus:add-extension -Dextensions="messaging-kafka" -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/order-service
+mvn quarkus:add-extension -Dextensions="messaging-kafka" -f $PROJECT_SOURCE/order-service
 ----
 
 You should see in the output:
@@ -552,7 +552,7 @@ Re-package the order service using the following command, which will use the mav
 
 [source,sh,role="copypaste"]
 ----
-mvn clean package -DskipTests -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/order-service && \
+mvn clean package -DskipTests -f $PROJECT_SOURCE/order-service && \
 oc label dc/order app.kubernetes.io/part-of=order --overwrite &&  \
 oc annotate dc/order app.openshift.io/connects-to=my-cluster,order-database --overwrite
 ----

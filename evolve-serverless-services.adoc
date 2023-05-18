@@ -319,7 +319,7 @@ Rebuild and re-deploy new payment service via running the following maven plugin
 
 [source,sh,role="copypaste"]
 ----
-mvn clean package -Pnative -DskipTests -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/payment-service
+mvn clean package -Pnative -DskipTests -f $PROJECT_SOURCE/payment-service
 ----
 
 The _-Pnative_ argument selects the native maven profile which invokes the _Graal compiler_. It will take a few minutes(up to 7 mins) to complete a native binary build as well as deploying a new knative service. After successful creation of the service we should see a *Knative Service*(_KSVC_) and *Revision*(_REV_) in the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View]:
@@ -509,7 +509,7 @@ We will need to create two pre-defined Tekton Tasks that we'll use in our pipeli
 [source,sh,role="copypaste"]
 ----
 oc project {{ USER_ID }}-cloudnative-pipeline &&
-oc create -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/apply_manifests_task.yaml && oc create -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/update_deployment_task.yaml
+oc create -f $PROJECT_SOURCE/payment-service/knative/pipeline/apply_manifests_task.yaml && oc create -f $PROJECT_SOURCE/payment-service/knative/pipeline/update_deployment_task.yaml
 ----
 
 Let’s confirm if the *tasks* are installed properly using https://github.com/tektoncd/cli/releases[Tekton CLI^] that already installed in VS Code:
@@ -670,7 +670,7 @@ You need to create the *PersistentVolumeClaim* which can be used for Pipeline ex
 
 [source,sh,role="copypaste"]
 ----
-oc create -f $PROJECT_SOURCE/cloud-native-workshop-v2m4-labs/payment-service/knative/pipeline/persistent_volume_claim.yaml
+oc create -f $PROJECT_SOURCE/payment-service/knative/pipeline/persistent_volume_claim.yaml
 ----
 
 A *PipelineRun* is how you can start a pipeline and tie it to the Git and image resources that should be used for this specific invocation. Let's go to {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnative-pipeline/tekton.dev%7Ev1beta1%7EPipeline[OpenShift Pipelines^] and click on *Start*:
