@@ -255,21 +255,17 @@ Login successful.
 
 You have access to the following projects and can switch between them with 'oc project <projectname>':
 
-  * {{ USER_ID }}-bookinfo
+    {{ USER_ID }}-bookinfo
     {{ USER_ID }}-catalog
     {{ USER_ID }}-cloudnative-pipeline
     {{ USER_ID }}-cloudnativeapps
+    {{ USER_ID }}-coolstore-dev
+  * {{ USER_ID }}-devspaces
     {{ USER_ID }}-inventory
     {{ USER_ID }}-istio-system
 
-Using project "{{ USER_ID }}-bookinfo".
-Welcome! See 'oc help' to get started.
+Using project "{{ USER_ID }}-devspaces".
 ----
-
-[NOTE]
-====
-After you log in using *Login to OpenShift*, the terminal is no longer usable as a regular terminal. You can close the terminal window. You will still be logged in when you open more terminals later!
-====
 
 Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
 

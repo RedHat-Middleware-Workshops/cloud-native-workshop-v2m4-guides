@@ -71,6 +71,10 @@ In case you see the *Authorize Access* page as below, select *Allow selected per
 image::auth-access.png[auth-access, 800]
 ====
 
+In case you've already created a workspace (*ccn-workshop*) for another module, make sure to delete it first.
+
+image::delete-ws.png[ds, 800]
+
 Once you log in, you’ll be placed on the *Create Workspace* dashboard. Copy the following `Git Repo URL` and select `Create & Open`.
 
 * *Git Repo URL*: `https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs/tree/ocp-4.13`
