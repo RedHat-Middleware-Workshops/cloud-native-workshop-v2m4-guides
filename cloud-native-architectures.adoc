@@ -46,11 +46,6 @@ https://Quarkus.io/[Quarkus] offers 4 major benefits to build cloud-native, micr
 
 === Getting Ready for the labs
 
-[NOTE]
-====
-If you’ve already created a workspace for the module then make sure to delete an existing workspace.
-====
-
 You will be using Visual Studio Code (VS Code) based on https://developers.redhat.com/products/openshift-dev-spaces/overview[Red Hat OpenShift Dev Spaces^]. **Changes to files are auto-saved every few seconds**, so you don't need to explicitly save changes.
 
 To get started, {{ DS_URL }}[access the Red Hat OpenShift Dev Spaces instance^] and select *Log in with OpenShift* button:
@@ -77,7 +72,7 @@ image::delete-ws.png[ds, 800]
 
 Once you log in, you’ll be placed on the *Create Workspace* dashboard. Copy the following `Git Repo URL` and select `Create & Open`.
 
-* *Git Repo URL*: `https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs/tree/ocp-4.13`
+* *Git Repo URL*: `https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m3-labs/tree/ocp-4.13`
 
 image::ds-landing.png[ds, 800]
 
