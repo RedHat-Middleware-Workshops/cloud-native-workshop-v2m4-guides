@@ -68,12 +68,12 @@ image::inventoryResource.png[inventory_service, 700]
 [source,none]
 ----
 %dev.quarkus.datasource.db-kind=h2
-%dev.quarkus.datasource.jdbc.url=jdbc:h2:mem:person
+%dev.quarkus.datasource.jdbc.url=jdbc:h2:mem:inventory
 %dev.quarkus.datasource.jdbc.driver=org.h2.Driver
 %dev.quarkus.datasource.username=inventory
 %dev.quarkus.datasource.password=mysecretpassword
-%dev.quarkus.datasource.max-size=8
-%dev.quarkus.datasource.min-size=2
+%dev.quarkus.datasource.jdbc.max-size=8
+%dev.quarkus.datasource.jdbc.min-size=2
 %dev.quarkus.hibernate-orm.database.generation=drop-and-create
 %dev.quarkus.hibernate-orm.log.sql=false
 ----
@@ -93,27 +93,39 @@ __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-Powered by Quarkus 2.2.3.Final-redhat-00013
-INFO  [io.quarkus] (Quarkus Main Thread) inventory 1.0-SNAPSHOT on JVM (powered by Quarkus 2.2.3.Final-redhat-00013) started in 14.001s. Listening on: http://0.0.0.0:8080
+INFO  [io.agr.pool] (Quarkus Main Thread) Datasource '<default>': Initial size smaller than min. Connections will be created when necessary
+
+INFO  [io.quarkus] (Quarkus Main Thread) inventory 1.0-SNAPSHOT on JVM (powered by Quarkus 2.13.7.Final-redhat-00003) started in 5.859s. Listening on: http://0.0.0.0:8080
 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
-INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, jdbc-postgresql, kubernetes, narayana-jta, resteasy, resteasy-jsonb, smallrye-context-propagation, smallrye-health]
+INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, kubernetes, narayana-jta, resteasy, resteasy-jackson, smallrye-context-propagation, smallrye-health, vertx]
 
 --
 Tests paused
-Press [r] to resume testing, [o] Toggle test output, [h] for more options>
+Press [r] to resume testing, [o] Toggle test output, [:] for the terminal, [h] for more options>
 ----
 
 You can see *Tests paused* by default when a Quarkus application gets started.
 
-VS Code will also detect that the Quarkus app opens port `5005` (for debugging) and `8080` (for web requests). Do not open port 5005, but open in the new tab for port `8080`, which opens a small web browser in VS Code:
+VS Code will also detect that the Quarkus app opens port `5005` (for debugging) and `8080` (for web requests). *Close the popup not to add a port 5005*, but when prompted, *Open In New Tab* to open a port `8080`, which opens a new tab in your web browser:
 
-image::open-port-1.png[Inventory RESTful Service, 700]
+image::open-port.png[port, 700]
 
-You should see the inventory web frontend directly in VS Code (you may need to click the _reload_ icon):
+[NOTE]
+====
+In case you see the popup message below, select `Open`.
 
-image::inventory-codeready.png[Inventory RESTful Service, 700]
+image::open-external.png[port, 700]
+====
 
-Open a *new* VS Code Terminal and invoke the RESTful endpoint using the following CURL command:
+You should see the *Coolstore Inveotry* page:
+
+image::coolstore-inventory.png[port, 900]
+
+Open a *new* terminal by selecting `+` icon:
+
+image::cmd-terminal.png[livecoding, 900]
+
+and invoke the RESTful endpoint using the following CURL commands.
 
 [source,sh,role="copypaste"]
 ----
@@ -128,17 +140,18 @@ The output looks like:
   {
     "id": 7,
     "itemId": "444435",
-    "link": "http://maps.google.com/?q=Paris",
     "location": "Paris",
-    "quantity": 600
+    "quantity": 600,
+    "link": "http://maps.google.com/?q=Paris"
   },
   {
     "id": 8,
     "itemId": "444437",
-    "link": "http://maps.google.com/?q=Tokyo",
     "location": "Tokyo",
-    "quantity": 230
+    "quantity": 230,
+    "link": "http://maps.google.com/?q=Tokyo"
   }
+]
 ----
 
 ===== Controlling Continuous Testing
@@ -152,6 +165,15 @@ There are various hotkeys you can use to control continuous testing. Pressing `h
 [r] - Resume testing
 [o] - Toggle test output (disabled)
 
+== Dev Services
+
+[c] - Show dev services containers
+[g] - Follow dev services logs to the console (disabled)
+
+== Exceptions
+
+[x] - Opens last exception in IDE (None)
+
 == HTTP
 
 [w] - Open the application in a browser
@@ -164,7 +186,12 @@ There are various hotkeys you can use to control continuous testing. Pressing `h
 [l] - Toggle live reload (enabled)
 [j] - Toggle log levels (INFO)
 [h] - Shows this help
+[:] - Enters terminal mode
 [q] - Quits the application
+
+--
+Tests paused
+Press [r] to resume testing, [o] Toggle test output, [:] for the terminal, [h] for more options>
 ----
 
 Quarkus also provides a new experimental Dev UI, which is available in dev mode (when you start quarkus with mvn quarkus:dev) at `/q/dev` by default. It allows you to quickly visualize all the extensions currently loaded, see their status and go directly to their documentation.
@@ -293,7 +320,7 @@ And label the items with proper icons:
 oc label dc/inventory app.kubernetes.io/part-of=inventory --overwrite && \
 oc label dc/inventory-database app.kubernetes.io/part-of=inventory app.openshift.io/runtime=postgresql --overwrite && \
 oc annotate dc/inventory app.openshift.io/connects-to=inventory-database --overwrite && \
-oc annotate dc/inventory app.openshift.io/vcs-ref=ocp-4.10 --overwrite
+oc annotate dc/inventory app.openshift.io/vcs-ref=ocp-4.13 --overwrite
 ----
 
 Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], make sure it's done deploying (dark blue circle):
@@ -314,35 +341,60 @@ image::codeready-workspace-catalog-project.png[catalog, 700]
 
 First of all, we won’t implement the catalog application to retrieve data because all functions are already built when we imported this project from Git server. There’re a few interesting things what we need to take a look at from this Spring Boot application before we will deploy it to OpenShift cluster.
 
-This catalog service is not using the default BOM (Bill of material) that Spring Boot projects typically use. Instead, we are using a BOM provided by Red Hat as part of the http://snowdrop.me/[Snowdrop^] project.
+Notice that we are using the Dekorate Maven dependency to deploy your Spring Boot applications to OpenShift. The Fabric8 Maven plugin is no longer supported. For information about deploying your application to OpenShift. Dekorate is a collection of compile-time annotation processors and application resource generators that are provided with Red Hat build of Spring Boot. It works by parsing annotations in your code when you build your application, and extracting configuration properties. Dekorate then uses the extracted values of properties to generate application configuration resources that you can use to deploy your application to a Kubernetes or OpenShift cluster. Find more information here, https://access.redhat.com/documentation/en-us/red_hat_support_for_spring_boot/2.7/html-single/dekorate_guide_for_spring_boot_developers/[Dekorate Guide for Spring Boot Developers^].
 
 [source,xml]
 ----
-<dependency>
-    <groupId>dev.snowdrop</groupId>
-    <artifactId>snowdrop-dependencies</artifactId>
-    <version>2.4.9.Final-redhat-00001</version>
-    <type>pom</type>
-    <scope>import</scope>
-</dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.dekorate</groupId>
+                <artifactId>dekorate-spring-bom</artifactId>
+                <version>${dekorate.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 ----
 
-image::catalog-pom.png[catalog, 700]
+We use this bill of material to make sure that we are using a version of Apache Tomcat (at least in this example) that Red Hat supports.
 
-Also, catalog service calls the inventory service that we deployed earlier using REST to retrieve the inventory status and include
-that in the response. Open `CatalogService.java` in `src/main/java/com/redhat/cloudnative/service` directory via Project Explorer
-and how `read()` and `readAll()` method work:
+Also, catalog service calls the inventory service that we deployed earlier using REST to retrieve the inventory status and include that in the response. Open `CatalogService.java` in `src/main/java/com/redhat/cloudnative/service` directory via Project Explorer and how `read()` and `readAll()` method work.
 
-image::catalog-service-codes.png[catalog, 700]
-
-Build and deploy the project using the following command, which will use the maven plugin to deploy via VS Code Terminal:
-
-[source,sh,role="copypaste"]
+[source,java]
 ----
-mvn clean package spring-boot:repackage -DskipTests -f $PROJECT_SOURCE/catalog-service
-----
+   public Product read(String id) {
+        Product product = repository.findById(id);
+        //TODO: Update the quantity for the product by calling the Inventory service
+        JSONArray jsonArray = new JSONArray(inventoryClient.getInventoryStatus(product.getItemId()));
+        List<String> quantity = IntStream.range(0, jsonArray.length())
+            .mapToObj(index -> ((JSONObject)jsonArray.get(index))
+            .optString("quantity")).collect(Collectors.toList());
+        product.setQuantity(Integer.parseInt(quantity.get(0)));
+        return product;
+    }
 
-The build and deploy may take a minute or two. Wait for it to complete. You should see a `BUILD SUCCESS` at the end of the build output.
+    public List<Product> readAll() {
+        List<Product> productList = repository.readAll();
+        //TODO: Update the quantity for the products by calling the Inventory service
+        for ( Product p : productList ) {
+            JSONArray jsonArray = new JSONArray(inventoryClient.getInventoryStatus(p.getItemId()));
+            List<String> quantity = IntStream.range(0, jsonArray.length())
+                .mapToObj(index -> ((JSONObject)jsonArray.get(index))
+                .optString("quantity")).collect(Collectors.toList());
+            p.setQuantity(Integer.parseInt(quantity.get(0)));
+        }
+        return productList; 
+    }
+----
 
 Our `production` catalog microservice will use an external database (PostgreSQL) to house inventory data. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^].
 
@@ -366,30 +418,24 @@ image::db-catalog-postgres-fields.png[db, 700]
 
 This will deploy the database to our catalog project. Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] to see it.
 
-Create a build configuration for your application using OpenJDK base container image in OpenShift:
-
-[source, properties, role="copypaste"]
-----
-oc new-build registry.access.redhat.com/ubi8/openjdk-17:latest --binary --name=catalog -l app=catalog
-----
-
-Start and watch the build, which will take about minutes to complete:
+Build and deploy the project using the following command, which will use the maven plugin to deploy via VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
-oc start-build catalog --from-file=$PROJECT_SOURCE/catalog-service/target/catalog-1.0.0-SNAPSHOT.jar --follow
+mvn clean install -Ddekorate.deploy=true -DskipTests -f $PROJECT_SOURCE/catalog-service
 ----
 
-Once the build is done, we’ll deploy it as an OpenShift application and override the spring profile to use our _production_ values. We will also give it some labels to make it look nice. Run this command:
+You should see a *route.route.openshift.io/catalog created* at the end of the deployment output.
+
+Once the application is deployed, we will also give it some labels to make it look nice. Run this command:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app catalog  --as-deployment-config -e JAVA_OPTS_APPEND='-Dspring.profiles.active=openshift' && oc expose service catalog && \
-oc label dc/catalog app.kubernetes.io/part-of=catalog app.openshift.io/runtime=rh-spring-boot --overwrite && \
+oc label dc/catalog app.kubernetes.io/part-of=catalog app.openshift.io/runtime=spring-boot --overwrite && \
 oc label dc/catalog-database app.kubernetes.io/part-of=catalog app.openshift.io/runtime=postgresql --overwrite && \
 oc annotate dc/catalog app.openshift.io/connects-to=inventory,catalog-database --overwrite && \
 oc annotate dc/catalog app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
-oc annotate dc/catalog app.openshift.io/vcs-ref=ocp-4.10 --overwrite
+oc annotate dc/catalog app.openshift.io/vcs-ref=ocp-4.13 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles! You will also see the icon of the *Red Hat Support for Spring Boot*.
@@ -591,7 +637,7 @@ And label the items with proper icons:
 oc label dc/cart app.kubernetes.io/part-of=cart app.openshift.io/runtime=quarkus --overwrite && \
 oc label dc/datagrid-service app.kubernetes.io/part-of=cart app.openshift.io/runtime=datagrid --overwrite && \
 oc annotate dc/cart app.openshift.io/connects-to=catalog,datagrid-service --overwrite && \
-oc annotate dc/cart app.openshift.io/vcs-ref=ocp-4.10 --overwrite
+oc annotate dc/cart app.openshift.io/vcs-ref=ocp-4.13 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles!
@@ -723,7 +769,7 @@ And label the items with proper icons:
 oc label dc/order app.kubernetes.io/part-of=order --overwrite && \
 oc label dc/order-database app.kubernetes.io/part-of=order app.openshift.io/runtime=mongodb --overwrite && \
 oc annotate dc/order app.openshift.io/connects-to=order-database --overwrite && \
-oc annotate dc/order app.openshift.io/vcs-ref=ocp-4.10 --overwrite
+oc annotate dc/order app.openshift.io/vcs-ref=ocp-4.13 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the orders. Ensure you get the blue circles!
@@ -778,7 +824,7 @@ npm run nodeshift && oc expose svc/coolstore-ui && \
 oc label dc/coolstore-ui app.kubernetes.io/part-of=coolstore --overwrite && \
 oc annotate dc/coolstore-ui app.openshift.io/connects-to=order-cart,catalog,inventory,order --overwrite && \
 oc annotate dc/coolstore-ui app.openshift.io/vcs-uri=https://github.com/RedHat-Middleware-Workshops/cloud-native-workshop-v2m4-labs.git --overwrite && \
-oc annotate dc/coolstore-ui app.openshift.io/vcs-ref=ocp-4.10 --overwrite
+oc annotate dc/coolstore-ui app.openshift.io/vcs-ref=ocp-4.13 --overwrite
 ----
 
 Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], make sure it's done deploying (dark blue circle):
