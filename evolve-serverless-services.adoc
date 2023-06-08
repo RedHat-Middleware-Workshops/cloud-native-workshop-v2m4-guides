@@ -93,22 +93,48 @@ Since we are on Linux in this environment, and the OS that will eventually run o
 
 [source,none]
 ----
-[getting-started-1.0.0-SNAPSHOT-runner:2235]     (inline):  49,486.05 ms,  2.28 GB
-[getting-started-1.0.0-SNAPSHOT-runner:2235]    (compile): 364,993.56 ms,  2.40 GB
-[getting-started-1.0.0-SNAPSHOT-runner:2235]      compile: 522,794.93 ms,  2.40 GB
-[getting-started-1.0.0-SNAPSHOT-runner:2235]        image:  28,483.78 ms,  2.43 GB
-[getting-started-1.0.0-SNAPSHOT-runner:2235]        write:   2,939.11 ms,  2.43 GB
-[getting-started-1.0.0-SNAPSHOT-runner:2235]      [total]: 1,034,480.54 ms,  2.43 GB
-# Printing build artifacts to: /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-native-image-source-jar/getting-started-1.0.0-SNAPSHOT-runner.build_artifacts.txt
+....
+[3/7] Building universe...                                                                              (11.6s @ 1.16GB)
+[4/7] Parsing methods...      [***]                                                                     (11.6s @ 1.01GB)
+[5/7] Inlining methods...     [***]                                                                      (5.1s @ 0.97GB)
+[6/7] Compiling methods...    [*********]                                                               (84.5s @ 1.86GB)
+[7/7] Creating image...                                                                                  (6.3s @ 2.02GB)
+  18.82MB (46.30%) for code area:    32,084 compilation units
+  21.51MB (52.92%) for image heap:  274,586 objects and 8 resources
+ 327.25KB ( 0.79%) for other data
+  40.65MB in total
+------------------------------------------------------------------------------------------------------------------------
+Top 10 packages in code area:                               Top 10 object types in image heap:
+   1.62MB sun.security.ssl                                     4.17MB byte[] for code metadata
+ 964.60KB java.util                                            2.50MB java.lang.String
+ 733.10KB java.lang.invoke                                     2.40MB java.lang.Class
+ 717.65KB com.sun.crypto.provider                              2.32MB byte[] for general heap data
+ 450.53KB sun.security.x509                                    1.92MB byte[] for java.lang.String
+ 447.23KB java.lang                                          874.33KB com.oracle.svm.core.hub.DynamicHubCompanion
+ 394.95KB io.netty.buffer                                    731.72KB java.util.HashMap$Node
+ 381.77KB java.io                                            538.02KB byte[] for reflection metadata
+ 381.18KB java.util.concurrent                               498.58KB java.lang.String[]
+ 342.79KB io.netty.handler.codec.http2                       390.79KB byte[] for embedded resources
+  12.26MB for 377 more packages                                4.30MB for 2492 more object types
+------------------------------------------------------------------------------------------------------------------------
+                        9.8s (4.3% of total time) in 44 GCs | Peak RSS: 3.35GB | CPU load: 2.40
+------------------------------------------------------------------------------------------------------------------------
+Produced artifacts:
+ /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-native-image-source-jar/getting-started-1.0.0-SNAPSHOT-runner (executable)
+ /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-native-image-source-jar/getting-started-1.0.0-SNAPSHOT-runner-build-output-stats.json (json)
+ /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-native-image-source-jar/getting-started-1.0.0-SNAPSHOT-runner-timing-stats.json (raw)
+ /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-native-image-source-jar/getting-started-1.0.0-SNAPSHOT-runner.build_artifacts.txt (txt)
+========================================================================================================================
+Finished generating 'getting-started-1.0.0-SNAPSHOT-runner' in 3m 49s.
 [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildRunner] objcopy --strip-debug getting-started-1.0.0-SNAPSHOT-runner
-[INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 1056916ms
+[INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 235612ms
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  3:26 min
-[INFO] Finished at: 2021-12-14T03:46:57Z
+[INFO] Total time:  04:00 min
+[INFO] Finished at: 2023-06-08T01:13:49Z
 [INFO] ------------------------------------------------------------------------
-[jboss@workspaceqs6f4a11ah12c3wa hello]$ 
+hello $ 
 ----
 
 The output of the native build is a native Linux binary, which you can see using the `readelf` command. Run this in a Terminal:
@@ -123,7 +149,7 @@ you'll see
 [source,console]
 ----
 ELF Header:
-  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
   Class:                             ELF64
   Data:                              2's complement, little endian
   Version:                           1 (current)
@@ -132,7 +158,16 @@ ELF Header:
   Type:                              EXEC (Executable file)
   Machine:                           Advanced Micro Devices X86-64
   Version:                           0x1
-  ....
+  Entry point address:               0x4051f0
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          42481592 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         9
+  Size of section headers:           64 (bytes)
+  Number of section headers:         31
+  Section header string table index: 30
 ----
 
 It's a binary that can only run on Linux, but as you'll see in a moment, this native executable starts up _very_ fast and takes up little memory.
@@ -157,12 +192,12 @@ __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-INFO  [io.quarkus] (main) getting-started 1.0.0-SNAPSHOT native (powered by Quarkus xx.xx.xx) started in 0.023s. Listening on: http://0.0.0.0:8080
+INFO  [io.quarkus] (main) getting-started 1.0.0-SNAPSHOT native (powered by Quarkus 2.13.7.Final-redhat-00003) started in 0.022s. Listening on: http://0.0.0.0:8080
 INFO  [io.quarkus] (main) Profile prod activated. 
-INFO  [io.quarkus] (main) Installed features: [cdi, resteasy, smallrye-context-propagation, vertx]
+INFO  [io.quarkus] (main) Installed features: [cdi, resteasy-reactive, smallrye-context-propagation, vertx]
 ----
 
-That’s *23 milliseconds* to start up. The start-up time might be different in your environment.
+That’s *22 milliseconds* to start up. The start-up time might be different in your environment.
 
 And extremely low memory usage as reported by the Linux `ps` utility. While the app is running, run the following command in another Terminal:
 
@@ -176,11 +211,10 @@ You should see something like:
 [source,shell]
 ----
     PID   RSS COMMAND
-   2320 41396 /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-runner
+   7400 40696 /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-runner
 ----
 
-This shows that our process is taking around 41MB of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set
-Size^], or RSS). Pretty compact!
+This shows that our process is taking around *40MB* of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set Size^], or RSS). Pretty compact!
 
 [NOTE]
 ====
@@ -199,10 +233,10 @@ You should see the return:
 [source,console]
 ----
 HTTP/1.1 200 OK
+content-length: 28
 Content-Type: text/plain;charset=UTF-8
-content-length: 14
 
-Hello RESTEasy
+Hello from RESTEasy Reactive
 ----
 
 *Congratulations!* You’ve now built a Java application as a native executable JAR and a Linux native binary. We’ll explore the benefits of native binaries later in when we start deploying to Kubernetes.
@@ -539,8 +573,8 @@ You will see the following clustertasks:
 
 [source,sh]
 ----
-buildah                    Buildah task builds...   14 minutes ago
-buildah-1-6-0              Buildah task builds...   14 minutes ago
+buildah                     Buildah task builds...   1 week ago
+buildah-1-10-0              Buildah task builds...   1 week ago
 ----
 
 A pipeline defines a number of tasks that should be executed and how they interact with each other via their inputs and outputs.
@@ -592,7 +626,7 @@ spec:
   - name: git-revision
     type: string
     description: revision to be used from repo of the code for deployment
-    default: "pipelines-1.5"
+    default: pipelines-1.8
   - name: IMAGE
     type: string
     description: image to be build from the code
@@ -618,8 +652,6 @@ spec:
       name: buildah
       kind: ClusterTask
     params:
-    - name: TLSVERIFY
-      value: "false"
     - name: IMAGE
       value: $(params.IMAGE)
     workspaces:
@@ -681,7 +713,7 @@ This dialog box is where you bind the final target values for the source repo of
 
 * deployment-name: `pipelines-vote-api`
  * git-url: `https://github.com/openshift/pipelines-vote-api.git`
- * git-revision: `pipelines-1.5`
+ * git-revision: `pipelines-1.8`
  * IMAGE: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/pipelines-vote-api`
  * shared-workspace: `source-pvc` in *PVC*
 
@@ -695,7 +727,7 @@ Let's run the pipeline to deploy `vote-ui` application. Go back to {{ CONSOLE_UR
 
  * deployment-name: `pipelines-vote-ui`
  * git-url: `https://github.com/openshift/pipelines-vote-ui.git`
- * git-revision: `pipelines-1.5`
+ * git-revision: `pipelines-1.8`
  * IMAGE: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/pipelines-vote-ui`
  * shared-workspace: `source-pvc` in *PVC*
 
