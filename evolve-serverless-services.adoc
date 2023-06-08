@@ -221,7 +221,7 @@ The OpenShift Serverless provides middleware primitives that enable:
 * Point-in-time snapshots of deployed code and configurations
 
 In the lab, _OpenShift Serverless Operator_ is already installed on your OpenShift 4 cluster but if you want to install it on your
-own OpenShift cluster, follow https://access.redhat.com/documentation/en-us/openshift_container_platform/4.10/html/serverless/install#install-serverless-operator[Installing OpenShift Serverless^].
+own OpenShift cluster, follow https://access.redhat.com/documentation/en-us/openshift_container_platform/4.13/html/serverless/install#install-serverless-operator[Installing OpenShift Serverless^].
 
 First, we need to delete existing `BuildConfig` as it is based an excutable Jar that we deployed it in the previous lab.
 

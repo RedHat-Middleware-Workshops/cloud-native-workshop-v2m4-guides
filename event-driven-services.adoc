@@ -272,18 +272,14 @@ And label the items with proper icons:
 ----
 oc label dc/payment app.kubernetes.io/part-of=payment --overwrite && \
 oc annotate dc/payment app.openshift.io/connects-to=my-cluster --overwrite && \
-oc annotate dc/payment app.openshift.io/vcs-ref=ocp-4.10 --overwrite
+oc annotate dc/payment app.openshift.io/vcs-ref=ocp-4.13 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the orders. Ensure you get the blue circles!
 
 image::payment-topology.png[order, 700]
 
-In order to test the payment application, click on the `my-cluster-kafka-0` pod:
-
-image::my-cluster-kafka-0.png[payment, 700]
-
-We will watch the Kafka topic via a CLI to confirm the messages are being sent/received in Kafka. Click on the *Terminal* tab in OpenShift (not in VS Code!) then execute the following command:
+In order to test the payment application, go to the {{ CONSOLE_URL }}/k8s/ns/{{ USER_ID }}-cloudnativeapps/pods/my-cluster-kafka-0[Pod detail^] and click on the `my-cluster-kafka-0` pod. We will watch the Kafka topic via a CLI to confirm the messages are being sent/received in Kafka. Click on the *Terminal* tab in OpenShift (not in VS Code!) then execute the following command:
 
 [source,sh,role="copypaste"]
 ----
