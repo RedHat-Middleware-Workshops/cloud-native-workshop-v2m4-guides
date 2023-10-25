@@ -532,6 +532,7 @@ mp.messaging.incoming.payments.request.timeout.ms=30000
 
 # Enable CORS requests from browsers
 quarkus.http.cors=true
+quarkus.http.cors.origins=/.*/
 
 # Incoming order topic messages
 mp.messaging.incoming.orders.connector=smallrye-kafka

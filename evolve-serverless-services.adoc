@@ -61,11 +61,11 @@ Let’s find out why Quarkus calls itself _SuperSonic Subatomic Subatomic Java_.
 [source,sh,role="copypaste"]
 ----
 mkdir /tmp/hello && cd /tmp/hello && \
-mvn com.redhat.quarkus.platform:quarkus-maven-plugin:2.13.7.Final-redhat-00003:create \
+mvn com.redhat.quarkus.platform:quarkus-maven-plugin:3.2.6.Final-redhat-00002:create \
     -DprojectGroupId=com.redhat.quarkus.platform \
     -DprojectArtifactId=getting-started \
     -DplatformGroupId=com.redhat.quarkus.platform \
-    -DplatformVersion=2.13.7.Final-redhat-00003 \
+    -DplatformVersion=3.2.6.Final-redhat-00002 \
     -DclassName="org.acme.quickstart.GreetingResource" \
     -Dpath="/hello"
 ----
@@ -93,31 +93,48 @@ Since we are on Linux in this environment, and the OS that will eventually run o
 
 [source,none]
 ----
-....
-[3/7] Building universe...                                                                              (11.6s @ 1.16GB)
-[4/7] Parsing methods...      [***]                                                                     (11.6s @ 1.01GB)
-[5/7] Inlining methods...     [***]                                                                      (5.1s @ 0.97GB)
-[6/7] Compiling methods...    [*********]                                                               (84.5s @ 1.86GB)
-[7/7] Creating image...                                                                                  (6.3s @ 2.02GB)
-  18.82MB (46.30%) for code area:    32,084 compilation units
-  21.51MB (52.92%) for image heap:  274,586 objects and 8 resources
- 327.25KB ( 0.79%) for other data
-  40.65MB in total
+========================================================================================================================
+GraalVM Native Image: Generating 'getting-started-1.0.0-SNAPSHOT-runner' (executable)...
+========================================================================================================================
+[1/7] Initializing...                                                                                    (6.8s @ 0.26GB)
+ Version info: 'GraalVM 22.3.3.1-Final Java 17 Mandrel Distribution'
+ Java version info: '17.0.8+7'
+ C compiler: gcc (redhat, x86_64, 8.5.0)
+ Garbage collector: Serial GC
+ 2 user-specific feature(s)
+ - io.quarkus.runner.Feature: Auto-generated class by Quarkus from the existing extensions
+ - io.quarkus.runtime.graal.DisableLoggingFeature: Disables INFO logging during the analysis phase
+[2/7] Performing analysis...  [************]                                                            (77.5s @ 1.27GB)
+  10,503 (88.48%) of 11,871 classes reachable
+  15,026 (57.48%) of 26,143 fields reachable
+  51,943 (55.35%) of 93,845 methods reachable
+     536 classes,   109 fields, and 2,641 methods registered for reflection
+      63 classes,    68 fields, and    55 methods registered for JNI access
+       4 native libraries: dl, pthread, rt, z
+[3/7] Building universe...                                                                               (8.1s @ 1.67GB)
+[4/7] Parsing methods...      [***]                                                                      (8.4s @ 1.52GB)
+[5/7] Inlining methods...     [***]                                                                      (4.2s @ 1.50GB)
+[6/7] Compiling methods...    [*******]                                                                 (58.5s @ 0.75GB)
+[7/7] Creating image...                                                                                  (5.0s @ 1.04GB)
+  19.55MB (47.00%) for code area:    33,184 compilation units
+  21.71MB (52.22%) for image heap:  283,756 objects and 8 resources
+ 332.12KB ( 0.78%) for other data
+  41.58MB in total
 ------------------------------------------------------------------------------------------------------------------------
 Top 10 packages in code area:                               Top 10 object types in image heap:
-   1.62MB sun.security.ssl                                     4.17MB byte[] for code metadata
- 964.60KB java.util                                            2.50MB java.lang.String
- 733.10KB java.lang.invoke                                     2.40MB java.lang.Class
- 717.65KB com.sun.crypto.provider                              2.32MB byte[] for general heap data
- 450.53KB sun.security.x509                                    1.92MB byte[] for java.lang.String
- 447.23KB java.lang                                          874.33KB com.oracle.svm.core.hub.DynamicHubCompanion
- 394.95KB io.netty.buffer                                    731.72KB java.util.HashMap$Node
- 381.77KB java.io                                            538.02KB byte[] for reflection metadata
- 381.18KB java.util.concurrent                               498.58KB java.lang.String[]
- 342.79KB io.netty.handler.codec.http2                       390.79KB byte[] for embedded resources
-  12.26MB for 377 more packages                                4.30MB for 2492 more object types
+   1.62MB sun.security.ssl                                     4.33MB byte[] for code metadata
+ 975.20KB java.util                                            2.59MB java.lang.String
+ 725.94KB java.lang.invoke                                     2.48MB java.lang.Class
+ 717.62KB com.sun.crypto.provider                              2.39MB byte[] for general heap data
+ 482.46KB java.lang                                            2.00MB byte[] for java.lang.String
+ 450.52KB sun.security.x509                                  902.60KB com.oracle.svm.core.hub.DynamicHubCompanion
+ 405.35KB io.netty.buffer                                    745.13KB java.util.HashMap$Node
+ 384.44KB java.io                                            564.84KB byte[] for reflection metadata
+ 381.04KB java.util.concurrent                               519.83KB java.lang.String[]
+ 346.62KB io.netty.handler.codec.http2                       390.93KB byte[] for embedded resources
+  12.92MB for 391 more packages                                4.42MB for 2555 more object types
 ------------------------------------------------------------------------------------------------------------------------
-                        9.8s (4.3% of total time) in 44 GCs | Peak RSS: 3.35GB | CPU load: 2.40
+                        8.8s (5.0% of total time) in 47 GCs | Peak RSS: 3.37GB | CPU load: 2.40
 ------------------------------------------------------------------------------------------------------------------------
 Produced artifacts:
  /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-native-image-source-jar/getting-started-1.0.0-SNAPSHOT-runner (executable)
@@ -125,14 +142,14 @@ Produced artifacts:
  /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-native-image-source-jar/getting-started-1.0.0-SNAPSHOT-runner-timing-stats.json (raw)
  /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-native-image-source-jar/getting-started-1.0.0-SNAPSHOT-runner.build_artifacts.txt (txt)
 ========================================================================================================================
-Finished generating 'getting-started-1.0.0-SNAPSHOT-runner' in 3m 49s.
+Finished generating 'getting-started-1.0.0-SNAPSHOT-runner' in 2m 53s.
 [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildRunner] objcopy --strip-debug getting-started-1.0.0-SNAPSHOT-runner
-[INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 235612ms
+[INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 177714ms
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  04:00 min
-[INFO] Finished at: 2023-06-08T01:13:49Z
+[INFO] Total time:  03:02 min
+[INFO] Finished at: 2023-10-25T21:12:41Z
 [INFO] ------------------------------------------------------------------------
 hello $ 
 ----
@@ -160,7 +177,7 @@ ELF Header:
   Version:                           0x1
   Entry point address:               0x4051f0
   Start of program headers:          64 (bytes into file)
-  Start of section headers:          42481592 (bytes into file)
+  Start of section headers:          43460616 (bytes into file)
   Flags:                             0x0
   Size of this header:               64 (bytes)
   Size of program headers:           56 (bytes)
@@ -192,12 +209,12 @@ __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-INFO  [io.quarkus] (main) getting-started 1.0.0-SNAPSHOT native (powered by Quarkus 2.13.7.Final-redhat-00003) started in 0.022s. Listening on: http://0.0.0.0:8080
+INFO  [io.quarkus] (main) getting-started 1.0.0-SNAPSHOT native (powered by Quarkus 3.2.6.Final-redhat-00002) started in 0.026s. Listening on: http://0.0.0.0:8080
 INFO  [io.quarkus] (main) Profile prod activated. 
 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy-reactive, smallrye-context-propagation, vertx]
 ----
 
-That’s *22 milliseconds* to start up. The start-up time might be different in your environment.
+That’s *26 milliseconds* to start up. The start-up time might be different in your environment.
 
 And extremely low memory usage as reported by the Linux `ps` utility. While the app is running, run the following command in another Terminal:
 
@@ -211,10 +228,10 @@ You should see something like:
 [source,shell]
 ----
     PID   RSS COMMAND
-   7400 40696 /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-runner
+  16157 45420 /tmp/hello/getting-started/target/getting-started-1.0.0-SNAPSHOT-runner
 ----
 
-This shows that our process is taking around *40MB* of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set Size^], or RSS). Pretty compact!
+This shows that our process is taking around *45MB* of memory (https://en.wikipedia.org/wiki/Resident_set_size[Resident Set Size^], or RSS). Pretty compact!
 
 [NOTE]
 ====
@@ -336,7 +353,7 @@ quarkus.kubernetes-client.trust-certs=true
 quarkus.kubernetes.deployment-target=knative// <2>
 quarkus.kubernetes.deploy=true
 quarkus.openshift.build-strategy=docker
-quarkus.openshift.expose=true
+quarkus.openshift.route.expose=true
 ----
 
 <1> Define a project name where you deploy a serverless application
