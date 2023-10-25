@@ -87,19 +87,21 @@ You should see a bunch of log output that ends with:
 
 [source,console]
 ----
+Listening for transport dt_socket at address: 5005
+INFO  [io.qua.dat.dep.dev.DevServicesDatasourceProcessor] (build-12) Dev Services for the default datasource (h2) started
 __  ____  __  _____   ___  __ ____  ______ 
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
 INFO  [io.agr.pool] (Quarkus Main Thread) Datasource '<default>': Initial size smaller than min. Connections will be created when necessary
 
-INFO  [io.quarkus] (Quarkus Main Thread) inventory 1.0-SNAPSHOT on JVM (powered by Quarkus 2.13.7.Final-redhat-00003) started in 5.859s. Listening on: http://0.0.0.0:8080
+INFO  [io.quarkus] (Quarkus Main Thread) inventory 1.0-SNAPSHOT on JVM (powered by Quarkus 3.2.6.Final-redhat-00002) started in 5.341s. Listening on: http://0.0.0.0:8080
 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
-INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, kubernetes, narayana-jta, resteasy, resteasy-jackson, smallrye-context-propagation, smallrye-health, vertx]
+INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-h2, kubernetes, narayana-jta, resteasy-reactive, resteasy-reactive-jackson, smallrye-context-propagation, smallrye-health, vertx]
 
 --
 Tests paused
-Press [r] to resume testing, [o] Toggle test output, [:] for the terminal, [h] for more options>
+Press [e] to edit command line args (currently ''), [r] to resume testing, [o] Toggle test output, [:] for the terminal, [h] for more options>
 ----
 
 You probably noticed that there was magic and we didn't specify the JDBC URL, this is because of https://quarkus.io/guides/databases-dev-services[Quarkus Dev Services^] and it works for all DBs, but here we can't have containers so we've done in-memory H2.
@@ -117,7 +119,11 @@ Then, press `c` to find more information about the H2 Dev Services.
 ----
 == Dev Services
 
-  Injected Config:  quarkus.datasource.password=sa, quarkus.datasource.db-kind=h2, quarkus.datasource.jdbc.url=jdbc:h2:tcp://localhost:42165/mem:quarkus;DB_CLOSE_DELAY=-1, quarkus.datasource.username=sa
+h2
+  Injected config:  - quarkus.datasource.db-kind=h2
+                    - quarkus.datasource.jdbc.url=jdbc:h2:tcp://localhost:44553/mem:quarkus;DB_CLOSE_DELAY=-1
+                    - quarkus.datasource.password=mysecretpassword
+                    - quarkus.datasource.username=inventory
 ----
 
 You can also see *Tests paused* by default when a Quarkus application gets started.
@@ -183,12 +189,12 @@ There are various hotkeys you can use to control continuous testing. Pressing `h
 
 == Dev Services
 
-[c] - Show dev services containers
-[g] - Follow dev services logs to the console (disabled)
+[c] - Show Dev Services containers
+[g] - Follow Dev Services logs in the console (disabled)
 
 == Exceptions
 
-[x] - Opens last exception in IDE (None)
+[x] - Open last exception (or project) in IDE (none)
 
 == HTTP
 
@@ -198,16 +204,17 @@ There are various hotkeys you can use to control continuous testing. Pressing `h
 == System
 
 [s] - Force restart
+[e] - Edits the command line parameters and restarts ()
 [i] - Toggle instrumentation based reload (disabled)
 [l] - Toggle live reload (enabled)
 [j] - Toggle log levels (INFO)
-[h] - Shows this help
-[:] - Enters terminal mode
-[q] - Quits the application
+[h] - Show this help
+[:] - Enter terminal mode
+[q] - Quit the application
 
 --
 Tests paused
-Press [r] to resume testing, [o] Toggle test output, [:] for the terminal, [h] for more options>
+Press [e] to edit command line args (currently ''), [r] to resume testing, [o] Toggle test output, [:] for the terminal, [h] for more options>
 ----
 
 Quarkus also provides a new experimental Dev UI, which is available in dev mode (when you start quarkus with mvn quarkus:dev) at `/q/dev` by default. It allows you to quickly visualize all the extensions currently loaded, see their status and go directly to their documentation.
@@ -617,7 +624,7 @@ quarkus.kubernetes-client.trust-certs=true<1>
 quarkus.kubernetes.deploy=true<2>
 quarkus.kubernetes.deployment-target=openshift<3>
 quarkus.openshift.build-strategy=docker<4>
-quarkus.openshift.expose=true<5>
+quarkus.openshift.route.expose=true<5>
 ----
 
 <1> We are using self-signed certs in this simple example, so this simply says to the extension to trust them.
