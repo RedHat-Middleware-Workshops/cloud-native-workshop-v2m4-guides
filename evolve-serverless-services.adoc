@@ -643,7 +643,7 @@ spec:
   - name: git-revision
     type: string
     description: revision to be used from repo of the code for deployment
-    default: pipelines-1.8
+    default: pipelines-1.11
   - name: IMAGE
     type: string
     description: image to be build from the code
@@ -730,7 +730,7 @@ This dialog box is where you bind the final target values for the source repo of
 
 * deployment-name: `pipelines-vote-api`
  * git-url: `https://github.com/openshift/pipelines-vote-api.git`
- * git-revision: `pipelines-1.8`
+ * git-revision: `pipelines-1.11`
  * IMAGE: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/pipelines-vote-api`
  * shared-workspace: `source-pvc` in *PVC*
 
@@ -744,7 +744,7 @@ Let's run the pipeline to deploy `vote-ui` application. Go back to {{ CONSOLE_UR
 
  * deployment-name: `pipelines-vote-ui`
  * git-url: `https://github.com/openshift/pipelines-vote-ui.git`
- * git-revision: `pipelines-1.8`
+ * git-revision: `pipelines-1.11`
  * IMAGE: `image-registry.openshift-image-registry.svc:5000/{{ USER_ID }}-cloudnative-pipeline/pipelines-vote-ui`
  * shared-workspace: `source-pvc` in *PVC*
 
