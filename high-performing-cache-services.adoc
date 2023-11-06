@@ -230,67 +230,6 @@ image::quarkus-devui.png[devui-endpoint, 800]
 
 Be sure to terminate the running Quarkus development via kbd:[CTRL+C].
 
-*In production*, the inventory service will connect to _PostgeSQL_ on OpenShift cluster.
-
-We will use _Quarkus extension_ to add *PostgreSQL JDBC Driver*. Go back to VS Code Terminal and run the following
-maven plugin:
-
-[source,sh,role="copypaste"]
-----
-mvn quarkus:add-extension -Dextensions="jdbc-postgresql" -f $PROJECT_SOURCE/inventory-service
-----
-
-You should see in the output:
-
-[source,console]
-----
-[INFO] [SUCCESS] ✅  Extension io.quarkus:quarkus-jdbc-postgresql has been installed
-----
-
-First, open a new brower with the {{ CONSOLE_URL }}[OpenShift web console^]:
-
-image::openshift_login.png[openshift_login, 700]
-
-Login using:
-
-* Username: `{{ USER_ID }}`
-* Password: `{{ OPENSHIFT_USER_PASSWORD }}`
-
-You will see a list of projects to which you have access:
-
-image::openshift_landing.png[openshift_landing, 700]
-
-[NOTE]
-====
-The project displayed in the landing page depends on which labs you will run today. If you will develop
-`Service Mesh and Identity` then you will see pre-created projects as the above screenshot.
-====
-
-Open the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^].
-
-Our production inventory microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new
-instance of PostgreSQL. *Right-Click* on the _Topology_ view. Then, click on _Database_ in the *Add to Project* popup menu in *{{ USER_ID }}-cloudnativeapps* project:
-
-image::db.png[db, 700]
-
-Type in `postgres` in the search box, and click on the *PostgreSQL (ephemeral)*:
-
-image::db-postgres.png[db, 700]
-
-Click on *Instantiate Template* and fill in the following fields, leaving the others as their default values:
-
-* *Namespace*: _choose `{{ USER_ID }}-cloudnativeapps` for the first Namespace. Leave the second one as `openshift`_
-* *Database Service Name*: `inventory-database`
-* *PostgreSQL Connection Username*: `inventory`
-* *PostgreSQL Connection Password*: `mysecretpassword`
-* *PostgreSQL Database Name*: `inventory`
-
-image::db-postgres-inventory-values.png[db, 700]
-
-This will deploy the database to our new project. Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] to see it:
-
-image::inventory-database-deployment.png[inventory_db_deployments, 700]
-
 Although your VS Code is running on the Kubernetes cluster, it's running with a default restricted _Service Account_ that prevents you from creating most resource types. So we'll log in with your workshop user. Execute the following command in the VS Code terminal:
 
 [source,sh,role="copypaste"]
@@ -318,11 +257,52 @@ You have access to the following projects and can switch between them with 'oc p
 Using project "{{ USER_ID }}-devspaces".
 ----
 
-Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
+Our production inventory microservice will use an external database (PostgreSQL) to house inventory data. First, deploy a new instance of PostgreSQL using the following `oc` command.
+
+[source,shell,role="copypaste"]
+----
+oc project {{ USER_ID }}-cloudnativeapps && \
+oc new-app --name inventory-database -e POSTGRESQL_USER=inventory -e POSTGRESQL_PASSWORD=mysecretpassword -e POSTGRESQL_DATABASE=inventory registry.redhat.io/rhel9/postgresql-15
+----
+
+Open a new brower with the {{ CONSOLE_URL }}[OpenShift web console^]:
+
+image::openshift_login.png[openshift_login, 700]
+
+Login using:
+
+* Username: `{{ USER_ID }}`
+* Password: `{{ OPENSHIFT_USER_PASSWORD }}`
+
+You will see a list of projects to which you have access:
+
+image::openshift_landing.png[openshift_landing, 700]
+
+[NOTE]
+====
+The project displayed in the landing page depends on which labs you will run today. If you will develop
+`Service Mesh and Identity` then you will see pre-created projects as the above screenshot.
+====
+
+Open the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^].
+
+This will deploy the database to our new project. Click on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] to see it:
+
+image::inventory-database-deployment.png[inventory_db_deployments, 700]
+
+Now let's deploy the application itself. Open the `application.properties` in the *src/main/resources* directory. Append the following configurations.
+
+[source,properties,role="copypaste"]
+----
+%prod.quarkus.openshift.deployment-kind=Deployment
+%prod.quarkus.container-image.group={{ USER_ID }}-cloudnativeapps
+%prod.quarkus.container-image.registry=image-registry.openshift-image-registry.svc:5000
+----
+
+Run the following command which will build and deploy using the OpenShift extension:
 
 [source,sh,role="copypaste"]
 ----
-oc project {{ USER_ID }}-cloudnativeapps && \
 mvn clean compile package -DskipTests -f $PROJECT_SOURCE/inventory-service
 ----
 
@@ -341,10 +321,10 @@ And label the items with proper icons:
 
 [source,sh,role="copypaste"]
 ----
-oc label dc/inventory app.kubernetes.io/part-of=inventory --overwrite && \
-oc label dc/inventory-database app.kubernetes.io/part-of=inventory app.openshift.io/runtime=postgresql --overwrite && \
-oc annotate dc/inventory app.openshift.io/connects-to=inventory-database --overwrite && \
-oc annotate dc/inventory app.openshift.io/vcs-ref=ocp-4.14 --overwrite
+oc label deployment/inventory app.kubernetes.io/part-of=inventory --overwrite && \
+oc label deployment/inventory-database app.kubernetes.io/part-of=inventory app.openshift.io/runtime=postgresql --overwrite && \
+oc annotate deployment/inventory app.openshift.io/connects-to=inventory-database --overwrite && \
+oc annotate deployment/inventory app.openshift.io/vcs-ref=ocp-4.14 --overwrite
 ----
 
 Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^], make sure it's done deploying (dark blue circle):
@@ -352,6 +332,11 @@ Back on the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology
 image::inventory_topology.png[inventory, 700]
 
 Click on the small arrow icon as shown above and you will see inventories:
+
+[NOTE]
+====
+In case you can't access the web page, please check if your web browser (e.g., Chrome) redirects to the page using `HTTPS` protocol. You must access the page using `HTTP` protocol.
+====
 
 image::inventory_topology_openurl.png[inventory, 700]
 
@@ -490,7 +475,7 @@ Let's create a simple version of the *cache service* in our cluster. Open the Te
 
 [source,sh,role="copypaste"]
 ----
-oc new-app --as-deployment-config quay.io/openshiftlabs/ccn-infinispan:12.0.0.Final-1 --name=datagrid-service -e USER=user -e PASS=pass
+oc new-app quay.io/openshiftlabs/ccn-infinispan:12.0.0.Final-1 --name=datagrid-service -e USER=user -e PASS=pass
 ----
 
 This will create a single instance of the Data Grid server to store our shopping carts.
@@ -626,6 +611,9 @@ quarkus.kubernetes.deploy=true<2>
 quarkus.kubernetes.deployment-target=openshift<3>
 quarkus.openshift.build-strategy=docker<4>
 quarkus.openshift.route.expose=true<5>
+quarkus.openshift.deployment-kind=Deployment<6>
+quarkus.container-image.group={{ USER_ID }}-cloudnativeapps<7>
+quarkus.container-image.registry=image-registry.openshift-image-registry.svc:5000<8>
 ----
 
 <1> We are using self-signed certs in this simple example, so this simply says to the extension to trust them.
@@ -633,6 +621,9 @@ quarkus.openshift.route.expose=true<5>
 <3> Instructs the extension to generate and create the OpenShift resources (like `DeploymentConfig` and `Service`) after building the container
 <4> Set the Docker build strategy
 <5> Instructs the extension to generate an OpenShift `Route`
+<6> Generate the Deployment resource
+<7> Specify a project where the application is deployed
+<8> Sepcify an internal container registry to push an application image
 
 *Docker build* strategy builds the artifacts (JAR files or a native executable) outside the OpenShift cluster, either locally or in a CI environment, and then provides them to the OpenShift build system together with a Dockerfile. The container is built inside the OpenShift cluster and provided as an image stream.
 
@@ -649,7 +640,7 @@ Finally, make sure it's actually done rolling out:
 
 [source,sh,role="copypaste"]
 ----
-oc rollout status -w dc/cart
+oc rollout status -w deployment/cart
 ----
 
 Wait for that command to report *replication controller _cart-1_ successfully rolled out* before continuing.
@@ -658,10 +649,10 @@ And label the items with proper icons:
 
 [source,sh,role="copypaste"]
 ----
-oc label dc/cart app.kubernetes.io/part-of=cart app.openshift.io/runtime=quarkus --overwrite && \
-oc label dc/datagrid-service app.kubernetes.io/part-of=cart app.openshift.io/runtime=datagrid --overwrite && \
-oc annotate dc/cart app.openshift.io/connects-to=catalog,datagrid-service --overwrite && \
-oc annotate dc/cart app.openshift.io/vcs-ref=ocp-4.14 --overwrite
+oc label deployment/cart app.kubernetes.io/part-of=cart app.openshift.io/runtime=quarkus --overwrite && \
+oc label deployment/datagrid-service app.kubernetes.io/part-of=cart app.openshift.io/runtime=datagrid --overwrite && \
+oc annotate deployment/cart app.openshift.io/connects-to=catalog,datagrid-service --overwrite && \
+oc annotate deployment/cart app.openshift.io/vcs-ref=ocp-4.14 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the catalog, and ensure you get the blue circles!
@@ -761,11 +752,20 @@ quarkus.mongodb.connection-string=mongodb://order-database:27017
 quarkus.mongodb.database=order
 ----
 
+Append the following configureations for the OpenShift Deployment in the `application.properties` as well.
+
+[source,sh,role="copypaste"]
+----
+quarkus.openshift.deployment-kind=Deployment<6>
+quarkus.container-image.group={{ USER_ID }}-cloudnativeapps<7>
+quarkus.container-image.registry=image-registry.openshift-image-registry.svc:5000<8>
+----
+
 Run the following `oc` command to deploy a `MongoDB` to OpenShift via VS Code Terminal:
 
 [source,sh,role="copypaste"]
 ----
-oc new-app -n {{ USER_ID }}-cloudnativeapps  --as-deployment-config --docker-image quay.io/openshiftlabs/ccn-mongo:4.0 --name=order-database
+oc new-app -n {{ USER_ID }}-cloudnativeapps  --docker-image quay.io/openshiftlabs/ccn-mongo:4.0 --name=order-database
 ----
 
 Now let's deploy the application itself. Run the following command which will build and deploy using the OpenShift extension:
@@ -781,19 +781,19 @@ Finally, make sure it's actually done rolling out:
 
 [source,sh,role="copypaste"]
 ----
-oc rollout status -w dc/order
+oc rollout status -w deployment/order
 ----
 
-Wait for that command to report *replication controller _order-1_ successfully rolled out* before continuing.
+Wait for that command to report *deployment "order" successfully rolled out* before continuing.
 
 And label the items with proper icons:
 
 [source,sh,role="copypaste"]
 ----
-oc label dc/order app.kubernetes.io/part-of=order --overwrite && \
-oc label dc/order-database app.kubernetes.io/part-of=order app.openshift.io/runtime=mongodb --overwrite && \
-oc annotate dc/order app.openshift.io/connects-to=order-database --overwrite && \
-oc annotate dc/order app.openshift.io/vcs-ref=ocp-4.14 --overwrite
+oc label deployment/order app.kubernetes.io/part-of=order --overwrite && \
+oc label deployment/order-database app.kubernetes.io/part-of=order app.openshift.io/runtime=mongodb --overwrite && \
+oc annotate deployment/order app.openshift.io/connects-to=order-database --overwrite && \
+oc annotate deployment/order app.openshift.io/vcs-ref=ocp-4.14 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the orders. Ensure you get the blue circles!

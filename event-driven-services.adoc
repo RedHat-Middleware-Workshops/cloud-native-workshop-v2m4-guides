@@ -249,6 +249,15 @@ mp.messaging.incoming.orders.request.timeout.ms=30000
 quarkus.vertx.max-event-loop-execute-time=30000
 ----
 
+Append the following configureations for the OpenShift Deployment in the `application.properties` as well.
+
+[source,sh,role="copypaste"]
+----
+quarkus.openshift.deployment-kind=Deployment<6>
+quarkus.container-image.group={{ USER_ID }}-cloudnativeapps<7>
+quarkus.container-image.registry=image-registry.openshift-image-registry.svc:5000<8>
+----
+
 Build and deploy the project using using the OpenShift extension, which will use the maven plugin to deploy via VS Code Terminal:
 
 [source,sh,role="copypaste"]
@@ -261,18 +270,18 @@ Make sure it's actually done rolling out:
 
 [source,sh,role="copypaste"]
 ----
-oc rollout status -w dc/payment
+oc rollout status -w deployment/payment
 ----
 
-Wait for that command to report *replication controller _payment-1_ successfully rolled out* before continuing.
+Wait for that command to report *deployment "payment" successfully rolled out* before continuing.
 
 And label the items with proper icons:
 
 [source,sh,role="copypaste"]
 ----
-oc label dc/payment app.kubernetes.io/part-of=payment --overwrite && \
-oc annotate dc/payment app.openshift.io/connects-to=my-cluster --overwrite && \
-oc annotate dc/payment app.openshift.io/vcs-ref=ocp-4.14 --overwrite
+oc label deployment/payment app.kubernetes.io/part-of=payment --overwrite && \
+oc annotate deployment/payment app.openshift.io/connects-to=my-cluster --overwrite && \
+oc annotate deployment/payment app.openshift.io/vcs-ref=ocp-4.14 --overwrite
 ----
 
 Finally, make sure it’s actually done rolling out. Visit the {{ CONSOLE_URL }}/topology/ns/{{ USER_ID }}-cloudnativeapps[Topology View^] for the orders. Ensure you get the blue circles!
@@ -430,8 +439,8 @@ Re-package the _cart service_ using the following command, which will use the ma
 [source,sh,role="copypaste"]
 ----
 mvn clean package -DskipTests -DskipTests -f $PROJECT_SOURCE/cart-service && \
-oc label dc/cart app.kubernetes.io/part-of=cart --overwrite &&  \
-oc annotate dc/cart app.openshift.io/connects-to=my-cluster,datagrid-service --overwrite
+oc label deployment/cart app.kubernetes.io/part-of=cart --overwrite &&  \
+oc annotate deployment/cart app.openshift.io/connects-to=my-cluster,datagrid-service --overwrite
 ----
 
 === 4. Adding Kafka Client to Order Service
@@ -550,8 +559,8 @@ Re-package the order service using the following command, which will use the mav
 [source,sh,role="copypaste"]
 ----
 mvn clean package -DskipTests -f $PROJECT_SOURCE/order-service && \
-oc label dc/order app.kubernetes.io/part-of=order --overwrite &&  \
-oc annotate dc/order app.openshift.io/connects-to=my-cluster,order-database --overwrite
+oc label deployment/order app.kubernetes.io/part-of=order --overwrite &&  \
+oc annotate deployment/order app.openshift.io/connects-to=my-cluster,order-database --overwrite
 ----
 
 Wait for all of the rebuilds and redeployments to complete, and you have all your blue circles!

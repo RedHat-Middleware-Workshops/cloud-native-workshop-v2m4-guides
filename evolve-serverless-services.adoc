@@ -285,7 +285,7 @@ We also will delete our existing payment _deployment_ and _route_ since Knative 
 
 [source,sh,role="copypaste"]
 ----
-oc delete dc/payment route/payment svc/payment
+oc delete deployment/payment route/payment svc/payment
 ----
 
 === 3. Enable Knative Eventing integration with Apache Kafka Event
@@ -324,6 +324,9 @@ And delete the configuration for the incoming stream. In `application.properties
 # quarkus.kubernetes.deployment-target=openshift
 # quarkus.openshift.build-strategy=docker
 # quarkus.openshift.expose=true
+# quarkus.openshift.deployment-kind=Deployment
+# quarkus.container-image.group={{ USER_ID }}-cloudnativeapps
+# quarkus.container-image.registry=image-registry.openshift-image-registry.svc:5000
 
 ...
 
@@ -591,7 +594,7 @@ You will see the following clustertasks:
 [source,sh]
 ----
 buildah                     Buildah task builds...   1 week ago
-buildah-1-10-0              Buildah task builds...   1 week ago
+buildah-1-12-0              Buildah task builds...   1 week ago
 ----
 
 A pipeline defines a number of tasks that should be executed and how they interact with each other via their inputs and outputs.
@@ -626,7 +629,7 @@ Next, click the `+` button at the upper right, and paste in the following YAML a
 
 [source,yaml,role="copypaste"]
 ----
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: build-and-deploy
